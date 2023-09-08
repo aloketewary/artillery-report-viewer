@@ -1,0 +1,22 @@
+<input type="file" class="file-input" [accept]="requiredFileType" (change)="onFileSelected($event)" #fileUpload>
+
+<div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+  <div class="mat-body-2 margin-10-r">{{fileName || "upload report json"}}</div>
+
+  <button mat-mini-fab color="accent" class="upload-btn" (click)="fileUpload.click()" *ngIf="!isFileUpload">
+    <mat-icon  class="material-symbols-outlined">attach_file</mat-icon>
+  </button>
+  <button mat-mini-fab color="accent" class="upload-btn" (click)="reset();" *ngIf="isFileUpload">
+    <mat-icon  class="material-symbols-outlined">clear</mat-icon>
+  </button>
+</div>
+
+<div class="progress">
+
+  <mat-progress-bar class="progress-bar" mode="determinate" [value]="uploadProgress" *ngIf="uploadProgress">
+
+  </mat-progress-bar>
+
+  <mat-icon class="cancel-upload" (click)="cancelUpload()" *ngIf="uploadProgress">delete_forever</mat-icon>
+
+</div>

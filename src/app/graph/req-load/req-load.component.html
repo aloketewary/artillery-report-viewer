@@ -1,0 +1,28 @@
+<div class="card-container">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Requests / Response Over Time</mat-card-title>
+      <span class="space"></span>
+      <mat-form-field appearance="outline">
+        <mat-label>Filter Resp Http Codes</mat-label>
+        <mat-select [formControl]="selectedHttpCodes" multiple>
+          <mat-select-trigger>
+            {{selectedHttpCodes.value?.[0] || ''}}
+            <span *ngIf="(selectedHttpCodes.value?.length || 0) > 1" class="example-additional-selection">
+              (+{{(selectedHttpCodes.value?.length || 0) - 1}} {{selectedHttpCodes.value?.length === 2 ? 'other' : 'others'}})
+            </span>
+          </mat-select-trigger>
+          <mat-option *ngFor="let codes of httpCodeLists" [value]="codes">{{codes}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-divider class="margin-10-tb">
+      </mat-divider>
+      <div echarts [options]="options" [theme]="isDarkMode ? 'dark': ''" class="chart" *ngIf="isDataAvailable"></div>
+      <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full" *ngIf="!isDataAvailable">
+        <div class="mat-subtitle-1">No results to display!</div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

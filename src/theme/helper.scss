@@ -1,0 +1,106 @@
+$no: 0px;
+$xs: 5px;
+$sm: 10px;
+$md: 15px;
+$lg: 20px;
+$xl: 25px;
+$xs-: -1*$xs;
+$sm-: -1*$sm;
+$md-: -1*$md;
+$lg-: -1*$lg;
+$xl-: -1*$xl;
+
+$listVariable: $no $xs $sm $md $lg $xl $xs- $sm- $md- $lg- $xl-;
+$listName: no xs sm md lg xl xs- sm- md- lg- xl-;
+$listProperty: margin padding;
+
+@each $property in $listProperty {
+	@each $item in $listName {
+		.#{$property}-#{$item} {
+			$thisItem: index($listName, $item);
+			$varItem: nth($listVariable, $thisItem);
+			#{$property}: $varItem;
+			&-t {
+				#{$property}-top: $varItem;
+			}
+			&-r {
+				#{$property}-right: $varItem;
+			}
+			&-b {
+				#{$property}-bottom: $varItem;
+			}
+			&-l {
+				#{$property}-left: $varItem;
+			}
+			&-tb {
+				#{$property}-top: $varItem;
+				#{$property}-bottom: $varItem;
+			}
+			&-lr {
+				#{$property}-left: $varItem;
+				#{$property}-right: $varItem;
+			}
+		}
+	}
+}
+
+@each $prop in $listProperty {
+	@for $i from -100 through 100 {
+		.#{$prop} {
+			&-#{$i} {
+				#{$prop}: #{$i+"px"};
+			}
+			&-#{$i}-t {
+				#{$prop}-top: #{$i+"px"};
+			}
+			&-#{$i}-r {
+				#{$prop}-right: #{$i+"px"};
+			}
+			&-#{$i}-b {
+				#{$prop}-bottom: #{$i+"px"};
+			}
+			&-#{$i}-l {
+				#{$prop}-left: #{$i+"px"};
+			}
+			&-#{$i}-tb {
+				#{$prop}-top: #{$i+"px"};
+				#{$prop}-bottom: #{$i+"px"};
+			}
+			&-#{$i}-lr {
+				#{$prop}-left: #{$i+"px"};
+				#{$prop}-right: #{$i+"px"};
+			}
+		}
+	}
+}
+
+
+@each $prop in $listProperty {
+  @for $i from -100 through 100 {
+    .#{$prop} {
+      &-#{$i} {
+        #{$prop}: #{$i+"px"} !important;
+      }
+      &-#{$i}-t {
+        #{$prop}-top: #{$i+"px"} !important;
+      }
+      &-#{$i}-r {
+        #{$prop}-right: #{$i+"px"} !important;
+      }
+      &-#{$i}-b {
+        #{$prop}-bottom: #{$i+"px"} !important;
+      }
+      &-#{$i}-l {
+        #{$prop}-left: #{$i+"px"} !important;
+      }
+      &-#{$i}-tb {
+        #{$prop}-top: #{$i+"px"} !important;
+        #{$prop}-bottom: #{$i+"px"} !important;
+      }
+      &-#{$i}-lr {
+        #{$prop}-left: #{$i+"px"} !important;
+        #{$prop}-right: #{$i+"px"} !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,125 @@
+<div class="card-container">
+  <div fxLayout="row wrap" fxLayoutAlign="space-between start">
+    <mat-card appearance="outlined" fxFlex.gt-sm="48" fxFlex="100">
+      <mat-card-header>
+        <mat-card-title>Scenarios</mat-card-title>
+        <!-- <mat-card-subtitle>subtitle</mat-card-subtitle> -->
+      </mat-card-header>
+      <mat-card-content>
+        <mat-divider class="margin-10-tb">
+        </mat-divider>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0px" class="flex-full">
+          <div class="mat-subtitle-2">Timestamp</div>
+          <div class="space"></div>
+          <div class="mat-subtitle-2">{{formatDate(report?.aggregate?.timestamp)}}</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0px" class="flex-full">
+          <div class="mat-subtitle-2">Scenarios Created</div>
+          <div class="space"></div>
+          <div class="mat-subtitle-2">{{formatNumber(report?.aggregate?.scenariosCreated)}}</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0px" class="flex-full">
+          <div class="mat-subtitle-2">Scenarios Completed</div>
+          <div class="space"></div>
+          <div class="mat-subtitle-2">{{formatNumber(report?.aggregate?.scenariosCompleted)}}</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0px" class="flex-full">
+          <div class="mat-subtitle-2">Total Requests Completed</div>
+          <div class="space"></div>
+          <div class="mat-subtitle-2">{{formatNumber(report?.aggregate?.requestsCompleted)}}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <mat-card appearance="outlined" fxFlex.gt-sm="48" fxFlex="100" ngClass.lt-md="margin-10-t">
+      <mat-card-header>
+        <mat-card-title>Aggregate Latency</mat-card-title>
+        <!-- <mat-card-subtitle>subtitle</mat-card-subtitle> -->
+      </mat-card-header>
+      <mat-card-content>
+        <mat-divider class="margin-10-tb">
+        </mat-divider>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0px" class="flex-full">
+          <div class="mat-subtitle-2">Shortest Call</div>
+          <div class="space"></div>
+          <div class="mat-subtitle-2">{{formatNumber(report?.aggregate?.latency?.min)}} ms</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0px" class="flex-full">
+          <div class="mat-subtitle-2">Longest Call</div>
+          <div class="space"></div>
+          <div class="mat-subtitle-2">{{formatNumber(report?.aggregate?.latency?.max)}} ms</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0px" class="flex-full">
+          <div class="mat-subtitle-2">Requests per second</div>
+          <div class="space"></div>
+          <div class="mat-subtitle-2">{{formatNumber(report?.aggregate?.rps?.mean)}} rps</div>
+        </div>
+        <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0px" class="flex-full">
+          <div class="mat-subtitle-2">Median Response Time</div>
+          <div class="space"></div>
+          <div class="mat-subtitle-2">{{formatNumber(report?.aggregate?.latency?.median)}} ms</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+  <div fxLayout="row wrap" fxLayoutAlign="space-between start" fxLayoutGap class="margin-10-t">
+    <mat-card appearance="outlined" fxFlex.gt-sm="48" fxFlex="100">
+      <mat-card-header>
+        <mat-card-title>Http code counts</mat-card-title>
+        <!-- <mat-card-subtitle>subtitle</mat-card-subtitle> -->
+      </mat-card-header>
+      <mat-card-content>
+        <mat-divider class="margin-10-tb">
+        </mat-divider>
+        <ng-container *ngIf="httpCodeDetails.length > 0; else elseTemplate">
+          <mat-list>
+            <mat-list-item *ngFor="let item of httpCodeDetails">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+                <div fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="0px">
+                  <span class="mat-subtitle-2">{{item.key}}</span>
+                  <span class="mat-caption">{{item.details}}</span>
+                </div>
+                <span class="space"></span>
+                <span class="mat-subtitle-2">{{formatNumber(item.value)}}</span>
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </ng-container>
+        <ng-template #elseTemplate>
+          <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full">
+            <div class="mat-subtitle-1">No results to display!</div>
+          </div>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+    <mat-card appearance="outlined" fxFlex.gt-sm="48" fxFlex="100" ngClass.lt-md="margin-10-t">
+      <mat-card-header>
+        <mat-card-title>Network Errors</mat-card-title>
+        <!-- <mat-card-subtitle>subtitle</mat-card-subtitle> -->
+      </mat-card-header>
+      <mat-card-content>
+        <mat-divider class="margin-10-tb">
+        </mat-divider>
+        <ng-container *ngIf="networkErrors.length > 0; else elseTemplate">
+          <mat-list>
+            <mat-list-item *ngFor="let item of networkErrors">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
+                <div fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="0px">
+                  <span class="mat-subtitle-2">{{item.key}}</span>
+                  <span class="mat-caption">{{item.details}}</span>
+                </div>
+                <span class="space"></span>
+                <span class="mat-subtitle-2">{{formatNumber(item.value)}}</span>
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </ng-container>
+        <ng-template #elseTemplate>
+          <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full">
+            <div class="mat-subtitle-1">No results to display!</div>
+          </div>
+        </ng-template>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

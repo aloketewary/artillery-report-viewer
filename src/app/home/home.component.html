@@ -1,0 +1,35 @@
+<div [ngClass]="{'arv-dark': isDarkMode }">
+  <mat-toolbar class="example-header" color="primary">
+    <button mat-icon-button color="accent" aria-label="Example icon button with a menu icon" (click)="sidenav.toggle()" *ngIf="false">
+      <mat-icon class="material-symbols-outlined">menu</mat-icon>
+    </button>
+    <div class="mat-headline-6 margin-0" matBadge="v3" matBadgeOverlap="false" [matBadgeColor]="isDarkMode ? 'accent' : 'warn'" fxHide.xs>Artillery Report Viewer</div>
+    <div class="mat-headline-6 margin-0" matBadge="v3" matBadgeOverlap="false" [matBadgeColor]="isDarkMode ? 'accent' : 'warn'" fxHide.gt-xs>ARV</div>
+    <div class="space"></div>
+    <app-file-upload #fileUploadComp [requiredFileType]="'.json'" (onFileProcess)="onReportUploadAndProcessed($event)" (onReset)="reset($event)" [isReset]="isReset"></app-file-upload>
+    <button mat-icon-button (click)="isDarkMode = !isDarkMode"><mat-icon class="material-symbols-outlined">{{ isDarkMode ? 'dark_mode' : 'light_mode'}}</mat-icon></button>
+  </mat-toolbar>
+
+  <mat-sidenav-container class="example-container">
+    <mat-sidenav #sidenav mode="side" class="example-sidenav" [fixedInViewport]="options.value.fixed"
+      [fixedTopGap]="options.value.top" [fixedBottomGap]="options.value.bottom">
+      {{options.value.fixed ? 'Fixed' : 'Non-fixed'}} Sidenav
+    </mat-sidenav>
+
+    <mat-sidenav-content [formGroup]="options">
+      <app-message *ngIf="!reportState.isLoaded"></app-message>
+      <app-overview *ngIf="reportState.isLoaded" [reportState]="reportState" [isDarkMode]="isDarkMode"></app-overview>
+      <app-info [isLoaded]="reportState.isLoaded" [reportStat]="reportState.report" [hasCustomMetrics]="reportState.hasCustomReportMetrics"
+      (onDownloadButtonHit)="onDownloadHit($event)"></app-info>
+      <app-scenario *ngIf="reportState.isLoaded" [reportState]="reportState"></app-scenario>
+      <app-phases *ngIf="reportState.isLoaded" [isLoaded]="reportState.isLoaded" [reportStat]="reportState.report"></app-phases>
+      <app-latency *ngIf="reportState.isLoaded" [reportState]="reportState" [isDarkMode]="isDarkMode"></app-latency>
+      <app-req-load *ngIf="reportState.isLoaded" [reportState]="reportState" [isDarkMode]="isDarkMode"></app-req-load>
+      <app-http-code *ngIf="reportState.isLoaded" [reportState]="reportState" [isDarkMode]="isDarkMode"></app-http-code>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+
+  <!-- <mat-toolbar class="example-footer">Footer</mat-toolbar> -->
+  <!--  -->
+
+</div>

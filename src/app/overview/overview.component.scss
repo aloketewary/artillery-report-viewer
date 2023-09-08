@@ -1,0 +1,22 @@
+.card {
+  &-container {
+    margin: 8px 24px;
+  }
+  &-bg-icon {
+    position: absolute;
+    right: 0;
+  }
+  &-icon {
+    font-size: 120px !important;
+    height: 102px !important;
+    width: 170px !important;
+    opacity: 0.3;
+    vertical-align: bottom;
+    text-align: right;
+  }
+  &-detail {
+    width: 250px;
+    height: 120px;
+    margin: 8px;
+  }
+}

@@ -1,0 +1,11 @@
+svg {
+  &.rating-full {
+    fill: #ffd055;
+  }
+  &.rating-half {
+    fill: #ffebb9;
+  }
+  &.rating-none {
+    fill: #404040;
+  }
+}

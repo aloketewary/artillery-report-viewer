@@ -1,0 +1,133 @@
+<div class="card-container">
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Overall Performance Stats</mat-card-title>
+      <span class="space"></span>
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="3px">
+        <app-star [rating]="overview.overallRating ?? 0"></app-star>
+        <span class="mat-subtitle-2">{{overview.overallRating ?? 0}}/5</span>
+      </div>
+      <!-- <mat-card-subtitle>subtitle</mat-card-subtitle> -->
+    </mat-card-header>
+    <mat-card-content>
+      <mat-divider class="margin-10-tb">
+      </mat-divider>
+      <div fxLayout="row wrap" fxLayoutAlign="space-between center" fxLayoutGap>
+        <mat-card appearance="outlined" class="card-detail" fxFlex.gt-md="23" fxFlex.gt-sm="30" fxFlex.gt-xs="43" fxFlex.xs="100">
+          <mat-card-content>
+            <div class="card-bg-icon">
+              <mat-icon class="card-icon material-symbols-outlined" color="primary">avg_pace</mat-icon>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+              <div class="mat-body-2 margin--5-tb margin-0-rl">Average Load</div>
+              <div class="space"></div>
+              <div class="mat-headline-4 margin-8-b">{{formatNumber(overview.avgLoad) || 0}}</div>
+              <div class="mat-caption text-tranc text-nowrap">Median requests / second</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card appearance="outlined" class="card-detail" fxFlex.gt-md="23" fxFlex.gt-sm="30" fxFlex.gt-xs="43" fxFlex.xs="100">
+          <mat-card-content>
+            <div class="card-bg-icon">
+              <mat-icon class="card-icon material-symbols-outlined" color="primary">hourglass_bottom</mat-icon>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+              <div class="mat-body-2 margin--5-tb margin-0-rl">Response Time</div>
+              <div class="space"></div>
+              <div class="mat-headline-4 margin-8-b">{{formatNumber(overview.responseTime)  || 0}}</div>
+              <div class="mat-caption text-tranc text-nowrap">Median response time (ms)</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card appearance="outlined" class="card-detail" fxFlex.gt-md="23" fxFlex.gt-sm="30" fxFlex.gt-xs="43" fxFlex.xs="100">
+          <mat-card-content>
+            <div class="card-bg-icon">
+              <mat-icon class="card-icon material-symbols-outlined" color="warn">info</mat-icon>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+              <div class="mat-body-2 margin--5-tb margin-0-rl">Bad Requests</div>
+              <div class="space"></div>
+              <div class="mat-headline-4 margin-8-b">{{formatNumber(overview.badReqCount) || 0}}</div>
+              <div class="mat-caption text-tranc text-nowrap">400+ Response codes</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card appearance="outlined" class="card-detail" fxFlex.gt-md="23" fxFlex.gt-sm="30" fxFlex.gt-xs="43" fxFlex.xs="100">
+          <mat-card-content>
+            <div class="card-bg-icon">
+              <mat-icon class="card-icon material-symbols-outlined" color="warn">warning</mat-icon>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+              <div class="mat-body-2 margin--5-tb margin-0-rl">Errors</div>
+              <div class="space"></div>
+              <div class="mat-headline-4 margin-8-b">{{formatNumber(overview.serverErrCount) || 0}}</div>
+              <div class="mat-caption text-tranc text-nowrap">500+ Response codes</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card appearance="outlined" class="card-detail" fxFlex.gt-md="23" fxFlex.gt-sm="30" fxFlex.gt-xs="43" fxFlex.xs="100">
+          <mat-card-content>
+            <div class="card-bg-icon">
+              <mat-icon class="card-icon material-symbols-outlined" color="primary">tag</mat-icon>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+              <div class="mat-body-2 margin--5-tb margin-0-rl">Requests</div>
+              <div class="space"></div>
+              <div class="mat-headline-4 margin-8-b">{{formatNumber((overview.httpCodeCount ?? 0) + (overview.networkErrCount ?? 0))  || 0}}</div>
+              <div class="mat-caption text-tranc text-nowrap">Total Requests</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card appearance="outlined" class="card-detail" fxFlex.gt-md="23" fxFlex.gt-sm="30" fxFlex.gt-xs="43" fxFlex.xs="100">
+          <mat-card-content>
+            <div class="card-bg-icon">
+              <mat-icon class="card-icon material-symbols-outlined" color="primary">percent</mat-icon>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+              <div class="mat-body-2 margin--5-tb margin-0-rl">Success Rate</div>
+              <div class="space"></div>
+              <div class="mat-headline-4 margin-8-b">{{overview.successPercent}}%</div>
+              <div class="mat-caption text-tranc text-nowrap">Successful Reqs / Total Reqs</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card appearance="outlined" class="card-detail" fxFlex.gt-md="23" fxFlex.gt-sm="30" fxFlex.gt-xs="43" fxFlex.xs="100">
+          <mat-card-content>
+            <div class="card-bg-icon">
+              <mat-icon class="card-icon material-symbols-outlined" color="primary">monitor_heart</mat-icon>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0px" class="flex-full margin-0-b">
+                <div class="mat-body-2 margin--5-tb margin-0-rl">Health</div>
+                <span class="space"></span>
+                <span class="badge badge-error">beta</span>
+              </div>
+              <div class="mat-headline-4 margin-8-b">{{ convertHealthRatingToText(overview.health ?? 0) }}</div>
+              <div class="mat-caption text-tranc text-nowrap">Estimated Health</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+        <mat-card appearance="outlined" class="card-detail" fxFlex.gt-md="23" fxFlex.gt-sm="30" fxFlex.gt-xs="43" fxFlex.xs="100">
+          <mat-card-content>
+            <div class="card-bg-icon">
+              <mat-icon class="card-icon material-symbols-outlined" color="accent">show_chart</mat-icon>
+            </div>
+            <div fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="8px">
+              <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0px" class="flex-full margin-0-b">
+                <div class="mat-body-2 margin--5-tb margin-0-rl">Performance</div>
+                <span class="space"></span>
+                <span class="badge badge-error">beta</span>
+              </div>
+              <div class="mat-headline-4 margin-8-b">{{ convertPerfRatingToText(overview.performance ?? 0)}}</div>
+              <div class="mat-caption text-tranc text-nowrap">Estimated Performance</div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<ng-template #singleInfo>
+
+</ng-template>
