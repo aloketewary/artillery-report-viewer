@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FileUploadComponent } from './file-upload.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 
 describe('FileUploadComponent', () => {
   let component: FileUploadComponent;
@@ -8,6 +10,10 @@ describe('FileUploadComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports:[
+        MatCardModule,
+        MatIconModule
+      ],
       declarations: [FileUploadComponent]
     });
     fixture = TestBed.createComponent(FileUploadComponent);
