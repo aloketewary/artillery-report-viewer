@@ -1,4 +1,7 @@
-# Arv
+# Artillery Report Viewer v3
+
+Artillery Report Viewer V3, this project is heavily inspired by artillery report viewer v2.
+
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.2.1.
 
