@@ -8,6 +8,7 @@
     <div class="space"></div>
     <app-file-upload #fileUploadComp [requiredFileType]="'.json'" (onFileProcess)="onReportUploadAndProcessed($event)" (onReset)="reset($event)" [isReset]="isReset"></app-file-upload>
     <button mat-icon-button (click)="isDarkMode = !isDarkMode"><mat-icon class="material-symbols-outlined">{{ isDarkMode ? 'dark_mode' : 'light_mode'}}</mat-icon></button>
+    <a mat-icon-button href="https://github.com/aloketewary/artillery-report-viewer" target="_blank"><mat-icon class="" [svgIcon]="isDarkMode ? 'github' : 'github'"></mat-icon></a>
   </mat-toolbar>
 
   <mat-sidenav-container class="example-container">

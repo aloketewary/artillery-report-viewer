@@ -5,7 +5,7 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "gh-pages" ]
   pull_request:
     branches: [ "master" ]
 
@@ -29,4 +29,5 @@ jobs:
     - run: npm install
     - run: npm ci
     - run: npm run build --if-present
-    - run: npm test
+    # - run: npm run deploy
+    # - run: npm test

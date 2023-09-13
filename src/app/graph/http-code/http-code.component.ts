@@ -35,7 +35,7 @@ export class HttpCodeComponent {
     const serverError = new Array<number>();
 
     const graphData = new Array<{ value: number, name: string }>();
-    Object.getOwnPropertyNames(this.reportState?.report?.results?.aggregate?.codes).map((id) => {
+    Object.getOwnPropertyNames(this.reportState?.report?.results?.aggregate?.codes ?? {}).map((id) => {
       graphData.push({ value: (this.reportState?.report?.results?.aggregate as any).codes[id] as number ?? 0, name: id });
     });
 

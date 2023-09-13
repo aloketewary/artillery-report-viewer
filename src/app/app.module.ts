@@ -1,6 +1,6 @@
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -16,7 +16,7 @@ import { MatChipsModule } from '@angular/material/chips';
 
 
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, DomSanitizer } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -37,6 +37,7 @@ import { LatencyComponent } from './graph/latency/latency.component';
 import { ReqLoadComponent } from './graph/req-load/req-load.component';
 import { HttpCodeComponent } from './graph/http-code/http-code.component';
 import { StarComponent } from './shared/star/star.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -78,9 +79,24 @@ import { StarComponent } from './shared/star/star.component';
     }),
     MatBadgeModule,
     MatSnackBarModule,
-    MatChipsModule
+    MatChipsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+
+  constructor(
+    private matIconRegistry: MatIconRegistry,
+    private domSanitizer: DomSanitizer) {
+      this.matIconRegistry.addSvgIcon(
+        "github",
+        this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icons/github-mark-white.svg")
+      );
+      this.matIconRegistry.addSvgIcon(
+        "github-dark",
+        this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icons/github-mark.svg")
+      );
+  }
+}
