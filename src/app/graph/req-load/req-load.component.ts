@@ -15,9 +15,9 @@ export class ReqLoadComponent {
   mergeOption: any;
   loading = false;
   isDataAvailable: boolean = false;
-  selectedHttpCodes = new FormControl(['200']);
+  selectedHttpCodes = new FormControl(['2xx']);
 
-  httpCodeLists: string[] = ['100', '200', '300', '400', '500'];
+  httpCodeLists: string[] = ['1xx', '2xx', '3xx', '4xx', '5xx'];
   @Input() isDarkMode: boolean = false;
 
   ngOnInit(): void {
@@ -45,7 +45,7 @@ export class ReqLoadComponent {
       let resp = 0;
       const selectedValues: Array<string> = this.selectedHttpCodes.value ?? [];
       Object.getOwnPropertyNames(item.codes).map((id) => {
-        if(selectedValues.includes(id)) {
+        if(selectedValues.includes(id.slice(0, -2) + 'xx')) {
           resp += (item as any).codes[id] as number ?? 0;
         }
       });
