@@ -102,7 +102,10 @@ export class HomeComponent implements OnInit {
   copyStatus = '';
   rawSearch = '';
   endpointSearch = '';
+  methodFilter = 'all';
   statusFilter = 'all';
+  errorFilter = 'all';
+  scenarioSearch = '';
   endpointSort: keyof EndpointRow = 'p95';
   readonly Math = Math;
   reportView: DashboardView = this.emptyView();
@@ -169,7 +172,13 @@ export class HomeComponent implements OnInit {
     if (!this.reportView.rawJson) {
       return;
     }
-    navigator.clipboard?.writeText(this.reportView.rawJson).then(() => {
+    const clipboard = navigator.clipboard;
+    if (!clipboard) {
+      this.copyStatus = 'Copy unavailable';
+      setTimeout(() => this.copyStatus = '', 1800);
+      return;
+    }
+    clipboard.writeText(this.reportView.rawJson).then(() => {
       this.copyStatus = 'Copied';
       setTimeout(() => this.copyStatus = '', 1800);
     }).catch(() => {
@@ -203,12 +212,19 @@ export class HomeComponent implements OnInit {
     const query = this.endpointSearch.trim().toLowerCase();
     return this.reportView.endpoints
       .filter((row) => !query || row.endpoint.toLowerCase().includes(query))
+      .filter((row) => this.methodFilter === 'all' || row.method === this.methodFilter)
       .filter((row) => this.statusFilter === 'all' || row.status === this.statusFilter)
+      .filter((row) => this.errorFilter === 'all' || (this.errorFilter === 'errors' ? (row.errorRate ?? 0) > 0 : (row.errorRate ?? 0) === 0))
       .sort((a, b) => {
         const left = a[this.endpointSort];
         const right = b[this.endpointSort];
         return (typeof right === 'number' ? right : -1) - (typeof left === 'number' ? left : -1);
       });
+  }
+
+  get filteredScenarios(): ScenarioRow[] {
+    const query = this.scenarioSearch.trim().toLowerCase();
+    return this.reportView.scenarios.filter((row) => !query || row.name.toLowerCase().includes(query));
   }
 
   sortEndpoints(column: keyof EndpointRow): void {
