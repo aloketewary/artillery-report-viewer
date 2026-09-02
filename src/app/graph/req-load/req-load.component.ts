@@ -4,9 +4,10 @@ import { EChartsOption } from 'echarts';
 import { ReportState } from 'src/app/model/report-state';
 
 @Component({
-  selector: 'app-req-load',
-  templateUrl: './req-load.component.html',
-  styleUrls: ['./req-load.component.scss']
+    selector: 'app-req-load',
+    templateUrl: './req-load.component.html',
+    styleUrls: ['./req-load.component.scss'],
+    standalone: false
 })
 export class ReqLoadComponent {
   @Input() reportState?: ReportState;

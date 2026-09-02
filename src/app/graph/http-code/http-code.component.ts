@@ -4,9 +4,10 @@ import { ThemeOption } from 'ngx-echarts';
 import { ReportState } from 'src/app/model/report-state';
 
 @Component({
-  selector: 'app-http-code',
-  templateUrl: './http-code.component.html',
-  styleUrls: ['./http-code.component.scss']
+    selector: 'app-http-code',
+    templateUrl: './http-code.component.html',
+    styleUrls: ['./http-code.component.scss'],
+    standalone: false
 })
 export class HttpCodeComponent {
   @Input() reportState?: ReportState;

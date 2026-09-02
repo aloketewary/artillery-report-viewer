@@ -3,9 +3,10 @@ import { EChartsOption } from 'echarts';
 import { ReportState } from 'src/app/model/report-state';
 
 @Component({
-  selector: 'app-latency',
-  templateUrl: './latency.component.html',
-  styleUrls: ['./latency.component.scss']
+    selector: 'app-latency',
+    templateUrl: './latency.component.html',
+    styleUrls: ['./latency.component.scss'],
+    standalone: false
 })
 export class LatencyComponent implements OnInit {
 

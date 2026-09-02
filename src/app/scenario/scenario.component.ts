@@ -4,9 +4,10 @@ import { ReportPayload } from '../model/report-payload';
 import { HttpCodeDetail } from '../model/http-code-detail';
 
 @Component({
-  selector: 'app-scenario',
-  templateUrl: './scenario.component.html',
-  styleUrls: ['./scenario.component.scss']
+    selector: 'app-scenario',
+    templateUrl: './scenario.component.html',
+    styleUrls: ['./scenario.component.scss'],
+    standalone: false
 })
 export class ScenarioComponent implements OnInit  {
 
