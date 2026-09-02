@@ -8,21 +8,29 @@
         <mat-select [formControl]="selectedHttpCodes" multiple>
           <mat-select-trigger>
             {{selectedHttpCodes.value?.[0] || ''}}
-            <span *ngIf="(selectedHttpCodes.value?.length || 0) > 1" class="example-additional-selection">
-              (+{{(selectedHttpCodes.value?.length || 0) - 1}} {{selectedHttpCodes.value?.length === 2 ? 'other' : 'others'}})
-            </span>
+            @if ((selectedHttpCodes.value?.length || 0) > 1) {
+              <span class="example-additional-selection">
+                (+{{(selectedHttpCodes.value?.length || 0) - 1}} {{selectedHttpCodes.value?.length === 2 ? 'other' : 'others'}})
+              </span>
+            }
           </mat-select-trigger>
-          <mat-option *ngFor="let codes of httpCodeLists" [value]="codes">{{codes}}</mat-option>
+          @for (codes of httpCodeLists; track codes) {
+            <mat-option [value]="codes">{{codes}}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
     </mat-card-header>
     <mat-card-content>
       <mat-divider class="margin-10-tb">
       </mat-divider>
-      <div echarts [options]="options" [theme]="isDarkMode ? 'dark': ''" class="chart" *ngIf="isDataAvailable"></div>
-      <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full" *ngIf="!isDataAvailable">
-        <div class="mat-subtitle-1">No results to display!</div>
-      </div>
+      @if (isDataAvailable) {
+        <div echarts [options]="options" [theme]="isDarkMode ? 'dark': ''" class="chart"></div>
+      }
+      @if (!isDataAvailable) {
+        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full">
+          <div class="mat-subtitle-1">No results to display!</div>
+        </div>
+      }
     </mat-card-content>
   </mat-card>
 </div>

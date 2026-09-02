@@ -8,10 +8,14 @@
       <mat-card-content>
         <mat-divider class="margin-10-tb">
         </mat-divider>
-        <div echarts [options]="options2" [theme]="isDarkMode ? 'dark': ''" class="chart" *ngIf="isDataAvailable"></div>
-        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full" *ngIf="!isDataAvailable">
-          <div class="mat-subtitle-1">No results to display!</div>
-        </div>
+        @if (isDataAvailable) {
+          <div echarts [options]="options2" [theme]="isDarkMode ? 'dark': ''" class="chart"></div>
+        }
+        @if (!isDataAvailable) {
+          <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full">
+            <div class="mat-subtitle-1">No results to display!</div>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
     <mat-card appearance="outlined" fxFlex.gt-sm="48" fxFlex="100" ngClass.lt-md="margin-10-t">
@@ -22,10 +26,14 @@
       <mat-card-content>
         <mat-divider class="margin-10-tb">
         </mat-divider>
-        <div echarts [options]="options" [theme]="isDarkMode ? 'dark': ''" class="chart" *ngIf="isDataAvailable"></div>
-        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full" *ngIf="!isDataAvailable">
-          <div class="mat-subtitle-1">No results to display!</div>
-        </div>
+        @if (isDataAvailable) {
+          <div echarts [options]="options" [theme]="isDarkMode ? 'dark': ''" class="chart"></div>
+        }
+        @if (!isDataAvailable) {
+          <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full">
+            <div class="mat-subtitle-1">No results to display!</div>
+          </div>
+        }
       </mat-card-content>
     </mat-card>
   </div>
