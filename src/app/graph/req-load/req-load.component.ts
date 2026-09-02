@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { EChartsOption } from 'echarts';
 import { ReportState } from 'src/app/model/report-state';
@@ -7,6 +7,7 @@ import { ReportState } from 'src/app/model/report-state';
     selector: 'app-req-load',
     templateUrl: './req-load.component.html',
     styleUrls: ['./req-load.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ReqLoadComponent {

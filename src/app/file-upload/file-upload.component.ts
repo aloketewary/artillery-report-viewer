@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { ReportPayload } from '../model/report-payload';
 import { ReportMetrics, ReportState } from '../model/report-state';
 import { BehaviorSubject } from 'rxjs';
@@ -7,6 +7,7 @@ import { BehaviorSubject } from 'rxjs';
     selector: 'app-file-upload',
     templateUrl: './file-upload.component.html',
     styleUrls: ['./file-upload.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class FileUploadComponent {

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { ReportState } from 'src/app/model/report-state';
 
@@ -6,6 +6,7 @@ import { ReportState } from 'src/app/model/report-state';
     selector: 'app-latency',
     templateUrl: './latency.component.html',
     styleUrls: ['./latency.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class LatencyComponent implements OnInit {

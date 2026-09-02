@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Overview } from '../model/overview';
 import { ReportItem } from '../model/report-item';
 import { ReportState } from '../model/report-state';
@@ -8,6 +8,7 @@ import { ReportPayload } from '../model/report-payload';
     selector: 'app-overview',
     templateUrl: './overview.component.html',
     styleUrls: ['./overview.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class OverviewComponent implements OnInit {

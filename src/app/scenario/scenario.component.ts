@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ReportState } from '../model/report-state';
 import { ReportPayload } from '../model/report-payload';
 import { HttpCodeDetail } from '../model/http-code-detail';
@@ -7,6 +7,7 @@ import { HttpCodeDetail } from '../model/http-code-detail';
     selector: 'app-scenario',
     templateUrl: './scenario.component.html',
     styleUrls: ['./scenario.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class ScenarioComponent implements OnInit  {

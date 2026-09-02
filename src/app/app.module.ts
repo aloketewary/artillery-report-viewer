@@ -37,7 +37,7 @@ import { LatencyComponent } from './graph/latency/latency.component';
 import { ReqLoadComponent } from './graph/req-load/req-load.component';
 import { HttpCodeComponent } from './graph/http-code/http-code.component';
 import { StarComponent } from './shared/star/star.component';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 
 @NgModule({ declarations: [
         AppComponent,
@@ -77,7 +77,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         }),
         MatBadgeModule,
         MatSnackBarModule,
-        MatChipsModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
+        MatChipsModule], providers: [provideHttpClient(withXhr(), withInterceptorsFromDi())] })
 export class AppModule {
 
   constructor(

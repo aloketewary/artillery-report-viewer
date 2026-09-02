@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { ReportPayload } from '../model/report-payload';
 import { ReportMetrics, ReportState } from '../model/report-state';
@@ -13,6 +13,7 @@ import { FileUploadComponent } from '../file-upload/file-upload.component';
     selector: 'app-home',
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class HomeComponent {

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { ThemeOption } from 'ngx-echarts';
 import { ReportState } from 'src/app/model/report-state';
@@ -7,6 +7,7 @@ import { ReportState } from 'src/app/model/report-state';
     selector: 'app-http-code',
     templateUrl: './http-code.component.html',
     styleUrls: ['./http-code.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false
 })
 export class HttpCodeComponent {
