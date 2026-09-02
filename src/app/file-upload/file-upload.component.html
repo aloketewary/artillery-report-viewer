@@ -1,29 +1,22 @@
 <input type="file" class="file-input" [accept]="requiredFileType" (change)="onFileSelected($event)" #fileUpload>
 
-<div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="10px">
-  <div class="mat-body-2 margin-10-r">{{fileName || "upload report json"}}</div>
-
+<div class="upload-control">
+  <span class="upload-name">{{fileName || 'Upload report JSON'}}</span>
   @if (!isFileUpload) {
-    <button mat-mini-fab color="accent" class="upload-btn" (click)="fileUpload.click()">
-      <mat-icon  class="material-symbols-outlined">attach_file</mat-icon>
+    <button tuiButton type="button" size="s" appearance="accent" (click)="fileUpload.click()">
+      Choose file
     </button>
   }
   @if (isFileUpload) {
-    <button mat-mini-fab color="accent" class="upload-btn" (click)="reset();">
-      <mat-icon  class="material-symbols-outlined">clear</mat-icon>
+    <button tuiButton type="button" size="s" appearance="secondary" (click)="reset()">
+      Clear
     </button>
   }
 </div>
 
-<div class="progress">
-
-  @if (uploadProgress) {
-    <mat-progress-bar class="progress-bar" mode="determinate" [value]="uploadProgress">
-    </mat-progress-bar>
-  }
-
-  @if (uploadProgress) {
-    <mat-icon class="cancel-upload" (click)="cancelUpload()">delete_forever</mat-icon>
-  }
-
-</div>
+@if (uploadProgress !== null) {
+  <progress class="upload-progress" max="100" [value]="uploadProgress" aria-label="Upload progress"></progress>
+  <button tuiButton type="button" size="xs" appearance="secondary" (click)="cancelUpload()">
+    Cancel upload
+  </button>
+}

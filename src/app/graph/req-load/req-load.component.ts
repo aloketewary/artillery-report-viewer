@@ -55,7 +55,7 @@ export class ReqLoadComponent {
     });
     this.options = {
       legend: {
-        data: ['Requests/sec', 'Avg Requests/sec', 'Median Response/sec'],
+        data: ['Requests/sec', 'Avg Requests/sec', 'Selected HTTP responses'],
         align: 'left',
       },
       tooltip: {},
@@ -112,7 +112,7 @@ export class ReqLoadComponent {
           smooth: true,
         },
         {
-          name: 'Median Response/sec',
+          name: 'Selected HTTP responses',
           type: 'line',
           // stack: 'counts',
           // areaStyle: {},

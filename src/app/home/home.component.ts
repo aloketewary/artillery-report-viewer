@@ -101,6 +101,10 @@ export class HomeComponent implements OnInit {
   chartOptions: EChartsOption = {};
   copyStatus = '';
   rawSearch = '';
+  endpointSearch = '';
+  statusFilter = 'all';
+  endpointSort: keyof EndpointRow = 'p95';
+  readonly Math = Math;
   reportView: DashboardView = this.emptyView();
 
   @ViewChild('fileUploadComp', { static: false }) fileUploadComp?: FileUploadComponent;
@@ -195,6 +199,22 @@ export class HomeComponent implements OnInit {
     this.updateChart();
   }
 
+  get filteredEndpoints(): EndpointRow[] {
+    const query = this.endpointSearch.trim().toLowerCase();
+    return this.reportView.endpoints
+      .filter((row) => !query || row.endpoint.toLowerCase().includes(query))
+      .filter((row) => this.statusFilter === 'all' || row.status === this.statusFilter)
+      .sort((a, b) => {
+        const left = a[this.endpointSort];
+        const right = b[this.endpointSort];
+        return (typeof right === 'number' ? right : -1) - (typeof left === 'number' ? left : -1);
+      });
+  }
+
+  sortEndpoints(column: keyof EndpointRow): void {
+    this.endpointSort = column;
+  }
+
   formatNumber(value?: number, maximumFractionDigits = 0): string {
     if (value === undefined || !Number.isFinite(value)) {
       return 'N/A';
@@ -264,14 +284,14 @@ export class HomeComponent implements OnInit {
   private buildView(payload: ReportPayload, raw: JsonRecord, fileName: string): DashboardView {
     const aggregate = payload.aggregate;
     const rawAggregate = asRecord(raw['aggregate']);
-    const counters = numberMap(rawAggregate?.['counters']) || aggregate?.counters as Record<string, number> | undefined;
-    const rates = numberMap(rawAggregate?.['rates']) || aggregate?.rates as Record<string, number> | undefined;
+    const counters = numberMap(rawAggregate?.['counters']) ?? numberMap(aggregate?.counters) ?? {};
+    const rates = numberMap(rawAggregate?.['rates']) ?? numberMap(aggregate?.rates) ?? {};
     const summaries = asRecord(rawAggregate?.['summaries']) || aggregate?.summaries as JsonRecord | undefined;
     const requests = firstNumber(counters, ['http.responses', 'http.requests', 'engine.http.responses']) ?? positive(aggregate?.requestsCompleted);
     const throughput = firstNumber(rates, ['http.request_rate', 'http.response_rate', 'engine.http.response_rate']) ?? positive(aggregate?.rps?.mean);
     const latency = this.readLatency(aggregate, summaries);
-    const codes = numberMap(aggregate?.codes);
-    const errors = numberMap(aggregate?.errors);
+    const codes = numberMap(aggregate?.codes) ?? {};
+    const errors = numberMap(aggregate?.errors) ?? {};
     const statusCounts = this.getStatusCounts(codes);
     const httpFailures = statusCounts.client + statusCounts.server;
     const runtimeErrors = sum(Object.values(errors));
@@ -281,7 +301,7 @@ export class HomeComponent implements OnInit {
     const scoreParts = this.scoreParts(throughput, latency?.p95, errorRate);
     const healthScore = scoreParts.length ? Math.round(scoreParts.reduce((total, part) => total + (part.value ?? 0), 0) / scoreParts.length) : undefined;
     const status = errorRate === undefined ? 'neutral' : errorRate === 0 ? 'healthy' : errorRate < 1 ? 'warning' : 'critical';
-    const endpoints = this.endpointRows(summaries, counters, codes, requests);
+    const endpoints = this.endpointRows(summaries, counters, codes, requests, duration);
     const errorRows = Object.entries(errors).sort(([, a], [, b]) => b - a).slice(0, 5).map(([name, count]) => ({
       name: name.replace(/_/g, ' '), count, endpoint: this.endpointForError(name),
     }));
@@ -337,7 +357,7 @@ export class HomeComponent implements OnInit {
     ];
   }
 
-  private endpointRows(summaries: JsonRecord | undefined, counters: Record<string, number> | undefined, codes: Record<string, number>, totalRequests?: number): EndpointRow[] {
+  private endpointRows(summaries: JsonRecord | undefined, counters: Record<string, number> | undefined, codes: Record<string, number>, totalRequests?: number, duration?: number): EndpointRow[] {
     const endpointNames = new Set<string>();
     Object.keys(summaries ?? {}).forEach((key) => {
       const marker = 'plugins.metrics-by-endpoint.response_time.';
@@ -355,21 +375,21 @@ export class HomeComponent implements OnInit {
         result[code] = value;
         return result;
       }, {} as Record<string, number>);
-      const requests = numberValue(summary?.['count']) ?? sum(Object.values(endpointCodes)) || undefined;
+      const requests = numberValue(summary?.['count']) ?? (sum(Object.values(endpointCodes)) || undefined);
       const failed = Object.entries(endpointCodes).filter(([code]) => Number(code) >= 400).reduce((total, [, value]) => total + value, 0);
       const errorRate = requests ? failed / requests * 100 : undefined;
       return {
         endpoint: endpoint.startsWith('/') ? endpoint : `/${endpoint}`,
-        method: 'N/A', requests, rps: requests && this.reportView.duration ? requests / this.reportView.duration : undefined,
+        method: 'N/A', requests, rps: requests && duration ? requests / duration : undefined,
         avg: numberValue(summary?.['mean']), p50: numberValue(summary?.['p50']), p95: numberValue(summary?.['p95']), p99: numberValue(summary?.['p99']),
-        errorRate, status: errorRate === undefined ? 'neutral' : errorRate === 0 ? 'healthy' : errorRate < 1 ? 'warning' : 'critical',
+        errorRate, status: (errorRate === undefined ? 'neutral' : errorRate === 0 ? 'healthy' : errorRate < 1 ? 'warning' : 'critical') as StatusTone,
       };
     }).sort((a, b) => (b.p99 ?? -1) - (a.p99 ?? -1));
   }
 
   private scenarioRows(counters: Record<string, number> | undefined, intermediate: ReportItem[] | undefined): ScenarioRow[] {
     return Object.entries(counters ?? {}).filter(([key]) => key.startsWith('vusers.created_by_name.')).map(([key, requests]) => ({
-      name: key.replace('vusers.created_by_name.', ''), requests, rps: undefined, p95: undefined, p99: undefined, errors: undefined, status: 'neutral',
+      name: key.replace('vusers.created_by_name.', ''), requests, rps: undefined, p95: undefined, p99: undefined, errors: undefined, status: 'neutral' as StatusTone,
     })).sort((a, b) => (b.requests ?? 0) - (a.requests ?? 0)).slice(0, 6);
   }
 
@@ -435,7 +455,7 @@ export class HomeComponent implements OnInit {
     const values = (intermediate ?? []).slice(-18).map((item) => {
       if (kind === 'requests') return item.requestsCompleted ?? 0;
       if (kind === 'rps') return item.rps?.mean ?? 0;
-      if (kind === 'errors') return sum(Object.values(numberMap(item.errors))) || 0;
+      if (kind === 'errors') return sum(Object.values(numberMap(item.errors) ?? {})) || 0;
       return kind === 'p95' ? item.latency?.p95 ?? 0 : item.latency?.p99 ?? 0;
     });
     const max = Math.max(...values, 1);
@@ -456,7 +476,7 @@ export class HomeComponent implements OnInit {
     ] : this.chartMetric === 'throughput' ? [
       { ...base, name: 'Requests/sec', data: entries.map((item) => item.rps?.mean), areaStyle: { color: 'rgba(8,127,145,0.12)' }, lineStyle: { color: '#087f91', width: 2 } },
     ] : [
-      { ...base, name: 'Runtime errors', data: entries.map((item) => sum(Object.values(numberMap(item.errors))) || null), areaStyle: { color: 'rgba(180,71,61,0.12)' }, lineStyle: { color: '#b4473d', width: 2 } },
+      { ...base, name: 'Runtime errors', data: entries.map((item) => sum(Object.values(numberMap(item.errors) ?? {})) || null), areaStyle: { color: 'rgba(180,71,61,0.12)' }, lineStyle: { color: '#b4473d', width: 2 } },
     ];
     this.chartOptions = {
       animation: false,

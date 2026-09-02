@@ -1,3 +1,36 @@
 .file-input {
   display: none;
 }
+
+.upload-control {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.25rem 0.25rem 0.25rem 0.7rem;
+  background: var(--arv-surface-muted);
+  border: 1px solid var(--arv-border);
+  border-radius: 0.7rem;
+}
+
+.upload-name {
+  max-width: 15rem;
+  overflow: hidden;
+  color: var(--arv-muted-text);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upload-progress {
+  display: block;
+  width: 100%;
+  height: 0.35rem;
+  margin-top: 0.35rem;
+  accent-color: var(--arv-accent);
+}
+
+@media (max-width: 700px) {
+  .upload-name {
+    max-width: 10rem;
+  }
+}

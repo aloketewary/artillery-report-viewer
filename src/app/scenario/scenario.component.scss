@@ -1,22 +1,79 @@
-.card {
-  &-container {
-    margin: 8px 24px;
-  }
-  &-bg-icon {
-    position: absolute;
-    right: 0;
-  }
-  &-icon {
-    font-size: 120px !important;
-    height: 102px !important;
-    width: 170px !important;
-    opacity: 0.1;
-    vertical-align: bottom;
-    text-align: right;
-  }
-  &-detail {
-    width: 250px;
-    height: 120px;
-    margin: 8px;
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 0 1.25rem;
+}
+
+.data-list {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.data-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--arv-border);
+}
+
+.data-list div:last-child {
+  border-bottom: 0;
+}
+
+.data-list dt {
+  color: var(--arv-muted-text);
+  font-size: 0.82rem;
+}
+
+.data-list dd {
+  margin: 0;
+  color: var(--arv-text);
+  font-size: 0.86rem;
+  font-weight: 650;
+  text-align: right;
+}
+
+.result-list {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.result-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--arv-border);
+}
+
+.result-list li:last-child {
+  border-bottom: 0;
+}
+
+.result-list li span {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.result-list strong {
+  overflow-wrap: anywhere;
+}
+
+.result-list small {
+  color: var(--arv-muted-text);
+}
+
+@media (max-width: 760px) {
+  .scenario-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 }

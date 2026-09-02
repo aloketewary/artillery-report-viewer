@@ -1,13 +1,7 @@
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { NgxEchartsModule } from 'ngx-echarts';
 import { ReqLoadComponent } from './req-load.component';
-import { MatCardModule } from '@angular/material/card';
-import { MatDividerModule } from '@angular/material/divider';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ReqLoadComponent', () => {
   let component: ReqLoadComponent;
@@ -15,17 +9,12 @@ describe('ReqLoadComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports:[
-        MatCardModule,
-        MatIconModule,
-        MatDividerModule,
-        ReactiveFormsModule,
+      imports: [
         FormsModule,
-        MatFormFieldModule,
-        MatSelectModule,
-        BrowserAnimationsModule
+        ReactiveFormsModule,
+        NgxEchartsModule.forRoot({ echarts: () => import('echarts') }),
       ],
-      declarations: [ReqLoadComponent]
+      declarations: [ReqLoadComponent],
     });
     fixture = TestBed.createComponent(ReqLoadComponent);
     component = fixture.componentInstance;

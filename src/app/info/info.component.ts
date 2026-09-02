@@ -12,9 +12,9 @@ export class InfoComponent {
   @Input() reportStat?: ReportMetrics;
   @Input() hasCustomMetrics: boolean = false;
   @Input() isLoaded: boolean = false;
-  @Output() onDownloadButtonHit: EventEmitter<any> = new EventEmitter<any>();
+  @Output() onDownloadButtonHit = new EventEmitter<void>();
 
-  downloadJson() {
+  downloadJson(): void {
     this.onDownloadButtonHit.emit();
   }
 }

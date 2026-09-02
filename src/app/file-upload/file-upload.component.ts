@@ -1,7 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { ReportPayload } from '../model/report-payload';
 import { ReportMetrics, ReportState } from '../model/report-state';
-import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'app-file-upload',
@@ -12,63 +10,82 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class FileUploadComponent {
   @Input() requiredFileType?: string;
-  @Input() isReset?: BehaviorSubject<string>;
-  @ViewChild('fileUpload') fileUpload?: ElementRef;
+  @ViewChild('fileUpload') fileUpload?: ElementRef<HTMLInputElement>;
   fileName = '';
   uploadProgress: number | null = null;
-  isFileUpload: boolean = false;
-  fileDetail?: ReportPayload;
+  isFileUpload = false;
+  fileDetail?: unknown;
   reportData?: ReportState;
-  @Output() onFileProcess: EventEmitter<ReportState> = new EventEmitter<ReportState>();
-  @Output() onReset: EventEmitter<string> = new EventEmitter<string>();
+  @Output() onFileProcess = new EventEmitter<ReportState>();
+  @Output() onReset = new EventEmitter<string>();
+  @Output() onFileError = new EventEmitter<string>();
+  private selectionId = 0;
 
-
-  constructor() {
-    this.isReset?.subscribe((_) => this.reset());
-   }
-
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
-
-    if (file) {
-      this.fileName = file.name;
-      const formData = new FormData();
-      formData.append("thumbnail", file);
-      this.processTheJson(file);
-
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) {
+      return;
     }
+
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      this.handleError('Please select an Artillery JSON report.');
+      return;
+    }
+
+    const selectionId = ++this.selectionId;
+    this.fileName = file.name;
+    void this.processTheJson(file, selectionId);
   }
 
-  cancelUpload() {
+  cancelUpload(): void {
     this.reset();
   }
 
-  reset() {
+  reset(emit = true): void {
+    this.selectionId += 1;
     this.uploadProgress = null;
     this.fileName = '';
     this.isFileUpload = false;
     this.fileDetail = undefined;
     this.reportData = undefined;
-    if(this.fileUpload?.nativeElement?.value) {
-      this.fileUpload.nativeElement.value = null;
+    if (this.fileUpload?.nativeElement) {
+      this.fileUpload.nativeElement.value = '';
     }
-    this.onReset.emit('null');
+    if (emit) {
+      this.onReset.emit('reset');
+    }
   }
 
-  processTheJson(fileData: File) {
+  async processTheJson(fileData: File, selectionId = this.selectionId): Promise<void> {
     try {
-      fileData.text().then((val) => {
-        this.fileDetail = JSON.parse(val) as ReportPayload;
-        this.isFileUpload = true;
-        this.reportData = new ReportState();
-        this.reportData.report =  new ReportMetrics(this.fileName, 0);
-        this.reportData.report.results = this.fileDetail;
-        this.onFileProcess.emit(this.reportData);
-      }).catch(err => {
-        throw err;
-      }) ;
-    } catch (error: any) {
-      console.error(error.message);
+      const parsed: unknown = JSON.parse(await fileData.text());
+      if (selectionId !== this.selectionId) {
+        return;
+      }
+      if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new Error('Report must contain a JSON object.');
+      }
+
+      this.fileDetail = parsed;
+      this.isFileUpload = true;
+      this.reportData = new ReportState();
+      this.reportData.report = new ReportMetrics(this.fileName, 0);
+      this.reportData.report.rawResults = parsed;
+      this.onFileProcess.emit(this.reportData);
+    } catch (error: unknown) {
+      if (selectionId === this.selectionId) {
+        this.handleError(this.errorMessage(error));
+      }
     }
+  }
+
+  private handleError(message: string): void {
+    this.reset(false);
+    this.onFileError.emit(message);
+  }
+
+  private errorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : 'Unable to read report file.';
   }
 }

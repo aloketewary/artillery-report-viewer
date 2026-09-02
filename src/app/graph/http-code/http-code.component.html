@@ -1,40 +1,24 @@
-<div class="card-container">
-  <div fxLayout="row wrap" fxLayoutAlign="space-between center" fxLayoutGap>
-    <mat-card appearance="outlined" fxFlex.gt-sm="48" fxFlex="100">
-      <mat-card-header>
-        <mat-card-title>Http Codes Over Time</mat-card-title>
-        <!-- <mat-card-subtitle>subtitle</mat-card-subtitle> -->
-      </mat-card-header>
-      <mat-card-content>
-        <mat-divider class="margin-10-tb">
-        </mat-divider>
-        @if (isDataAvailable) {
-          <div echarts [options]="options2" [theme]="isDarkMode ? 'dark': ''" class="chart"></div>
-        }
-        @if (!isDataAvailable) {
-          <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full">
-            <div class="mat-subtitle-1">No results to display!</div>
-          </div>
-        }
-      </mat-card-content>
-    </mat-card>
-    <mat-card appearance="outlined" fxFlex.gt-sm="48" fxFlex="100" ngClass.lt-md="margin-10-t">
-      <mat-card-header>
-        <mat-card-title>Response Codes</mat-card-title>
-        <!-- <mat-card-subtitle>subtitle</mat-card-subtitle> -->
-      </mat-card-header>
-      <mat-card-content>
-        <mat-divider class="margin-10-tb">
-        </mat-divider>
-        @if (isDataAvailable) {
-          <div echarts [options]="options" [theme]="isDarkMode ? 'dark': ''" class="chart"></div>
-        }
-        @if (!isDataAvailable) {
-          <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0px" class="flex-full">
-            <div class="mat-subtitle-1">No results to display!</div>
-          </div>
-        }
-      </mat-card-content>
-    </mat-card>
-  </div>
+<div class="chart-grid">
+  <section class="arv-panel" aria-labelledby="http-code-time-title">
+    <header class="arv-panel-header">
+      <h2 id="http-code-time-title">HTTP codes over time</h2>
+    </header>
+    <div class="arv-divider"></div>
+    @if (isDataAvailable) {
+      <div echarts [options]="options2" [theme]="isDarkMode ? 'dark' : ''" class="chart" role="img" aria-label="HTTP response code time series"></div>
+    } @else {
+      <div class="arv-empty">No time-series results to display.</div>
+    }
+  </section>
+  <section class="arv-panel" aria-labelledby="http-code-summary-title">
+    <header class="arv-panel-header">
+      <h2 id="http-code-summary-title">Response codes</h2>
+    </header>
+    <div class="arv-divider"></div>
+    @if (isDataAvailable) {
+      <div echarts [options]="options" [theme]="isDarkMode ? 'dark' : ''" class="chart" role="img" aria-label="HTTP response code distribution"></div>
+    } @else {
+      <div class="arv-empty">No aggregate results to display.</div>
+    }
+  </section>
 </div>

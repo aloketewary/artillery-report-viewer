@@ -1,8 +1,7 @@
-<div class="card__rating">
-  @for (rate of ratings; track rate) {
-    <svg height="25" width="23" [ngClass]="{'star': true, 'rating-full': rate === 'rating-full', 'rating-half': rate === 'rating-half', 'rating-none': rate === 'rating-none' }" data-rating="1">
-      <polygon points="9.9, 1.1, 3.3, 21.78, 19.8, 8.58, 0, 8.58, 16.5, 21.78" />
+<div class="card__rating" role="img" [attr.aria-label]="rating + ' out of 5 stars'">
+  @for (rate of ratings; track $index) {
+    <svg aria-hidden="true" viewBox="0 0 20 22" [ngClass]="{'star': true, 'rating-full': rate === 'rating-full', 'rating-half': rate === 'rating-half', 'rating-none': rate === 'rating-none'}">
+      <polygon points="9.9,1.1 3.3,21.78 19.8,8.58 0,8.58 16.5,21.78" />
     </svg>
   }
-
 </div>

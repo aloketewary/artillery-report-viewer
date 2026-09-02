@@ -1,95 +1,61 @@
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-
-import { MatInputModule } from '@angular/material/input';
-import { MatListModule } from '@angular/material/list';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatBadgeModule } from '@angular/material/badge';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatChipsModule } from '@angular/material/chips';
-
-
 import { NgModule } from '@angular/core';
-import { BrowserModule, DomSanitizer } from '@angular/platform-browser';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { TuiButton, TuiNotification, TuiRoot, provideTaiga } from '@taiga-ui/core';
+import { TuiBadge } from '@taiga-ui/kit';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HomeComponent } from './home/home.component';
-import { MatRippleModule } from '@angular/material/core';
 import { MessageComponent } from './shared/message/message.component';
 import { OverviewComponent } from './overview/overview.component';
-import { MatCardModule } from '@angular/material/card';
-import { MatDividerModule } from '@angular/material/divider';
-import { FlexLayoutModule } from '@angular/flex-layout';
 import { InfoComponent } from './info/info.component';
 import { ScenarioComponent } from './scenario/scenario.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
 import { PhasesComponent } from './phases/phases.component';
-import { NgxEchartsModule } from 'ngx-echarts';
 import { LatencyComponent } from './graph/latency/latency.component';
 import { ReqLoadComponent } from './graph/req-load/req-load.component';
 import { HttpCodeComponent } from './graph/http-code/http-code.component';
 import { StarComponent } from './shared/star/star.component';
-import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
+import { ReportDetailsComponent } from './report-details/report-details.component';
 
-@NgModule({ declarations: [
-        AppComponent,
-        HomeComponent,
-        MessageComponent,
-        OverviewComponent,
-        InfoComponent,
-        ScenarioComponent,
-        FileUploadComponent,
-        PhasesComponent,
-        LatencyComponent,
-        ReqLoadComponent,
-        HttpCodeComponent,
-        StarComponent
-    ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        MatSidenavModule,
-        MatIconModule,
-        MatButtonModule,
-        MatCheckboxModule,
-        MatToolbarModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatRippleModule,
-        MatCardModule,
-        MatDividerModule,
-        FlexLayoutModule,
-        MatProgressBarModule,
-        MatListModule,
-        MatSelectModule,
-        NgxEchartsModule.forRoot({
-            echarts: () => import('echarts')
-        }),
-        MatBadgeModule,
-        MatSnackBarModule,
-        MatChipsModule], providers: [provideHttpClient(withXhr(), withInterceptorsFromDi())] })
-export class AppModule {
-
-  constructor(
-    private matIconRegistry: MatIconRegistry,
-    private domSanitizer: DomSanitizer) {
-      this.matIconRegistry.addSvgIcon(
-        "github",
-        this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icons/github-mark-white.svg")
-      );
-      this.matIconRegistry.addSvgIcon(
-        "github-dark",
-        this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/icons/github-mark.svg")
-      );
-  }
-}
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    MessageComponent,
+    OverviewComponent,
+    InfoComponent,
+    ScenarioComponent,
+    FileUploadComponent,
+    PhasesComponent,
+    LatencyComponent,
+    ReqLoadComponent,
+    HttpCodeComponent,
+    StarComponent,
+    ReportDetailsComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TuiRoot,
+    TuiButton,
+    TuiBadge,
+    ...TuiNotification,
+    NgxEchartsModule.forRoot({
+      echarts: () => import('echarts'),
+    }),
+  ],
+  providers: [
+    ...provideTaiga(),
+    provideHttpClient(withXhr(), withInterceptorsFromDi()),
+  ],
+  bootstrap: [AppComponent],
+})
+export class AppModule {}

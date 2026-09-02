@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { TuiButton } from '@taiga-ui/core';
 import { InfoComponent } from './info.component';
 
 describe('InfoComponent', () => {
@@ -8,7 +8,8 @@ describe('InfoComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [InfoComponent]
+      imports: [TuiButton],
+      declarations: [InfoComponent],
     });
     fixture = TestBed.createComponent(InfoComponent);
     component = fixture.componentInstance;

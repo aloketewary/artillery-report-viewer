@@ -1,11 +1,25 @@
-svg {
-  &.rating-full {
-    fill: #ffd055;
-  }
-  &.rating-half {
-    fill: #ffebb9;
-  }
-  &.rating-none {
-    fill: #404040;
-  }
+.card__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.card__rating svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.star {
+  fill: transparent;
+  stroke: var(--arv-accent);
+  stroke-width: 1.4;
+}
+
+.rating-full {
+  fill: var(--arv-accent);
+}
+
+.rating-half {
+  fill: var(--arv-accent);
+  opacity: 0.5;
 }

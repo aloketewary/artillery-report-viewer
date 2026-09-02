@@ -1,52 +1,146 @@
-<div [ngClass]="{'arv-dark': isDarkMode }">
-  <mat-toolbar class="example-header" color="primary">
-    @if (false) {
-      <button mat-icon-button color="accent" aria-label="Example icon button with a menu icon" (click)="sidenav.toggle()">
-        <mat-icon class="material-symbols-outlined">menu</mat-icon>
-      </button>
-    }
-    <div class="mat-headline-6 margin-0" matBadge="v3" matBadgeOverlap="false" [matBadgeColor]="isDarkMode ? 'accent' : 'warn'" fxHide.xs>Artillery Report Viewer</div>
-    <div class="mat-headline-6 margin-0" matBadge="v3" matBadgeOverlap="false" [matBadgeColor]="isDarkMode ? 'accent' : 'warn'" fxHide.gt-xs>ARV</div>
-    <div class="space"></div>
-    <app-file-upload #fileUploadComp [requiredFileType]="'.json'" (onFileProcess)="onReportUploadAndProcessed($event)" (onReset)="reset($event)" [isReset]="isReset"></app-file-upload>
-    <button mat-icon-button (click)="isDarkMode = !isDarkMode"><mat-icon class="material-symbols-outlined">{{ isDarkMode ? 'dark_mode' : 'light_mode'}}</mat-icon></button>
-    <a mat-icon-button href="https://github.com/aloketewary/artillery-report-viewer" target="_blank"><mat-icon class="" [svgIcon]="isDarkMode ? 'github' : 'github'"></mat-icon></a>
-  </mat-toolbar>
+<div class="app-shell" [class.arv-dark]="isDarkMode">
+  <header class="app-header">
+    <div class="header-brand">
+      <span class="brand-mark" aria-hidden="true"><span></span></span>
+      <div>
+        <strong class="brand-name">PerfLens</strong>
+        <span class="brand-caption">Performance intelligence</span>
+      </div>
+    </div>
 
-  <mat-sidenav-container class="example-container">
-    <mat-sidenav #sidenav mode="side" class="example-sidenav" [fixedInViewport]="options.value.fixed"
-      [fixedTopGap]="options.value.top" [fixedBottomGap]="options.value.bottom">
-      {{options.value.fixed ? 'Fixed' : 'Non-fixed'}} Sidenav
-    </mat-sidenav>
+    <div class="run-context" aria-label="Report context">
+      <label>
+        <span>Project</span>
+        <select aria-label="Project"><option>Checkout API</option></select>
+      </label>
+      <label>
+        <span>Test run</span>
+        <select aria-label="Test run"><option>{{reportState.isLoaded ? reportView.fileName : 'No report loaded'}}</option></select>
+      </label>
+      <div class="context-meta">
+        <span>{{formatDate(reportView.timestamp)}}</span>
+        <strong>Production-like</strong>
+      </div>
+    </div>
 
-    <mat-sidenav-content [formGroup]="options">
+    <div class="header-actions">
+      <button class="button button-quiet" type="button" (click)="onDownloadHit()" [disabled]="!reportState.isLoaded">Export report</button>
+      <button class="button button-quiet" type="button" (click)="toggleTheme()" [attr.aria-pressed]="isDarkMode">{{isDarkMode ? 'Light mode' : 'Dark mode'}}</button>
+      <span class="run-status" [class]="'tone-' + reportView.status" [attr.aria-label]="'Run status: ' + reportView.statusLabel">
+        <span class="status-dot" aria-hidden="true"></span>{{reportView.statusLabel}}
+      </span>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <aside class="side-nav" aria-label="Report sections">
+      <div class="side-nav-heading">Report</div>
+      @for (item of ['Overview', 'Performance', 'Endpoints', 'Scenarios', 'Errors', 'Comparison', 'Insights', 'Raw Data']; track item) {
+        <button class="nav-item" [class.is-active]="activeNav === item" type="button" (click)="setActiveNav(item)">
+          <span class="nav-glyph" aria-hidden="true">{{item.substring(0, 1)}}</span>
+          <span>{{item}}</span>
+        </button>
+      }
+      <div class="side-nav-footer">
+        <span class="data-badge">{{reportState.isLoaded ? 'Measured data' : 'Waiting for data'}}</span>
+        <small>PerfLens transforms Artillery output into an actionable read.</small>
+      </div>
+    </aside>
+
+    <main class="app-content">
+      @if (errorMessage) {
+        <div class="app-notification" role="alert">{{errorMessage}}</div>
+      }
+
       @if (!reportState.isLoaded) {
-        <app-message></app-message>
-      }
-      @if (reportState.isLoaded) {
-        <app-overview [reportState]="reportState" [isDarkMode]="isDarkMode"></app-overview>
-      }
-      <app-info [isLoaded]="reportState.isLoaded" [reportStat]="reportState.report" [hasCustomMetrics]="reportState.hasCustomReportMetrics"
-      (onDownloadButtonHit)="onDownloadHit($event)"></app-info>
-      @if (reportState.isLoaded) {
-        <app-scenario [reportState]="reportState"></app-scenario>
-      }
-      @if (reportState.isLoaded) {
-        <app-phases [isLoaded]="reportState.isLoaded" [reportStat]="reportState.report"></app-phases>
-      }
-      @if (reportState.isLoaded) {
-        <app-latency [reportState]="reportState" [isDarkMode]="isDarkMode"></app-latency>
-      }
-      @if (reportState.isLoaded) {
-        <app-req-load [reportState]="reportState" [isDarkMode]="isDarkMode"></app-req-load>
-      }
-      @if (reportState.isLoaded) {
-        <app-http-code [reportState]="reportState" [isDarkMode]="isDarkMode"></app-http-code>
-      }
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+        <section class="empty-workspace" aria-labelledby="empty-title">
+          <span class="section-kicker">Start here</span>
+          <h1 id="empty-title">Turn a load test into a clear decision.</h1>
+          <p>Upload an Artillery JSON report to see health, tail latency, traffic, and the next investigation point.</p>
+          <app-file-upload #fileUploadComp [requiredFileType]="'.json'" (onFileProcess)="onReportUploadAndProcessed($event)" (onReset)="reset($event)" (onFileError)="onFileError($event)"></app-file-upload>
+        </section>
+      } @else {
+        <section class="dashboard-intro" id="overview">
+          <div>
+            <span class="section-kicker">Performance report</span>
+            <h1>Know what changed before you open the logs.</h1>
+            <p>One view of the run's health, traffic shape, tail latency, and failure signals.</p>
+          </div>
+          <div class="intro-summary" [class]="'summary-' + reportView.status">
+            <div class="summary-score">{{reportView.healthScore ?? 'N/A'}}<span>{{reportView.healthScore === undefined ? '' : '/100'}}</span></div>
+            <div><strong>{{reportView.healthLabel}}</strong><small>Calculated health score</small></div>
+          </div>
+        </section>
 
-  <!-- <mat-toolbar class="example-footer">Footer</mat-toolbar> -->
-  <!--  -->
+        <section class="kpi-grid" aria-label="Key performance indicators">
+          @for (metric of reportView.metrics; track metric.label) {
+            <article class="metric-card" [class]="'metric-' + metric.tone">
+              <div class="metric-topline"><span>{{metric.label}}</span><span class="metric-status">{{toneLabel(metric.tone)}}</span></div>
+              <strong class="metric-value">{{metric.value}}</strong>
+              <span class="metric-detail">{{metric.detail}}</span>
+              <div class="metric-trend">{{metric.trend}}</div>
+              <div class="metric-foot">
+                @if (metric.target) { <span>{{metric.target}}</span> }
+                @if (metric.progress !== undefined) { <span>{{formatNumber(metric.progress)}}%</span> }
+              </div>
+              <div class="metric-progress" aria-hidden="true"><span [style.width.%]="metric.progress ?? 0"></span></div>
+              <div class="sparkline" aria-hidden="true">
+                @for (bar of metric.bars; track $index) { <span [style.height.%]="bar"></span> }
+              </div>
+            </article>
+          }
+        </section>
 
+        <section class="content-grid health-grid" aria-labelledby="health-title">
+          <article class="panel health-panel" id="insights">
+            <div class="panel-heading"><div><span class="section-kicker">Calculated from measured metrics</span><h2 id="health-title">Performance health</h2></div><span class="score-state" [class]="'tone-' + reportView.status">{{reportView.healthLabel}}</span></div>
+            <div class="health-score"><strong>{{reportView.healthScore ?? 'N/A'}}</strong><span>/ 100</span><p>{{reportView.insight}}</p></div>
+            <div class="score-breakdown">
+              @for (part of reportView.scoreParts; track part.label) {
+                <div class="score-row"><span>{{part.label}}</span><strong>{{part.value ?? 'N/A'}}</strong><div class="score-track"><span [style.width.%]="part.value ?? 0"></span></div></div>
+              }
+            </div>
+          </article>
+          <article class="panel signal-panel" aria-labelledby="signals-title">
+            <div class="panel-heading"><div><span class="section-kicker">What to investigate</span><h2 id="signals-title">Run signals</h2></div><span class="signal-count">{{reportView.errors.length}} signals</span></div>
+            <div class="signal-list">
+              @if (reportView.errors.length) {
+                @for (error of reportView.errors.slice(0, 3); track error.name) {
+                  <div class="signal-item"><span class="signal-icon tone-critical">!</span><div><strong>{{error.name}}</strong><small>{{formatNumber(error.count)}} occurrences{{error.endpoint ? ' at ' + error.endpoint : ''}}</small></div><span class="signal-arrow">›</span></div>
+                }
+              } @else {
+                <div class="signal-item"><span class="signal-icon tone-healthy">✓</span><div><strong>No recorded failures</strong><small>Runtime and HTTP error maps are empty.</small></div></div>
+              }
+            </div>
+          </article>
+        </section>
+
+        <section class="panel timeline-panel" id="performance" aria-labelledby="timeline-title">
+          <div class="panel-heading timeline-heading"><div><span class="section-kicker">Measured timeline</span><h2 id="timeline-title">Performance over time</h2><p>Use the series toggles to separate tail latency, traffic, and errors.</p></div><div class="chart-controls"><div class="segmented" role="group" aria-label="Timeline metric"><button [class.is-active]="chartMetric === 'latency'" type="button" (click)="setChartMetric('latency')">Latency</button><button [class.is-active]="chartMetric === 'throughput'" type="button" (click)="setChartMetric('throughput')">Throughput</button><button [class.is-active]="chartMetric === 'errors'" type="button" (click)="setChartMetric('errors')">Errors</button></div><div class="range-controls" role="group" aria-label="Timeline range"><button [class.is-active]="chartRange === '1m'" type="button" (click)="setChartRange('1m')">1m</button><button [class.is-active]="chartRange === '5m'" type="button" (click)="setChartRange('5m')">5m</button><button [class.is-active]="chartRange === '15m'" type="button" (click)="setChartRange('15m')">15m</button><button [class.is-active]="chartRange === 'all'" type="button" (click)="setChartRange('all')">All</button></div></div></div>
+          @if (reportView.hasTimeline) { <div echarts [options]="chartOptions" [theme]="isDarkMode ? 'dark' : ''" class="timeline-chart" role="img" aria-label="Performance timeline chart"></div> } @else { <div class="arv-empty">No time-series results to display.</div> }
+        </section>
+
+        <section class="panel endpoint-panel" id="endpoints" aria-labelledby="endpoint-title">
+          <div class="panel-heading"><div><span class="section-kicker">Measured by route when available</span><h2 id="endpoint-title">Endpoint performance</h2><p>Sort by tail latency or failure rate to find the first place to investigate.</p></div><div class="filter-row"><input type="search" [(ngModel)]="endpointSearch" placeholder="Filter endpoints" aria-label="Filter endpoints"><select [(ngModel)]="statusFilter" aria-label="Filter endpoint status"><option value="all">All status</option><option value="healthy">Healthy</option><option value="warning">Warning</option><option value="critical">Critical</option></select></div></div>
+          <div class="table-scroll"><table><thead><tr><th>Endpoint</th><th>Method</th><th><button type="button" (click)="sortEndpoints('requests')">Requests</button></th><th><button type="button" (click)="sortEndpoints('rps')">RPS</button></th><th>Avg</th><th>P50</th><th><button type="button" (click)="sortEndpoints('p95')">P95</button></th><th><button type="button" (click)="sortEndpoints('p99')">P99</button></th><th><button type="button" (click)="sortEndpoints('errorRate')">Error %</button></th><th>Status</th></tr></thead><tbody>
+            @for (row of filteredEndpoints; track row.endpoint) { <tr><td class="endpoint-name">{{row.endpoint}}</td><td><span class="method-badge">{{row.method}}</span></td><td>{{formatCompact(row.requests)}}</td><td>{{row.rps === undefined ? 'N/A' : formatNumber(row.rps, 1)}}</td><td>{{formatMs(row.avg)}}</td><td>{{formatMs(row.p50)}}</td><td class="emphasis-number">{{formatMs(row.p95)}}</td><td class="emphasis-number">{{formatMs(row.p99)}}</td><td>{{formatPercent(row.errorRate)}}</td><td><span class="table-status" [class]="'tone-' + row.status">{{toneLabel(row.status)}}</span></td></tr> }
+            @if (!filteredEndpoints.length) { <tr><td colspan="10" class="table-empty">No endpoint metrics match this filter.</td></tr> }
+          </tbody></table></div>
+        </section>
+
+        <section class="content-grid analysis-grid">
+          <article class="panel distribution-panel" aria-labelledby="distribution-title"><div class="panel-heading"><div><span class="section-kicker">Tail latency</span><h2 id="distribution-title">Latency distribution</h2></div><span class="unit-label">milliseconds</span></div><div class="percentile-rail"><div class="rail-line"></div>@for (percentile of reportView.latencyPercentiles; track percentile.label) { <div class="percentile-point" [class.is-emphasis]="percentile.emphasis" [style.left.%]="percentile.value !== undefined && reportView.latency?.p99 ? Math.min(96, (percentile.value / reportView.latency.p99) * 88) : 4"><span>{{percentile.label}}</span><strong>{{percentile.value === undefined ? 'N/A' : formatNumber(percentile.value, 1)}}</strong></div> }</div><div class="distribution-caption"><span>Fast path</span><span>Tail behaviour</span></div></article>
+          <article class="panel status-panel" id="errors" aria-labelledby="status-title"><div class="panel-heading"><div><span class="section-kicker">Response outcomes</span><h2 id="status-title">Errors and failures</h2></div><strong class="failure-total">{{formatCompact(reportView.errorCount)}}</strong></div><div class="status-bars"><div><span>2xx</span><div class="status-track"><i class="bar-success" [style.width.%]="reportView.requests ? reportView.statusCounts.success / reportView.requests * 100 : 0"></i></div><strong>{{formatCompact(reportView.statusCounts.success)}}</strong></div><div><span>3xx</span><div class="status-track"><i class="bar-info" [style.width.%]="reportView.requests ? reportView.statusCounts.redirects / reportView.requests * 100 : 0"></i></div><strong>{{formatCompact(reportView.statusCounts.redirects)}}</strong></div><div><span>4xx</span><div class="status-track"><i class="bar-warning" [style.width.%]="reportView.requests ? reportView.statusCounts.client / reportView.requests * 100 : 0"></i></div><strong>{{formatCompact(reportView.statusCounts.client)}}</strong></div><div><span>5xx</span><div class="status-track"><i class="bar-danger" [style.width.%]="reportView.requests ? reportView.statusCounts.server / reportView.requests * 100 : 0"></i></div><strong>{{formatCompact(reportView.statusCounts.server)}}</strong></div></div><div class="error-list">@for (error of reportView.errors.slice(0, 2); track error.name) { <div><strong>{{error.name}}</strong><span>{{formatNumber(error.count)}} occurrences</span></div> } @if (!reportView.errors.length) { <div><strong>No common errors</strong><span>N/A</span></div> }</div></article>
+        </section>
+
+        <section class="panel scenario-panel" id="scenarios" aria-labelledby="scenario-title"><div class="panel-heading"><div><span class="section-kicker">Load shape</span><h2 id="scenario-title">Scenario performance</h2><p>Scenario-level latency is shown only when the report measures it directly.</p></div><span class="unit-label">{{reportView.scenarios.length}} scenarios</span></div><div class="table-scroll"><table><thead><tr><th>Scenario</th><th>Requests</th><th>RPS</th><th>P95</th><th>P99</th><th>Errors</th><th>Status</th></tr></thead><tbody>@for (row of reportView.scenarios; track row.name) { <tr><td class="scenario-name">{{row.name}}</td><td>{{formatCompact(row.requests)}}</td><td>{{row.rps === undefined ? 'N/A' : formatNumber(row.rps, 1)}}</td><td>{{formatMs(row.p95)}}</td><td>{{formatMs(row.p99)}}</td><td>{{formatCompact(row.errors)}}</td><td><span class="table-status" [class]="'tone-' + row.status">{{toneLabel(row.status)}}</span></td></tr>} @if (!reportView.scenarios.length) { <tr><td colspan="7" class="table-empty">No scenario counters were included in this report.</td></tr> }</tbody></table></div></section>
+
+        <section class="panel comparison-panel" id="comparison" aria-labelledby="comparison-title"><div class="panel-heading"><div><span class="section-kicker">Historical context</span><h2 id="comparison-title">Compare runs</h2><p>Historical comparison appears when a previous run is available.</p></div><button class="button button-secondary" type="button" disabled>Compare previous run</button></div><div class="comparison-empty"><strong>No baseline available</strong><span>Upload a previous report or connect a run history to see meaningful change direction.</span></div></section>
+
+        <details class="panel raw-panel" id="raw-data"><summary><span><span class="section-kicker">Advanced</span><strong>Raw Artillery data</strong><small>Inspect the source only when you need it.</small></span><span class="summary-action">Expand</span></summary><div class="raw-toolbar"><input type="search" [(ngModel)]="rawSearch" placeholder="Search JSON" aria-label="Search raw JSON"><button class="button button-secondary" type="button" (click)="copyRawJson()">{{copyStatus || 'Copy JSON'}}</button><button class="button button-secondary" type="button" (click)="onDownloadHit()">Download JSON</button></div>@if (rawSearch && !rawMatchesSearch()) { <div class="arv-empty">No matching text in raw report.</div> } @else { <pre>{{reportView.rawJson}}</pre> }</details>
+
+        <div class="report-footer"><app-file-upload #fileUploadComp [requiredFileType]="'.json'" (onFileProcess)="onReportUploadAndProcessed($event)" (onReset)="reset($event)" (onFileError)="onFileError($event)"></app-file-upload><span>Measured values stay distinct from calculated health scores.</span></div>
+      }
+    </main>
+  </div>
 </div>

@@ -1,127 +1,161 @@
+@use 'theme/helper';
 
-// Custom Theming for Angular Material
-// For more information: https://material.angular.io/guide/theming
-@use '@angular/material' as mat;
-// Plus imports for other components in your app.
-
-// Include the common styles for Angular Material. We include this here so that you only
-// have to load a single css file for Angular Material in your app.
-// Be sure that you only ever include this mixin once!
-@include mat.elevation-classes();
-@include mat.app-background();
-@import 'theme/helper';
-
-
-// Define the palettes for your theme using the Material Design palettes available in palette.scss
-// (imported above). For each palette, you can optionally specify a default, lighter, and darker
-// hue. Available color palettes: https://material.io/design/color/
-$arv-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
-$arv-accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400);
-
-// The warn palette is optional (defaults to red).
-$arv-warn: mat.m2-define-palette(mat.$m2-red-palette);
-
-$arv-typography: mat.m2-define-typography-config();
-
-
-// Create the theme object. A theme consists of configurations for individual
-// theming systems such as "color" or "typography".
-$arv-theme: mat.m2-define-light-theme((
-  color: (
-    primary: $arv-primary,
-    accent: $arv-accent,
-    warn: $arv-warn,
-  ),
-  typography: $arv-typography
-));
-
-// Define a dark theme
-$arv-dark-theme: mat.m2-define-dark-theme((
- color: (
-   primary: mat.m2-define-palette(mat.$m2-pink-palette),
-   accent: mat.m2-define-palette(mat.$m2-blue-grey-palette),
- ),
-  // Only include `typography` and `density` in the default dark theme.
-  typography: $arv-typography,
-  density: 0,
-));
-
-
-// Include theme styles for core and each component used in your app.
-// Alternatively, you can import and @include the theme mixins for each component
-// that you are using.
-@include mat.all-component-themes($arv-theme);
-@include mat.typography-hierarchy($arv-theme);
-
-.arv-dark {
-  @include mat.all-component-themes($arv-dark-theme);
-  @include mat.typography-hierarchy($arv-dark-theme);
+:root {
+  --arv-background: #eef2f6;
+  --arv-surface: #ffffff;
+  --arv-surface-raised: #ffffff;
+  --arv-surface-muted: #f4f7fa;
+  --arv-text: #152238;
+  --arv-muted-text: #65758b;
+  --arv-border: #dce4ec;
+  --arv-border-strong: #c6d2df;
+  --arv-accent: #087f91;
+  --arv-accent-strong: #075f70;
+  --arv-accent-soft: #e0f3f5;
+  --arv-success: #24775b;
+  --arv-danger: #b4473d;
+  --arv-warning: #a36b20;
+  --arv-shadow: rgb(21 34 56 / 0.07);
+  --arv-chart-grid: #dce4ec;
+  --arv-focus: #075f70;
+  --arv-card-gap: 1rem;
+  --arv-card-padding: 1.1rem;
 }
 
-/* You can add global styles to this file, and also import other style files */
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background-color: #f6f6f6; }
-
-.space {
-  flex: 1 1 auto;
+.arv-dark,
+[data-theme='dark'] {
+  --arv-background: #0d1725;
+  --arv-surface: #142338;
+  --arv-surface-raised: #192a41;
+  --arv-surface-muted: #1a2c43;
+  --arv-text: #e8f0f7;
+  --arv-muted-text: #a6b7ca;
+  --arv-border: #2d425b;
+  --arv-border-strong: #3d5570;
+  --arv-accent: #72d1d8;
+  --arv-accent-strong: #9ae7e8;
+  --arv-accent-soft: #153e4a;
+  --arv-success: #72c29d;
+  --arv-danger: #ff9a8f;
+  --arv-warning: #e2ad69;
+  --arv-shadow: rgb(0 0 0 / 0.24);
+  --arv-chart-grid: #2d425b;
+  --arv-focus: #9ae7e8;
 }
 
-.text-tranc {
-  text-overflow: ellipsis;
+[data-density='compact'] {
+  --arv-card-gap: 0.7rem;
+  --arv-card-padding: 0.85rem;
 }
 
-.text-nowrap {
-  text-wrap: nowrap;
+html,
+body {
+  min-height: 100%;
+  overflow-x: clip;
 }
 
-.flex-full {
-  width: 100% !important;
+body {
+  margin: 0;
+  background: var(--arv-background);
+  color: var(--arv-text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-.badge {
-  padding: 0px 5px 0px;
-  font-size: 12.025px;
-  font-weight: normal;
-  white-space: nowrap;
-  color: #ffffff;
-  background-color: #999999;
-  -webkit-border-radius: 9px;
-  -moz-border-radius: 9px;
-  border-radius: 9px;
+button,
+a,
+select,
+input {
+  font: inherit;
 }
-.badge:hover {
-  color: #ffffff;
-  text-decoration: none;
-  cursor: pointer;
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--arv-focus);
+  outline-offset: 2px;
 }
-.badge-error {
-  background-color: #b94a48;
+
+::selection {
+  color: var(--arv-text);
+  background: var(--arv-accent-soft);
 }
-.badge-error:hover {
-  background-color: #953b39;
+
+.arv-panel {
+  margin: 1.25rem 0;
+  padding: 1.35rem;
+  background: var(--arv-surface);
+  border: 1px solid var(--arv-border);
+  border-radius: 1rem;
+  box-shadow: 0 12px 32px var(--arv-shadow);
 }
-.badge-warning {
-  background-color: #f89406;
+
+.arv-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2rem;
 }
-.badge-warning:hover {
-  background-color: #c67605;
+
+.arv-panel-header h1,
+.arv-panel-header h2,
+.arv-panel-header h3 {
+  margin: 0;
+  color: var(--arv-text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
 }
-.badge-success {
-  background-color: #468847;
+
+.arv-panel-header p {
+  margin: 0.35rem 0 0;
+  color: var(--arv-muted-text);
+  font-size: 0.86rem;
 }
-.badge-success:hover {
-  background-color: #356635;
+
+.arv-panel-kicker,
+.panel-kicker {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--arv-accent-strong);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
-.badge-info {
-  background-color: #3a87ad;
+
+.arv-divider {
+  height: 1px;
+  margin: 1.15rem 0;
+  background: var(--arv-border);
 }
-.badge-info:hover {
-  background-color: #2d6987;
+
+.arv-muted {
+  color: var(--arv-muted-text);
 }
-.badge-inverse {
-  background-color: #333333;
+
+.arv-empty {
+  display: grid;
+  min-height: 5rem;
+  place-items: center;
+  padding: 1rem;
+  color: var(--arv-muted-text);
+  text-align: center;
 }
-.badge-inverse:hover {
-  background-color: #1a1a1a;
+
+@media (max-width: 700px) {
+  .arv-panel {
+    margin: 0.85rem 0;
+    padding: 1rem;
+    border-radius: 0.85rem;
+  }
+
+  .arv-panel-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }

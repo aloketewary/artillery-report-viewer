@@ -1,0 +1,156 @@
+<section class="arv-panel" aria-labelledby="details-title">
+  <header class="arv-panel-header">
+    <div>
+      <h2 id="details-title">Report details</h2>
+      <p class="arv-muted">Useful context behind the headline score.</p>
+    </div>
+    <span class="arv-muted">Aggregate metrics</span>
+  </header>
+  <div class="arv-divider"></div>
+
+  @if (runFacts.length > 0) {
+    <div class="fact-grid" aria-label="Run facts">
+      @for (fact of runFacts; track fact.label) {
+        <div class="fact-item">
+          <span>{{fact.label}}</span>
+          <strong>{{fact.value}}</strong>
+        </div>
+      }
+    </div>
+  }
+
+  @if (outcomeMetrics.length > 0) {
+    <div class="detail-section">
+      <h3>Outcome summary</h3>
+      <div class="insight-grid">
+        @for (metric of outcomeMetrics; track metric.label) {
+          <div class="insight-item">
+            <span>{{metric.label}}</span>
+            <strong>{{metric.value}}</strong>
+            @if (metric.note) {
+              <small>{{metric.note}}</small>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (responseLatency.length > 0) {
+    <div class="detail-section">
+      <h3>Response latency</h3>
+      <div class="latency-strip" aria-label="Response latency summary">
+        @for (metric of responseLatency; track metric.label) {
+          <div class="latency-item">
+            <span>{{metric.label}}</span>
+            <strong>{{metric.value}}</strong>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (statusRows.length > 0 || errorRows.length > 0 || scenarioRows.length > 0) {
+    <div class="detail-grid">
+      @if (statusRows.length > 0) {
+        <div class="detail-section compact-section">
+          <h3>HTTP status mix</h3>
+          <div class="breakdown-list" aria-label="HTTP status breakdown">
+            @for (row of statusRows; track row.label) {
+              <div class="breakdown-row">
+                <span class="breakdown-label"><strong>{{row.label}}</strong> response</span>
+                <span>{{formatNumber(row.count)}} <small>{{row.share}}</small></span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (errorRows.length > 0) {
+        <div class="detail-section compact-section error-section">
+          <h3>Runtime errors</h3>
+          <p class="section-note">Errors reported by the load test, separate from HTTP status codes.</p>
+          <div class="breakdown-list" aria-label="Runtime error breakdown">
+            @for (row of errorRows; track row.label) {
+              <div class="breakdown-row">
+                <span class="breakdown-label">{{row.label}}</span>
+                <span>{{formatNumber(row.count)}} <small>{{row.share}}</small></span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (scenarioRows.length > 0) {
+        <div class="detail-section compact-section">
+          <h3>Workload mix</h3>
+          <p class="section-note">Virtual users created by scenario.</p>
+          <div class="breakdown-list" aria-label="Workload mix">
+            @for (row of scenarioRows; track row.label) {
+              <div class="breakdown-row">
+                <span class="breakdown-label">{{row.label}}</span>
+                <span>{{formatNumber(row.count)}} <small>{{row.share}}</small></span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (timingMetrics.length > 0) {
+    <div class="detail-section">
+      <h3>Transport timing</h3>
+      <div class="metric-table" role="table" aria-label="Transport timing percentiles">
+        <div class="metric-row metric-row-header" role="row">
+          <span role="columnheader">Metric</span>
+          <span role="columnheader">P50</span>
+          <span role="columnheader">P75</span>
+          <span role="columnheader">P90</span>
+          <span role="columnheader">P95</span>
+          <span role="columnheader">P99</span>
+          <span role="columnheader">P999</span>
+        </div>
+        @for (metric of timingMetrics; track metric.label) {
+          <div class="metric-row" role="row">
+            <span role="cell">{{metric.label}}</span>
+            <span role="cell">{{formatNumber(metric.p50)}} ms</span>
+            <span role="cell">{{formatNumber(metric.p75)}} ms</span>
+            <span role="cell">{{formatNumber(metric.p90)}} ms</span>
+            <span role="cell">{{formatNumber(metric.p95)}} ms</span>
+            <span role="cell">{{formatNumber(metric.p99)}} ms</span>
+            <span role="cell">{{formatNumber(metric.p999)}} ms</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (endpointMetrics.length > 0) {
+    <div class="detail-section">
+      <h3>Endpoint response time</h3>
+      <div class="metric-table" role="table" aria-label="Endpoint response time percentiles">
+        <div class="metric-row metric-row-header" role="row">
+          <span role="columnheader">Endpoint</span>
+          <span role="columnheader">P50</span>
+          <span role="columnheader">P75</span>
+          <span role="columnheader">P90</span>
+          <span role="columnheader">P95</span>
+          <span role="columnheader">P99</span>
+          <span role="columnheader">P999</span>
+        </div>
+        @for (metric of endpointMetrics; track metric.label) {
+          <div class="metric-row" role="row">
+            <span role="cell" class="endpoint-name">{{metric.label}}</span>
+            <span role="cell">{{formatNumber(metric.p50)}} ms</span>
+            <span role="cell">{{formatNumber(metric.p75)}} ms</span>
+            <span role="cell">{{formatNumber(metric.p90)}} ms</span>
+            <span role="cell">{{formatNumber(metric.p95)}} ms</span>
+            <span role="cell">{{formatNumber(metric.p99)}} ms</span>
+            <span role="cell">{{formatNumber(metric.p999)}} ms</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</section>

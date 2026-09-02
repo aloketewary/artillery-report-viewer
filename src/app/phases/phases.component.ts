@@ -1,5 +1,6 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { ReportMetrics } from '../model/report-state';
+import { ReportPhase } from '../model/report-phase';
 
 @Component({
     selector: 'app-phases',
@@ -10,8 +11,9 @@ import { ReportMetrics } from '../model/report-state';
 })
 export class PhasesComponent {
   @Input() reportStat?: ReportMetrics;
-  @Input() isLoaded: boolean = false;
+  @Input() isLoaded = false;
 
-  constructor() {
+  get phases(): ReportPhase[] {
+    return this.reportStat?.results?.aggregate?.phases ?? [];
   }
 }
