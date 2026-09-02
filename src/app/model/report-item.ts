@@ -1,7 +1,8 @@
-import { ReportPhase } from "./report-phase";
+import { ReportPhase } from './report-phase';
 
 export class ReportItem {
   timestamp?: Date;
+  period?: number | string;
   scenariosCreated?: number;
   scenariosCompleted?: number;
   requestsCompleted?: number;
@@ -15,9 +16,10 @@ export class ReportItem {
   matches?: number;
   customStats?: object;
   counters?: object;
+  rates?: object;
+  summaries?: object;
   scenariosAvoided?: number;
   phases?: Array<ReportPhase>;
-
 
   constructor() {
     this.latency = new Latency();
@@ -28,6 +30,8 @@ export class ReportItem {
     this.counters = {};
     this.customStats = {};
     this.histograms = {};
+    this.rates = {};
+    this.summaries = {};
     this.scenarioDuration = new ScenarioDuration();
     this.phases = new Array<ReportPhase>();
   }

@@ -1,4 +1,4 @@
-import { ReportPayload } from "./report-payload";
+import { ReportPayload } from './report-payload';
 
 export class ReportState {
   hasCustomReportMetrics: boolean;
@@ -15,6 +15,7 @@ export class ReportMetrics {
   name: string;
   version: number;
   results?: ReportPayload;
+  rawResults?: unknown;
 
   constructor(_name: string, _version: number) {
     this.name = _name;
