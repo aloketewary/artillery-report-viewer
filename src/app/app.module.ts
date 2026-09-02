@@ -37,54 +37,47 @@ import { LatencyComponent } from './graph/latency/latency.component';
 import { ReqLoadComponent } from './graph/req-load/req-load.component';
 import { HttpCodeComponent } from './graph/http-code/http-code.component';
 import { StarComponent } from './shared/star/star.component';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    MessageComponent,
-    OverviewComponent,
-    InfoComponent,
-    ScenarioComponent,
-    FileUploadComponent,
-    PhasesComponent,
-    LatencyComponent,
-    ReqLoadComponent,
-    HttpCodeComponent,
-    StarComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    BrowserAnimationsModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatToolbarModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatRippleModule,
-    MatCardModule,
-    MatDividerModule,
-    FlexLayoutModule,
-    MatProgressBarModule,
-    MatListModule,
-    MatSelectModule,
-    NgxEchartsModule.forRoot({
-      echarts: () => import('echarts')
-    }),
-    MatBadgeModule,
-    MatSnackBarModule,
-    MatChipsModule,
-    HttpClientModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
+@NgModule({ declarations: [
+        AppComponent,
+        HomeComponent,
+        MessageComponent,
+        OverviewComponent,
+        InfoComponent,
+        ScenarioComponent,
+        FileUploadComponent,
+        PhasesComponent,
+        LatencyComponent,
+        ReqLoadComponent,
+        HttpCodeComponent,
+        StarComponent
+    ],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        MatSidenavModule,
+        MatIconModule,
+        MatButtonModule,
+        MatCheckboxModule,
+        MatToolbarModule,
+        FormsModule,
+        ReactiveFormsModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatRippleModule,
+        MatCardModule,
+        MatDividerModule,
+        FlexLayoutModule,
+        MatProgressBarModule,
+        MatListModule,
+        MatSelectModule,
+        NgxEchartsModule.forRoot({
+            echarts: () => import('echarts')
+        }),
+        MatBadgeModule,
+        MatSnackBarModule,
+        MatChipsModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class AppModule {
 
   constructor(
