@@ -16,18 +16,49 @@ export class FileUploadComponent {
   isFileUpload = false;
   fileDetail?: unknown;
   reportData?: ReportState;
+  isDragging = false;
+  isProcessing = false;
   @Output() onFileProcess = new EventEmitter<ReportState>();
   @Output() onReset = new EventEmitter<string>();
   @Output() onFileError = new EventEmitter<string>();
   private selectionId = 0;
 
+  openFileDialog(): void {
+    this.fileUpload?.nativeElement.click();
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-    if (!file) {
-      return;
+    if (file) {
+      this.processSelectedFile(file);
     }
+  }
 
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
+
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  onFileDropped(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    const file = event.dataTransfer?.files?.[0];
+    if (file) {
+      this.processSelectedFile(file);
+    }
+  }
+
+  private processSelectedFile(file: File): void {
     if (!file.name.toLowerCase().endsWith('.json')) {
       this.handleError('Please select an Artillery JSON report.');
       return;
@@ -35,6 +66,7 @@ export class FileUploadComponent {
 
     const selectionId = ++this.selectionId;
     this.fileName = file.name;
+    this.isProcessing = true;
     void this.processTheJson(file, selectionId);
   }
 
@@ -47,6 +79,8 @@ export class FileUploadComponent {
     this.uploadProgress = null;
     this.fileName = '';
     this.isFileUpload = false;
+    this.isDragging = false;
+    this.isProcessing = false;
     this.fileDetail = undefined;
     this.reportData = undefined;
     if (this.fileUpload?.nativeElement) {
@@ -76,6 +110,10 @@ export class FileUploadComponent {
     } catch (error: unknown) {
       if (selectionId === this.selectionId) {
         this.handleError(this.errorMessage(error));
+      }
+    } finally {
+      if (selectionId === this.selectionId) {
+        this.isProcessing = false;
       }
     }
   }

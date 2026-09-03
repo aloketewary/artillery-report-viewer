@@ -1,17 +1,27 @@
 <input type="file" class="file-input" [accept]="requiredFileType" (change)="onFileSelected($event)" #fileUpload>
 
-<div class="upload-control">
-  <span class="upload-name">{{fileName || 'Upload report JSON'}}</span>
-  @if (!isFileUpload) {
-    <button tuiButton type="button" size="s" appearance="accent" (click)="fileUpload.click()">
-      Choose file
-    </button>
-  }
-  @if (isFileUpload) {
-    <button tuiButton type="button" size="s" appearance="secondary" (click)="reset()">
-      Clear
-    </button>
-  }
+<div class="drop-zone" [class.is-dragging]="isDragging" [attr.aria-busy]="isProcessing" aria-label="Drop an Artillery JSON report here" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onFileDropped($event)">
+  <div class="drop-copy">
+    <strong>{{ isDragging ? 'Release to load report' : 'Drop Artillery JSON here' }}</strong>
+    <span>or choose a file</span>
+  </div>
+
+  <div class="upload-control">
+    <span class="upload-name">{{fileName || 'No report selected'}}</span>
+    @if (isProcessing) {
+      <span class="upload-status" role="status" aria-live="polite">Reading report...</span>
+    }
+    @if (!isProcessing && !isFileUpload) {
+      <button tuiButton type="button" size="s" appearance="accent" (click)="openFileDialog()">
+        Choose file
+      </button>
+    }
+    @if (!isProcessing && isFileUpload) {
+      <button tuiButton type="button" size="s" appearance="secondary" (click)="reset()">
+        Clear
+      </button>
+    }
+  </div>
 </div>
 
 @if (uploadProgress !== null) {

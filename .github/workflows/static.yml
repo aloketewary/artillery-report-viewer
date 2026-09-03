@@ -33,12 +33,12 @@ jobs:
         run: npm ci
 
       - name: Build Angular app
-        run: npm run build -- --configuration production --base-href /artillery-report-viewer/ --output-path docs
+        run: npm run build -- --configuration production --base-href /artillery-report-viewer/
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs
+          path: dist/arv/browser
 
   deploy:
     needs: build

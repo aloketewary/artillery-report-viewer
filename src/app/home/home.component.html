@@ -24,7 +24,7 @@
     </div>
 
     <div class="header-actions">
-      <button class="button button-quiet" type="button" (click)="onDownloadHit()" [disabled]="!reportState.isLoaded">Export report</button>
+      <button class="button button-quiet" type="button" (click)="exportReport()" [disabled]="!reportState.isLoaded">Export report</button>
       <button class="button button-quiet" type="button" (click)="toggleTheme()" [attr.aria-pressed]="isDarkMode">{{isDarkMode ? 'Light mode' : 'Dark mode'}}</button>
       <span class="run-status" [class]="'tone-' + reportView.status" [attr.aria-label]="'Run status: ' + reportView.statusLabel">
         <span class="status-dot" aria-hidden="true"></span>{{reportView.statusLabel}}
@@ -52,7 +52,14 @@
         <div class="app-notification" role="alert">{{errorMessage}}</div>
       }
 
-      @if (!reportState.isLoaded) {
+      @if (isLoading) {
+        <section class="empty-workspace loading-workspace" aria-labelledby="loading-title" aria-live="polite" aria-busy="true">
+          <span class="section-kicker">Preparing report</span>
+          <h1 id="loading-title">Loading sample report.</h1>
+          <p>Reading the local report and calculating performance metrics.</p>
+          <div class="loading-skeleton" aria-hidden="true"><span></span><span></span><span></span></div>
+        </section>
+      } @else if (!reportState.isLoaded) {
         <section class="empty-workspace" aria-labelledby="empty-title">
           <span class="section-kicker">Start here</span>
           <h1 id="empty-title">Turn a load test into a clear decision.</h1>
@@ -133,7 +140,7 @@
           <article class="panel status-panel" id="errors" aria-labelledby="status-title"><div class="panel-heading"><div><span class="section-kicker">Response outcomes</span><h2 id="status-title">Errors and failures</h2></div><strong class="failure-total">{{formatCompact(reportView.errorCount)}}</strong></div><div class="status-bars"><div><span>2xx</span><div class="status-track"><i class="bar-success" [style.width.%]="reportView.requests ? reportView.statusCounts.success / reportView.requests * 100 : 0"></i></div><strong>{{formatCompact(reportView.statusCounts.success)}}</strong></div><div><span>3xx</span><div class="status-track"><i class="bar-info" [style.width.%]="reportView.requests ? reportView.statusCounts.redirects / reportView.requests * 100 : 0"></i></div><strong>{{formatCompact(reportView.statusCounts.redirects)}}</strong></div><div><span>4xx</span><div class="status-track"><i class="bar-warning" [style.width.%]="reportView.requests ? reportView.statusCounts.client / reportView.requests * 100 : 0"></i></div><strong>{{formatCompact(reportView.statusCounts.client)}}</strong></div><div><span>5xx</span><div class="status-track"><i class="bar-danger" [style.width.%]="reportView.requests ? reportView.statusCounts.server / reportView.requests * 100 : 0"></i></div><strong>{{formatCompact(reportView.statusCounts.server)}}</strong></div></div><div class="error-list">@for (error of reportView.errors.slice(0, 2); track error.name) { <div><strong>{{error.name}}</strong><span>{{formatNumber(error.count)}} occurrences</span></div> } @if (!reportView.errors.length) { <div><strong>No common errors</strong><span>N/A</span></div> }</div></article>
         </section>
 
-        <section class="panel scenario-panel" id="scenarios" aria-labelledby="scenario-title"><div class="panel-heading"><div><span class="section-kicker">Load shape</span><h2 id="scenario-title">Scenario performance</h2><p>Scenario-level latency is shown only when the report measures it directly.</p></div><span class="unit-label">{{reportView.scenarios.length}} scenarios</span><div class="filter-row"><input type="search" [(ngModel)]="scenarioSearch" placeholder="Filter scenarios" aria-label="Filter scenarios"></div></div><div class="table-scroll"><table><thead><tr><th>Scenario</th><th>Requests</th><th>RPS</th><th>P95</th><th>P99</th><th>Errors</th><th>Status</th></tr></thead><tbody>@for (row of filteredScenarios; track row.name) { <tr><td class="scenario-name">{{row.name}}</td><td>{{formatCompact(row.requests)}}</td><td>{{row.rps === undefined ? 'N/A' : formatNumber(row.rps, 1)}}</td><td>{{formatMs(row.p95)}}</td><td>{{formatMs(row.p99)}}</td><td>{{formatCompact(row.errors)}}</td><td><span class="table-status" [class]="'tone-' + row.status">{{toneLabel(row.status)}}</span></td></tr>} @if (!filteredScenarios.length) { <tr><td colspan="7" class="table-empty">No scenario counters were included in this report.</td></tr> }</tbody></table></div></section>
+        <section class="panel scenario-panel" id="scenarios" aria-labelledby="scenario-title"><div class="panel-heading"><div><span class="section-kicker">Load shape</span><h2 id="scenario-title">Scenario performance</h2><p>Scenario-level latency is shown only when the report measures it directly.</p></div><span class="unit-label">{{reportView.scenarios.length}} scenarios</span><div class="filter-row"><input type="search" [(ngModel)]="scenarioSearch" placeholder="Filter scenarios" aria-label="Filter scenarios"></div></div><div class="table-scroll"><table><thead><tr><th>Scenario</th><th>VUs created</th><th>RPS</th><th>P95</th><th>P99</th><th>Errors</th><th>Status</th></tr></thead><tbody>@for (row of filteredScenarios; track row.name) { <tr><td class="scenario-name">{{row.name}}</td><td>{{formatCompact(row.virtualUsersCreated)}}</td><td>{{row.rps === undefined ? 'N/A' : formatNumber(row.rps, 1)}}</td><td>{{formatMs(row.p95)}}</td><td>{{formatMs(row.p99)}}</td><td>{{formatCompact(row.errors)}}</td><td><span class="table-status" [class]="'tone-' + row.status">{{toneLabel(row.status)}}</span></td></tr>} @if (!filteredScenarios.length) { <tr><td colspan="7" class="table-empty">No scenario counters were included in this report.</td></tr> }</tbody></table></div></section>
 
         <section class="panel comparison-panel" id="comparison" aria-labelledby="comparison-title"><div class="panel-heading"><div><span class="section-kicker">Historical context</span><h2 id="comparison-title">Compare runs</h2><p>Historical comparison appears when a previous run is available.</p></div><button class="button button-secondary" type="button" disabled>Compare previous run</button></div><div class="comparison-empty"><strong>No baseline available</strong><span>Upload a previous report or connect a run history to see meaningful change direction.</span></div></section>
 

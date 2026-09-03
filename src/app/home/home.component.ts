@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { EChartsOption } from 'echarts';
 import { FileUploadComponent } from '../file-upload/file-upload.component';
-import { ReportItem } from '../model/report-item';
-import { ReportPayload } from '../model/report-payload';
+import { Percentiles, PerformanceReport, TimelinePoint } from '../model/performance-report';
 import { ReportState } from '../model/report-state';
+import { normalizeArtilleryReport } from '../shared/report/performance-report-adapter';
 import { parseArtilleryReport } from '../shared/report/report-adapter';
 
 type ChartMetric = 'latency' | 'throughput' | 'errors';
@@ -35,9 +35,11 @@ interface EndpointRow {
   status: StatusTone;
 }
 
+type EndpointSort = keyof EndpointRow | 'priority';
+
 interface ScenarioRow {
   name: string;
-  requests?: number;
+  virtualUsersCreated?: number;
   rps?: number;
   p95?: number;
   p99?: number;
@@ -62,7 +64,8 @@ interface DashboardView {
   failedRequests?: number;
   p95?: number;
   p99?: number;
-  latency?: ReportItem['latency'];
+  latency?: Percentiles;
+  timeline: TimelinePoint[];
   status: StatusTone;
   statusLabel: string;
   healthScore?: number;
@@ -81,10 +84,6 @@ interface DashboardView {
   hasTimeline: boolean;
 }
 
-interface JsonRecord {
-  [key: string]: unknown;
-}
-
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -94,6 +93,7 @@ interface JsonRecord {
 export class HomeComponent implements OnInit {
   reportState = new ReportState();
   errorMessage = '';
+  isLoading = true;
   isDarkMode = false;
   activeNav = 'Overview';
   chartMetric: ChartMetric = 'latency';
@@ -106,7 +106,7 @@ export class HomeComponent implements OnInit {
   statusFilter = 'all';
   errorFilter = 'all';
   scenarioSearch = '';
-  endpointSort: keyof EndpointRow = 'p95';
+  endpointSort: EndpointSort = 'priority';
   readonly Math = Math;
   reportView: DashboardView = this.emptyView();
 
@@ -115,19 +115,31 @@ export class HomeComponent implements OnInit {
   constructor(private readonly http: HttpClient) {}
 
   ngOnInit(): void {
+    this.isLoading = true;
     this.http.get<unknown>('assets/report.json').subscribe({
       next: (source) => {
-        if (!this.reportState.isLoaded) {
+        if (this.reportState.isLoaded) {
+          this.isLoading = false;
+          return;
+        }
+
+        try {
           this.loadSource(source, 'report.json');
+        } catch (error: unknown) {
+          this.onFileError(error instanceof Error ? error.message : 'Unable to load the sample report.');
+        } finally {
+          this.isLoading = false;
         }
       },
       error: () => {
+        this.isLoading = false;
         // Upload remains available when no local fixture is present.
       },
     });
   }
 
   reset(_: string): void {
+    this.isLoading = false;
     this.reportState = new ReportState();
     this.reportView = this.emptyView();
     this.errorMessage = '';
@@ -135,6 +147,7 @@ export class HomeComponent implements OnInit {
   }
 
   onReportUploadAndProcessed(data: ReportState): void {
+    this.isLoading = false;
     try {
       const source = data.report?.rawResults ?? data.report?.results;
       if (!source) {
@@ -147,6 +160,7 @@ export class HomeComponent implements OnInit {
   }
 
   onFileError(message: string): void {
+    this.isLoading = false;
     this.errorMessage = message;
     this.reportState = new ReportState();
     this.reportView = this.emptyView();
@@ -166,6 +180,143 @@ export class HomeComponent implements OnInit {
     downloader.download = this.reportView.fileName || 'report.json';
     downloader.click();
     setTimeout(() => URL.revokeObjectURL(url));
+  }
+
+  exportReport(): void {
+    if (!this.reportState.isLoaded) {
+      return;
+    }
+
+    const html = this.buildExportHtml();
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const downloader = document.createElement('a');
+    downloader.href = url;
+    downloader.download = this.exportFileName();
+    downloader.click();
+    setTimeout(() => URL.revokeObjectURL(url));
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      this.errorMessage = 'HTML report downloaded. Allow pop-ups to print or save a PDF.';
+      return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+    setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+    }, 250);
+  }
+
+  private buildExportHtml(): string {
+    const view = this.reportView;
+    const metricRows = view.metrics.map((metric) => `
+      <article class="metric">
+        <span>${this.exportText(metric.label)}</span>
+        <strong>${this.exportText(metric.value)}</strong>
+        <small>${this.exportText(metric.detail)}</small>
+        <em>${this.exportText(metric.target || metric.trend)}</em>
+      </article>`).join('');
+    const scoreRows = view.scoreParts.map((part) => `
+      <tr><td>${this.exportText(part.label)}</td><td>${this.exportText(part.value)}</td></tr>`).join('');
+    const endpointRows = view.endpoints.map((row) => `
+      <tr>
+        <td>${this.exportText(row.endpoint)}</td><td>${this.exportText(row.method)}</td>
+        <td>${this.exportText(this.formatCompact(row.requests))}</td><td>${this.exportText(this.formatNumber(row.rps, 1))}</td>
+        <td>${this.exportText(this.formatMs(row.avg))}</td><td>${this.exportText(this.formatMs(row.p50))}</td>
+        <td>${this.exportText(this.formatMs(row.p95))}</td><td>${this.exportText(this.formatMs(row.p99))}</td>
+        <td>${this.exportText(this.formatPercent(row.errorRate))}</td><td>${this.exportText(this.toneLabel(row.status))}</td>
+      </tr>`).join('');
+    const errorRows = view.errors.map((error) => `
+      <tr><td>${this.exportText(error.name)}</td><td>${this.exportText(error.count)}</td><td>${this.exportText(error.endpoint)}</td></tr>`).join('');
+
+    return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PerfLens report: ${this.exportText(view.fileName)}</title>
+  <style>
+    :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #152238; background: #eef2f6; }
+    * { box-sizing: border-box; }
+    body { max-width: 1180px; margin: 0 auto; padding: 32px; background: #fff; }
+    header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding-bottom: 24px; border-bottom: 2px solid #dce4ec; }
+    h1, h2, p { margin: 0; }
+    h1 { font-size: 28px; letter-spacing: -0.04em; }
+    h2 { margin: 28px 0 12px; font-size: 18px; letter-spacing: -0.02em; }
+    p, small, td, th { font-size: 12px; line-height: 1.5; }
+    .muted, small, th { color: #65758b; }
+    .actions { display: flex; gap: 8px; }
+    button { padding: 8px 12px; color: #fff; background: #087f91; border: 0; border-radius: 5px; cursor: pointer; }
+    .status { color: #24775b; font-weight: 800; letter-spacing: 0.08em; }
+    .meta { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; }
+    .meta span { color: #65758b; font-size: 12px; }
+    .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .metric, .section { padding: 16px; border: 1px solid #dce4ec; border-radius: 8px; }
+    .metric { display: grid; gap: 5px; }
+    .metric span, .metric em { color: #65758b; font-size: 11px; font-style: normal; }
+    .metric strong { font-size: 22px; letter-spacing: -0.04em; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 8px; text-align: left; border-bottom: 1px solid #dce4ec; }
+    th { font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    .health { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 24px; }
+    .score { color: #087f91; font-size: 46px; font-weight: 800; letter-spacing: -0.08em; }
+    .timeline { overflow-x: auto; }
+    @media (max-width: 700px) { body { padding: 18px; } header, .health { display: block; } .actions { margin-top: 16px; } .metrics { grid-template-columns: 1fr 1fr; } }
+    @media print { body { max-width: none; padding: 0; } .actions { display: none; } .section, .metric { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <p class="muted">PerfLens performance report</p>
+      <h1>${this.exportText(view.fileName)}</h1>
+      <div class="meta"><span>${this.exportText(this.formatDate(view.timestamp))}</span><span>Artillery JSON</span><span class="status">${this.exportText(view.statusLabel)}</span></div>
+    </div>
+    <div class="actions"><button type="button" onclick="window.print()">Print / Save PDF</button></div>
+  </header>
+
+  <h2>Summary</h2>
+  <section class="metrics">${metricRows}</section>
+
+  <h2>Performance health</h2>
+  <section class="section health">
+    <div><div class="score">${this.exportText(view.healthScore)} / 100</div><p>${this.exportText(view.healthLabel)}</p><p class="muted">${this.exportText(view.insight)}</p></div>
+    <table><tbody>${scoreRows || '<tr><td>No score available</td></tr>'}</tbody></table>
+  </section>
+
+  <h2>Performance timeline</h2>
+  <section class="section timeline"><table><thead><tr><th>Time</th><th>Requests</th><th>RPS</th><th>P50</th><th>P90</th><th>P95</th><th>P99</th><th>Error %</th></tr></thead><tbody>${this.exportTimelineRows()}</tbody></table></section>
+
+  <h2>Endpoint performance</h2>
+  <section class="section timeline"><table><thead><tr><th>Endpoint</th><th>Method</th><th>Requests</th><th>RPS</th><th>Avg</th><th>P50</th><th>P95</th><th>P99</th><th>Error %</th><th>Status</th></tr></thead><tbody>${endpointRows || '<tr><td colspan="10">No endpoint metrics available</td></tr>'}</tbody></table></section>
+
+  <h2>Errors</h2>
+  <section class="section"><table><thead><tr><th>Error</th><th>Count</th><th>Endpoint</th></tr></thead><tbody>${errorRows || '<tr><td colspan="3">No common errors</td></tr>'}</tbody></table></section>
+</body>
+</html>`;
+  }
+
+  private exportTimelineRows(): string {
+    const entries = this.reportView.timeline;
+    if (!entries.length) {
+      return '<tr><td colspan="8">No time-series data available</td></tr>';
+    }
+
+    const step = Math.max(1, Math.ceil(entries.length / 120));
+    return entries.filter((_, index) => index % step === 0).map((item) => `<tr><td>${this.exportText(item.at ? this.formatDate(item.at) : 'N/A')}</td><td>${this.exportText(this.formatCompact(item.requestsCompleted))}</td><td>${this.exportText(this.formatNumber(item.throughputRps, 1))}</td><td>${this.exportText(this.formatMs(item.latency?.p50))}</td><td>${this.exportText(this.formatMs(item.latency?.p90))}</td><td>${this.exportText(this.formatMs(item.latency?.p95))}</td><td>${this.exportText(this.formatMs(item.latency?.p99))}</td><td>${this.exportText(this.formatPercent(item.errorRatePercent))}</td></tr>`).join('');
+  }
+
+  private exportFileName(): string {
+    const base = this.reportView.fileName.replace(/\.[^/.]+$/, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'report';
+    return `perflens-${base}-report.html`;
+  }
+
+  private exportText(value: unknown): string {
+    return String(value ?? 'N/A').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   copyRawJson(): void {
@@ -215,16 +366,32 @@ export class HomeComponent implements OnInit {
       .filter((row) => this.methodFilter === 'all' || row.method === this.methodFilter)
       .filter((row) => this.statusFilter === 'all' || row.status === this.statusFilter)
       .filter((row) => this.errorFilter === 'all' || (this.errorFilter === 'errors' ? (row.errorRate ?? 0) > 0 : (row.errorRate ?? 0) === 0))
-      .sort((a, b) => {
-        const left = a[this.endpointSort];
-        const right = b[this.endpointSort];
-        return (typeof right === 'number' ? right : -1) - (typeof left === 'number' ? left : -1);
+      .sort((left, right) => {
+        if (this.endpointSort === 'priority') {
+          return this.compareEndpointPriority(left, right);
+        }
+        const leftValue = left[this.endpointSort];
+        const rightValue = right[this.endpointSort];
+        return (typeof rightValue === 'number' ? rightValue : -1) - (typeof leftValue === 'number' ? leftValue : -1);
       });
   }
 
   get filteredScenarios(): ScenarioRow[] {
     const query = this.scenarioSearch.trim().toLowerCase();
     return this.reportView.scenarios.filter((row) => !query || row.name.toLowerCase().includes(query));
+  }
+
+  private compareEndpointPriority(left: EndpointRow, right: EndpointRow): number {
+    const statusRank = (status: StatusTone): number => status === 'critical' ? 3 : status === 'warning' ? 2 : status === 'healthy' ? 1 : 0;
+    const leftPriority = [statusRank(left.status), left.errorRate ?? -1, left.p99 ?? -1, left.p95 ?? -1];
+    const rightPriority = [statusRank(right.status), right.errorRate ?? -1, right.p99 ?? -1, right.p95 ?? -1];
+
+    for (let index = 0; index < leftPriority.length; index += 1) {
+      if (leftPriority[index] !== rightPriority[index]) {
+        return rightPriority[index] - leftPriority[index];
+      }
+    }
+    return left.endpoint.localeCompare(right.endpoint);
   }
 
   sortEndpoints(column: keyof EndpointRow): void {
@@ -282,6 +449,7 @@ export class HomeComponent implements OnInit {
 
   private loadSource(source: unknown, fileName: string): void {
     const parsed = parseArtilleryReport(source);
+    const normalized = normalizeArtilleryReport(parsed, fileName);
     const state = new ReportState();
     state.report = {
       name: fileName,
@@ -292,50 +460,40 @@ export class HomeComponent implements OnInit {
     state.isLoaded = true;
     state.hasCustomReportMetrics = parsed.hasCustomMetrics;
     this.reportState = state;
-    this.reportView = this.buildView(parsed.payload, parsed.raw, fileName);
+    this.reportView = this.buildView(normalized);
     this.errorMessage = '';
     this.updateChart();
   }
 
-  private buildView(payload: ReportPayload, raw: JsonRecord, fileName: string): DashboardView {
-    const aggregate = payload.aggregate;
-    const rawAggregate = asRecord(raw['aggregate']);
-    const counters = numberMap(rawAggregate?.['counters']) ?? numberMap(aggregate?.counters) ?? {};
-    const rates = numberMap(rawAggregate?.['rates']) ?? numberMap(aggregate?.rates) ?? {};
-    const summaries = asRecord(rawAggregate?.['summaries']) || aggregate?.summaries as JsonRecord | undefined;
-    const requests = firstNumber(counters, ['http.responses', 'http.requests', 'engine.http.responses']) ?? positive(aggregate?.requestsCompleted);
-    const throughput = firstNumber(rates, ['http.request_rate', 'http.response_rate', 'engine.http.response_rate']) ?? positive(aggregate?.rps?.mean);
-    const latency = this.readLatency(aggregate, summaries);
-    const codes = numberMap(aggregate?.codes) ?? {};
-    const errors = numberMap(aggregate?.errors) ?? {};
-    const statusCounts = this.getStatusCounts(codes);
-    const httpFailures = statusCounts.client + statusCounts.server;
-    const runtimeErrors = sum(Object.values(errors));
-    const errorCount = requests !== undefined ? runtimeErrors + httpFailures : undefined;
-    const errorRate = requests && errorCount !== undefined ? (errorCount / requests) * 100 : undefined;
-    const duration = this.readDuration(rawAggregate, payload.intermediate);
+  private buildView(report: PerformanceReport): DashboardView {
+    const requests = report.summary.requestsCompleted;
+    const throughput = report.summary.throughputRps;
+    const errorCount = report.summary.errorCount;
+    const errorRate = report.summary.errorRatePercent;
+    const latency = report.summary.latency;
+    const duration = report.metadata.durationSeconds;
     const scoreParts = this.scoreParts(throughput, latency?.p95, errorRate);
-    const healthScore = scoreParts.length ? Math.round(scoreParts.reduce((total, part) => total + (part.value ?? 0), 0) / scoreParts.length) : undefined;
+    const healthScore = scoreParts.length
+      ? Math.round(scoreParts.reduce((total, part) => total + (part.value ?? 0), 0) / scoreParts.length)
+      : undefined;
     const status = errorRate === undefined ? 'neutral' : errorRate === 0 ? 'healthy' : errorRate < 1 ? 'warning' : 'critical';
-    const endpoints = this.endpointRows(summaries, counters, codes, requests, duration);
-    const errorRows = Object.entries(errors).sort(([, a], [, b]) => b - a).slice(0, 5).map(([name, count]) => ({
-      name: name.replace(/_/g, ' '), count, endpoint: this.endpointForError(name),
-    }));
-    const metrics = this.metricCards(requests, throughput, errorRate, latency, duration, payload.intermediate, status);
-    const rawJson = JSON.stringify(raw, null, 2);
+    const endpoints = this.endpointRows(report.endpoints);
+    const metrics = this.metricCards(requests, throughput, errorRate, latency, duration, report.timeline, status);
+    const rawJson = JSON.stringify(report.raw, null, 2);
 
     return {
-      fileName,
-      timestamp: aggregate?.timestamp,
+      fileName: report.metadata.name,
+      timestamp: report.metadata.startedAt,
       duration,
       requests,
       throughput,
       errorCount,
       errorRate,
-      failedRequests: httpFailures || runtimeErrors || undefined,
+      failedRequests: report.summary.failedRequests,
       p95: latency?.p95,
       p99: latency?.p99,
       latency,
+      timeline: report.timeline,
       status,
       statusLabel: status === 'healthy' ? 'PASSED' : status === 'neutral' ? 'INCOMPLETE' : 'FAILED',
       healthScore,
@@ -344,80 +502,68 @@ export class HomeComponent implements OnInit {
       insight: this.insight(endpoints, errorRate, latency),
       metrics,
       endpoints,
-      scenarios: this.scenarioRows(counters, payload.intermediate),
-      errors: errorRows,
-      codes: Object.entries(codes).sort(([a], [b]) => a.localeCompare(b)).map(([code, count]) => ({
+      scenarios: this.scenarioRows(report.scenarios),
+      errors: report.errors,
+      codes: Object.entries(report.summary.statusCodes).sort(([a], [b]) => a.localeCompare(b)).map(([code, count]) => ({
         code, count, percentage: requests ? (count / requests) * 100 : 0, tone: this.codeTone(code),
       })),
-      statusCounts,
+      statusCounts: {
+        success: report.summary.statusCounts.success,
+        redirects: report.summary.statusCounts.redirects,
+        client: report.summary.statusCounts.clientErrors,
+        server: report.summary.statusCounts.serverErrors,
+      },
       latencyPercentiles: [
         { label: 'P50', value: latency?.p50 }, { label: 'P75', value: latency?.p75 },
         { label: 'P90', value: latency?.p90 }, { label: 'P95', value: latency?.p95, emphasis: true },
         { label: 'P99', value: latency?.p99, emphasis: true },
       ],
-      raw,
+      raw: report.raw,
       rawJson,
-      hasTimeline: (payload.intermediate?.length ?? 0) > 0,
+      hasTimeline: report.timeline.length > 0,
     };
   }
 
-  private metricCards(requests: number | undefined, throughput: number | undefined, errorRate: number | undefined, latency: ReportItem['latency'] | undefined, duration: number | undefined, intermediate: ReportItem[] | undefined, overallStatus: StatusTone): MetricCard[] {
-    const bars = this.sparkline(intermediate, 'requests');
+  private metricCards(requests: number | undefined, throughput: number | undefined, errorRate: number | undefined, latency: Percentiles | undefined, duration: number | undefined, timeline: TimelinePoint[], overallStatus: StatusTone): MetricCard[] {
+    const bars = this.sparkline(timeline, 'requests');
     return [
       { label: 'Requests', value: this.formatCompact(requests), detail: 'Completed responses', trend: 'No baseline', tone: overallStatus, bars },
-      { label: 'Throughput', value: throughput === undefined ? 'N/A' : this.formatNumber(throughput, 1), detail: 'Requests per second', trend: 'No baseline', tone: throughput === undefined ? 'neutral' : 'healthy', target: 'Observed rate', progress: throughput === undefined ? undefined : Math.min(100, throughput / 10), bars: this.sparkline(intermediate, 'rps') },
-      { label: 'Error rate', value: this.formatPercent(errorRate), detail: 'Runtime and HTTP failures', trend: 'No baseline', tone: errorRate === undefined ? 'neutral' : errorRate === 0 ? 'healthy' : errorRate < 1 ? 'warning' : 'critical', target: 'Target < 1%', progress: errorRate === undefined ? undefined : Math.max(0, 100 - Math.min(100, errorRate * 10)), bars: this.sparkline(intermediate, 'errors') },
-      { label: 'P95 latency', value: this.formatMs(latency?.p95), detail: '95th percentile response', trend: 'No baseline', tone: this.latencyTone(latency?.p95), target: 'Target < 500 ms', progress: latency?.p95 === undefined ? undefined : Math.max(0, 100 - (latency.p95 / 500) * 100), bars: this.sparkline(intermediate, 'p95') },
-      { label: 'P99 latency', value: this.formatMs(latency?.p99), detail: 'Tail response time', trend: 'No baseline', tone: this.latencyTone(latency?.p99, true), target: 'Target < 1,000 ms', progress: latency?.p99 === undefined ? undefined : Math.max(0, 100 - (latency.p99 / 1000) * 100), bars: this.sparkline(intermediate, 'p99') },
-      { label: 'Test duration', value: this.formatDuration(duration), detail: 'Observed run window', trend: '100% parsed', tone: duration === undefined ? 'neutral' : 'healthy', target: 'Raw timeline available', progress: duration === undefined ? undefined : 100, bars: this.sparkline(intermediate, 'requests') },
+      { label: 'Throughput', value: throughput === undefined ? 'N/A' : this.formatNumber(throughput, 1), detail: 'Requests per second', trend: 'No baseline', tone: throughput === undefined ? 'neutral' : 'healthy', target: 'Observed rate', progress: throughput === undefined ? undefined : Math.min(100, throughput / 10), bars: this.sparkline(timeline, 'rps') },
+      { label: 'Error rate', value: this.formatPercent(errorRate), detail: 'Runtime and HTTP failures', trend: 'No baseline', tone: errorRate === undefined ? 'neutral' : errorRate === 0 ? 'healthy' : errorRate < 1 ? 'warning' : 'critical', target: 'Target < 1%', progress: errorRate === undefined ? undefined : Math.max(0, 100 - Math.min(100, errorRate * 10)), bars: this.sparkline(timeline, 'errors') },
+      { label: 'P95 latency', value: this.formatMs(latency?.p95), detail: '95th percentile response', trend: 'No baseline', tone: this.latencyTone(latency?.p95), target: 'Target < 500 ms', progress: latency?.p95 === undefined ? undefined : Math.max(0, 100 - (latency.p95 / 500) * 100), bars: this.sparkline(timeline, 'p95') },
+      { label: 'P99 latency', value: this.formatMs(latency?.p99), detail: 'Tail response time', trend: 'No baseline', tone: this.latencyTone(latency?.p99, true), target: 'Target < 1,000 ms', progress: latency?.p99 === undefined ? undefined : Math.max(0, 100 - (latency.p99 / 1000) * 100), bars: this.sparkline(timeline, 'p99') },
+      { label: 'Test duration', value: this.formatDuration(duration), detail: 'Observed run window', trend: '100% parsed', tone: duration === undefined ? 'neutral' : 'healthy', target: 'Raw timeline available', progress: duration === undefined ? undefined : 100, bars: this.sparkline(timeline, 'requests') },
     ];
   }
 
-  private endpointRows(summaries: JsonRecord | undefined, counters: Record<string, number> | undefined, codes: Record<string, number>, totalRequests?: number, duration?: number): EndpointRow[] {
-    const endpointNames = new Set<string>();
-    Object.keys(summaries ?? {}).forEach((key) => {
-      const marker = 'plugins.metrics-by-endpoint.response_time.';
-      if (key.startsWith(marker)) endpointNames.add(key.slice(marker.length));
-    });
-    Object.keys(counters ?? {}).forEach((key) => {
-      const marker = 'plugins.metrics-by-endpoint.';
-      if (key.startsWith(marker)) endpointNames.add(key.slice(marker.length).split('.codes.')[0]);
-    });
-
-    return [...endpointNames].map((endpoint) => {
-      const summary = asRecord(summaries?.[`plugins.metrics-by-endpoint.response_time.${endpoint}`]);
-      const endpointCodes = Object.entries(counters ?? {}).filter(([key]) => key.startsWith(`plugins.metrics-by-endpoint.${endpoint}.codes.`)).reduce((result, [key, value]) => {
-        const code = key.split('.codes.')[1];
-        result[code] = value;
-        return result;
-      }, {} as Record<string, number>);
-      const requests = numberValue(summary?.['count']) ?? (sum(Object.values(endpointCodes)) || undefined);
-      const failed = Object.entries(endpointCodes).filter(([code]) => Number(code) >= 400).reduce((total, [, value]) => total + value, 0);
-      const errorRate = requests ? failed / requests * 100 : undefined;
+  private endpointRows(endpoints: PerformanceReport['endpoints']): EndpointRow[] {
+    return endpoints.map((endpoint) => {
+      const errorRate = endpoint.errorRatePercent;
       return {
-        endpoint: endpoint.startsWith('/') ? endpoint : `/${endpoint}`,
-        method: 'N/A', requests, rps: requests && duration ? requests / duration : undefined,
-        avg: numberValue(summary?.['mean']), p50: numberValue(summary?.['p50']), p95: numberValue(summary?.['p95']), p99: numberValue(summary?.['p99']),
-        errorRate, status: (errorRate === undefined ? 'neutral' : errorRate === 0 ? 'healthy' : errorRate < 1 ? 'warning' : 'critical') as StatusTone,
+        endpoint: endpoint.name,
+        method: endpoint.method ?? 'N/A',
+        requests: endpoint.requests,
+        rps: endpoint.throughputRps,
+        avg: endpoint.latency?.mean,
+        p50: endpoint.latency?.p50,
+        p95: endpoint.latency?.p95,
+        p99: endpoint.latency?.p99,
+        errorRate,
+        status: (errorRate === undefined ? 'neutral' : errorRate === 0 ? 'healthy' : errorRate < 1 ? 'warning' : 'critical') as StatusTone,
       };
-    }).sort((a, b) => (b.p99 ?? -1) - (a.p99 ?? -1));
+    });
   }
 
-  private scenarioRows(counters: Record<string, number> | undefined, intermediate: ReportItem[] | undefined): ScenarioRow[] {
-    return Object.entries(counters ?? {}).filter(([key]) => key.startsWith('vusers.created_by_name.')).map(([key, requests]) => ({
-      name: key.replace('vusers.created_by_name.', ''), requests, rps: undefined, p95: undefined, p99: undefined, errors: undefined, status: 'neutral' as StatusTone,
-    })).sort((a, b) => (b.requests ?? 0) - (a.requests ?? 0)).slice(0, 6);
-  }
-
-  private getStatusCounts(codes: Record<string, number>): { success: number; redirects: number; client: number; server: number } {
-    return Object.entries(codes).reduce((result, [code, count]) => {
-      const numericCode = Number(code);
-      if (numericCode >= 500) result.server += count;
-      else if (numericCode >= 400) result.client += count;
-      else if (numericCode >= 300) result.redirects += count;
-      else if (numericCode >= 200) result.success += count;
-      return result;
-    }, { success: 0, redirects: 0, client: 0, server: 0 });
+  private scenarioRows(scenarios: PerformanceReport['scenarios']): ScenarioRow[] {
+    return scenarios.map((scenario) => ({
+      name: scenario.name,
+      virtualUsersCreated: scenario.virtualUsersCreated,
+      rps: undefined,
+      p95: undefined,
+      p99: undefined,
+      errors: scenario.errorCount,
+      status: 'neutral' as StatusTone,
+    }));
   }
 
   private scoreParts(throughput?: number, p95?: number, errorRate?: number): Array<{ label: string; value?: number }> {
@@ -429,7 +575,7 @@ export class HomeComponent implements OnInit {
     ];
   }
 
-  private insight(endpoints: EndpointRow[], errorRate?: number, latency?: ReportItem['latency']): string {
+  private insight(endpoints: EndpointRow[], errorRate?: number, latency?: Percentiles): string {
     const slowest = endpoints[0];
     if (slowest?.p99 !== undefined && latency?.p99 !== undefined && slowest.p99 > latency.p99 * 1.5) {
       return `${slowest.endpoint} is the clearest tail-latency outlier. Investigate this endpoint before increasing load.`;
@@ -443,35 +589,11 @@ export class HomeComponent implements OnInit {
     return 'Upload a report with aggregate latency, error, or throughput metrics to calculate health.';
   }
 
-  private readLatency(aggregate: ReportItem | undefined, summaries: JsonRecord | undefined): ReportItem['latency'] | undefined {
-    const source = asRecord(summaries?.['http.response_time']);
-    if (!source && !aggregate?.latency) return undefined;
-    const latency = aggregate?.latency;
-    return {
-      min: numberValue(source?.['min']) ?? positive(latency?.min),
-      max: numberValue(source?.['max']) ?? positive(latency?.max),
-      median: numberValue(source?.['median']) ?? positive(latency?.median),
-      p50: numberValue(source?.['p50']) ?? positive(latency?.p50),
-      p75: numberValue(source?.['p75']),
-      p90: numberValue(source?.['p90']),
-      p95: numberValue(source?.['p95']) ?? positive(latency?.p95),
-      p99: numberValue(source?.['p99']) ?? positive(latency?.p99),
-    };
-  }
-
-  private readDuration(rawAggregate: JsonRecord | undefined, intermediate?: ReportItem[]): number | undefined {
-    const first = numberValue(rawAggregate?.['firstMetricAt']);
-    const last = numberValue(rawAggregate?.['lastMetricAt']);
-    if (first !== undefined && last !== undefined && last >= first) return (last - first) / 1000;
-    const timestamps = (intermediate ?? []).map((item) => item.timestamp?.getTime()).filter((time): time is number => time !== undefined);
-    return timestamps.length > 1 ? (Math.max(...timestamps) - Math.min(...timestamps)) / 1000 : undefined;
-  }
-
-  private sparkline(intermediate: ReportItem[] | undefined, kind: 'requests' | 'rps' | 'errors' | 'p95' | 'p99'): number[] {
-    const values = (intermediate ?? []).slice(-18).map((item) => {
+  private sparkline(timeline: TimelinePoint[], kind: 'requests' | 'rps' | 'errors' | 'p95' | 'p99'): number[] {
+    const values = timeline.slice(-18).map((item) => {
       if (kind === 'requests') return item.requestsCompleted ?? 0;
-      if (kind === 'rps') return item.rps?.mean ?? 0;
-      if (kind === 'errors') return sum(Object.values(numberMap(item.errors) ?? {})) || 0;
+      if (kind === 'rps') return item.throughputRps ?? 0;
+      if (kind === 'errors') return item.errorCount ?? 0;
       return kind === 'p95' ? item.latency?.p95 ?? 0 : item.latency?.p99 ?? 0;
     });
     const max = Math.max(...values, 1);
@@ -479,9 +601,8 @@ export class HomeComponent implements OnInit {
   }
 
   private updateChart(): void {
-    const intermediate = this.reportState.report?.results?.intermediate ?? [];
-    const entries = intermediate.slice(this.chartRange === 'all' ? 0 : this.rangeStart(intermediate.length));
-    const labels = entries.map((item) => item.timestamp ? new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(item.timestamp) : 'N/A');
+    const entries = this.reportView.timeline.slice(this.chartRange === 'all' ? 0 : this.rangeStart(this.reportView.timeline.length));
+    const labels = entries.map((item) => item.at ? new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(item.at) : 'N/A');
     const text = this.isDarkMode ? '#a6b7ca' : '#65758b';
     const grid = this.isDarkMode ? '#2d425b' : '#dce4ec';
     const base = { type: 'line', smooth: true, showSymbol: false, lineStyle: { width: 2 }, emphasis: { focus: 'series' } } as const;
@@ -490,9 +611,9 @@ export class HomeComponent implements OnInit {
       { ...base, name: 'P95', data: entries.map((item) => item.latency?.p95), lineStyle: { color: '#d88a27', width: 2 } },
       { ...base, name: 'P99', data: entries.map((item) => item.latency?.p99), lineStyle: { color: '#b4473d', width: 2 } },
     ] : this.chartMetric === 'throughput' ? [
-      { ...base, name: 'Requests/sec', data: entries.map((item) => item.rps?.mean), areaStyle: { color: 'rgba(8,127,145,0.12)' }, lineStyle: { color: '#087f91', width: 2 } },
+      { ...base, name: 'Requests/sec', data: entries.map((item) => item.throughputRps), areaStyle: { color: 'rgba(8,127,145,0.12)' }, lineStyle: { color: '#087f91', width: 2 } },
     ] : [
-      { ...base, name: 'Runtime errors', data: entries.map((item) => sum(Object.values(numberMap(item.errors) ?? {})) || null), areaStyle: { color: 'rgba(180,71,61,0.12)' }, lineStyle: { color: '#b4473d', width: 2 } },
+      { ...base, name: 'Runtime errors', data: entries.map((item) => item.errorCount ?? null), areaStyle: { color: 'rgba(180,71,61,0.12)' }, lineStyle: { color: '#b4473d', width: 2 } },
     ];
     this.chartOptions = {
       animation: false,
@@ -527,41 +648,7 @@ export class HomeComponent implements OnInit {
 
   private emptyView(): DashboardView {
     return {
-      fileName: 'No report loaded', status: 'neutral', statusLabel: 'WAITING', healthLabel: 'N/A', scoreParts: [], insight: 'Upload an Artillery JSON report to calculate performance health.', metrics: [], endpoints: [], scenarios: [], errors: [], codes: [], statusCounts: { success: 0, redirects: 0, client: 0, server: 0 }, latencyPercentiles: [], raw: undefined, rawJson: '', hasTimeline: false,
+      fileName: 'No report loaded', status: 'neutral', statusLabel: 'WAITING', healthLabel: 'N/A', scoreParts: [], insight: 'Upload an Artillery JSON report to calculate performance health.', metrics: [], endpoints: [], scenarios: [], errors: [], codes: [], statusCounts: { success: 0, redirects: 0, client: 0, server: 0 }, latencyPercentiles: [], timeline: [], raw: undefined, rawJson: '', hasTimeline: false,
     };
   }
-}
-
-function asRecord(value: unknown): JsonRecord | undefined {
-  return value !== null && typeof value === 'object' && !Array.isArray(value) ? value as JsonRecord : undefined;
-}
-
-function numberMap(value: unknown): Record<string, number> | undefined {
-  const record = asRecord(value);
-  if (!record) return undefined;
-  const result: Record<string, number> = {};
-  for (const [key, raw] of Object.entries(record)) {
-    const value = numberValue(raw);
-    if (value !== undefined) result[key] = value;
-  }
-  return result;
-}
-
-function numberValue(value: unknown): number | undefined {
-  if (typeof value === 'number' && Number.isFinite(value)) return value;
-  if (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value))) return Number(value);
-  return undefined;
-}
-
-function firstNumber(values: Record<string, number> | undefined, keys: string[]): number | undefined {
-  for (const key of keys) if (values?.[key] !== undefined) return values[key];
-  return undefined;
-}
-
-function sum(values: number[]): number {
-  return values.reduce((total, value) => total + value, 0);
-}
-
-function positive(value?: number): number | undefined {
-  return value !== undefined && value >= 0 ? value : undefined;
 }
