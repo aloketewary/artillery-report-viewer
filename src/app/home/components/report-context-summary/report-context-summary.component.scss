@@ -1,0 +1,90 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.report-context-summary {
+  min-width: 0;
+  padding: 0.9rem 1rem;
+  background: var(--arv-surface);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-lg);
+}
+
+.report-context-summary dl {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) repeat(4, minmax(0, 1fr));
+  gap: 0.9rem 1.25rem;
+  margin: 0;
+}
+
+.report-context-summary dl > div {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.report-context-summary dt {
+  color: var(--arv-muted-text);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.report-context-summary dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--arv-text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-context-summary dd[data-availability='unavailable'] {
+  color: var(--arv-muted-text);
+  font-weight: 600;
+}
+
+.context-status dd {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.context-status dd strong {
+  color: var(--arv-state-neutral);
+  font-size: 0.72rem;
+}
+
+.context-status dd small {
+  color: var(--arv-muted-text);
+  font-size: 0.6rem;
+  font-weight: 600;
+}
+
+.context-status dd[data-tone='healthy'] strong { color: var(--arv-state-success); }
+.context-status dd[data-tone='warning'] strong { color: var(--arv-state-warning); }
+.context-status dd[data-tone='critical'] strong { color: var(--arv-state-critical); }
+
+@media (max-width: 1023px) {
+  .report-context-summary dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .report-context-summary {
+    padding: 0.85rem;
+  }
+
+  .report-context-summary dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+  }
+
+  .report-context-summary dl > div:first-child {
+    grid-column: 1 / -1;
+  }
+}

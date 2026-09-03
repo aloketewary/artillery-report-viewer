@@ -1,0 +1,44 @@
+<app-shell [presentation]="shellPresentation" class="entry-shell">
+  <div class="app-content">
+    @if (errorMessage) {
+      <div tuiNotification appearance="negative" size="m" class="landing-notification" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <strong>{{uploadState.kind === 'invalid-json' ? 'Invalid JSON file' : 'Unable to read report'}}</strong>
+        <span>{{errorMessage}}</span>
+      </div>
+    }
+
+    @if (isLoading) {
+      <section class="loading-workspace" [class]="'loading-workspace upload-state-' + uploadState.kind"
+        aria-labelledby="loading-title" aria-live="polite" aria-busy="true">
+        <span class="section-kicker">Local analysis</span>
+        <h1 id="loading-title">{{sampleLoadingTitle()}}</h1>
+        <p>{{sampleLoadingMessage()}}</p>
+        <div class="loading-status" role="status" aria-live="polite">{{uploadStateMessage()}}</div>
+        <tui-loader class="loading-indicator" size="m" [inheritColor]="true" [loading]="true"
+          aria-label="Loading report"></tui-loader>
+      </section>
+    } @else {
+      <section class="welcome-workspace upload-landing" aria-labelledby="welcome-title">
+        <div class="welcome-copy">
+          <span class="section-kicker">Local performance analysis</span>
+          <h1 id="welcome-title">Turn load test results into a clear performance readout.</h1>
+          <p class="welcome-lede">Upload an Artillery JSON report to inspect traffic, latency, errors, and endpoint behavior.</p>
+          <p class="local-processing-note">{{localProcessingMessage}}</p>
+        </div>
+        <div class="welcome-upload">
+          <app-file-upload #fileUploadComp [requiredFileType]="'.json'"
+            (onFileProcess)="onReportUploadAndProcessed($event)" (onReset)="reset($event)"
+            (onFileError)="onFileError($event)" (onStateChange)="onUploadStateChanged($event)"></app-file-upload>
+          <div class="welcome-actions" aria-describedby="sample-action-help">
+            <button tuiButton type="button" size="s" appearance="secondary" [disabled]="isUploadBusy()"
+              [attr.aria-busy]="isUploadBusy() ? 'true' : 'false'"
+              aria-describedby="sample-action-help upload-surface-status"
+              (click)="loadSampleReport()">Open sample report</button>
+            <span id="sample-action-help">Explore the dashboard with a built-in JSON example.</span>
+          </div>
+        </div>
+      </section>
+    }
+  </div>
+</app-shell>

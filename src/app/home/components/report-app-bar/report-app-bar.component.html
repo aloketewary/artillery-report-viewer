@@ -1,0 +1,23 @@
+<header class="app-bar" aria-label="PerfLens application header">
+  <app-brand-block [mode]="presentation.mode"></app-brand-block>
+
+  <app-global-actions
+    [theme]="presentation.theme"
+    [canExport]="presentation.canExport"
+    [canReset]="presentation.canReset"
+    (intent)="forwardIntent($event)">
+  </app-global-actions>
+
+  <button
+    class="navigation-toggle"
+    tuiButton
+    type="button"
+    size="s"
+    appearance="secondary"
+    aria-controls="report-section-navigation"
+    [attr.aria-expanded]="navigationOpen"
+    [attr.aria-label]="navigationOpen ? 'Hide report sections' : 'Show report sections'"
+    (click)="navigationToggle.emit()">
+    {{navigationOpen ? 'Close' : 'Sections'}}
+  </button>
+</header>

@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+
+.global-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  min-width: max-content;
+}
+
+.fab-action {
+  display: inline-grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.action-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.theme-toggle {
+  display: inline-grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+}
+
+.theme-icon {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 767px) {
+  .global-actions {
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+}

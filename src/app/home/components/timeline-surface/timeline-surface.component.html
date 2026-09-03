@@ -1,0 +1,92 @@
+<div class="timeline-summary" aria-label="Selected timeline summary">
+  <div class="timeline-summary-primary">
+    <div class="timeline-summary-heading">
+      <span class="timeline-summary-label">{{metricLabel}}</span>
+      @if (hasData && hasMetricData) {
+        <span tuiBadge appearance="accent" size="s">Measured</span>
+      } @else {
+        <span tuiBadge appearance="neutral" size="s">Unavailable</span>
+      }
+    </div>
+    <strong>{{formatMetricValue(latestMetricValue)}}</strong>
+    <span class="timeline-summary-detail">{{latestMetricLabel}} · {{metricDescription}}</span>
+  </div>
+  <dl class="timeline-facts">
+    <div>
+      <dt>Window</dt>
+      <dd>{{displayWindowLabel}}</dd>
+    </div>
+    <div>
+      <dt>Points</dt>
+      <dd>{{displayEntries.length}}</dd>
+    </div>
+  </dl>
+</div>
+
+<div id="timeline-chart" class="timeline-stage">
+  @if (hasData && hasMetricData) {
+    <div
+      echarts
+      [options]="chartOptions"
+      [theme]="''"
+      class="timeline-chart"
+      role="img"
+      [attr.aria-label]="chartAccessibleLabel"
+      aria-describedby="timeline-chart-summary"></div>
+  } @else if (hasData) {
+    <div tuiMessage appearance="neutral" class="timeline-metric-empty" role="status" aria-live="polite">
+      <strong>{{metricLabel}} unavailable</strong>
+      <span>{{metricAvailabilityMessage}}</span>
+    </div>
+  } @else {
+    <div tuiMessage appearance="neutral" class="arv-empty timeline-empty" role="status">
+      Time-series data is unavailable for this report.
+    </div>
+  }
+</div>
+
+@if (hasData && hasMetricData) {
+  <p id="timeline-chart-summary" class="timeline-selection-status" role="status" aria-live="polite">
+    Showing {{metricLabel}} for {{rangeLabel}}. {{pointSummary}}
+  </p>
+}
+
+@if (hasData) {
+  <details class="timeline-data-fallback">
+    <summary aria-controls="timeline-values-table">
+      <span>View timeline values as text</span>
+      <span class="timeline-fallback-meta">{{pointSummary}}</span>
+    </summary>
+    <div class="table-scroll" id="timeline-values-table">
+      <table>
+        <caption>{{metricLabel}} timeline values with request and error context</caption>
+        <thead>
+          <tr>
+            <th scope="col">Time</th>
+            <th scope="col">Requests</th>
+            <th scope="col">Throughput (RPS)</th>
+            <th scope="col">P50 (ms)</th>
+            <th scope="col">P90 (ms)</th>
+            <th scope="col">P95 (ms)</th>
+            <th scope="col">P99 (ms)</th>
+            <th scope="col">Error rate</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (point of displayEntries; track $index) {
+            <tr>
+              <td>{{formatTime(point.at)}}</td>
+              <td>{{formatCompact(point.requestsCompleted)}}</td>
+              <td>{{formatNumber(point.throughputRps, 1)}}</td>
+              <td>{{formatMs(point.latency?.p50)}}</td>
+              <td>{{formatMs(point.latency?.p90)}}</td>
+              <td>{{formatMs(point.latency?.p95)}}</td>
+              <td>{{formatMs(point.latency?.p99)}}</td>
+              <td>{{formatPercent(point.errorRatePercent)}}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+}

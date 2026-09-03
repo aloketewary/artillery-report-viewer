@@ -59,7 +59,7 @@ export function normalizeArtilleryReport(parsed: ParsedReport, name: string): Pe
       latency: aggregate.latency,
     },
     endpoints: normalizeEndpoints(rawAggregate, aggregate.latency, durationSeconds),
-    scenarios: normalizeScenarios(aggregate.counters),
+    scenarios: normalizeScenarios(aggregate.counters, aggregate.summaries, durationSeconds),
     errors: normalizeErrors(aggregate.errors),
     timeline,
     raw: parsed.raw,
@@ -125,7 +125,7 @@ function normalizeTimelinePoint(source: JsonRecord, fallback: ReportItem | undef
     requestsCompleted: item.requestsCompleted,
     throughputRps: item.throughputRps,
     errorCount: errorCount || undefined,
-    errorRatePercent: item.requestsCompleted && errorCount ? errorCount / item.requestsCompleted * 100 : undefined,
+    errorRatePercent: item.requestsCompleted !== undefined && item.requestsCompleted > 0 ? errorCount / item.requestsCompleted * 100 : undefined,
     latency: item.latency,
   };
 }
@@ -172,15 +172,54 @@ function normalizeEndpoints(rawAggregate: JsonRecord | undefined, aggregateLaten
   }).sort((left, right) => (right.latency?.p99 ?? -1) - (left.latency?.p99 ?? -1));
 }
 
-function normalizeScenarios(counters: Record<string, number>): ScenarioPerformance[] {
-  return Object.entries(counters)
-    .filter(([key]) => key.startsWith('vusers.created_by_name.'))
-    .map(([key, virtualUsersCreated]) => ({
-      name: key.replace('vusers.created_by_name.', ''),
-      virtualUsersCreated,
-    }))
-    .sort((left, right) => (right.virtualUsersCreated ?? 0) - (left.virtualUsersCreated ?? 0))
+function normalizeScenarios(counters: Record<string, number>, summaries: JsonRecord, durationSeconds?: number): ScenarioPerformance[] {
+  const createdPrefix = 'vusers.created_by_name.';
+  const completedPrefix = 'vusers.completed_by_name.';
+  const failedPrefix = 'vusers.failed_by_name.';
+  const skippedPrefix = 'vusers.skipped_by_name.';
+  const requestPrefixes = ['http.responses_by_name.', 'http.requests_by_name.'];
+  const errorPrefixes = ['errors_by_name.'];
+  const latencyPrefix = 'plugins.metrics-by-scenario.response_time.';
+  const names = new Set<string>();
+
+  Object.keys(counters)
+    .filter((key) => key.startsWith(createdPrefix) || key.startsWith(completedPrefix) || key.startsWith(failedPrefix) || key.startsWith(skippedPrefix) || requestPrefixes.some((prefix) => key.startsWith(prefix)) || errorPrefixes.some((prefix) => key.startsWith(prefix)))
+    .forEach((key) => {
+      const prefixes = [createdPrefix, completedPrefix, failedPrefix, skippedPrefix, ...requestPrefixes, ...errorPrefixes];
+      const prefix = prefixes.find((candidate) => key.startsWith(candidate));
+      const name = prefix ? key.slice(prefix.length) : '';
+      if (name) names.add(name);
+    });
+  Object.keys(summaries).filter((key) => key.startsWith(latencyPrefix)).forEach((key) => names.add(key.slice(latencyPrefix.length)));
+
+  return [...names]
+    .map((name): ScenarioPerformance => {
+      const requests = firstNamedCounter(counters, requestPrefixes, name);
+      const errorCount = firstNamedCounter(counters, errorPrefixes, name);
+      const latency = normalizeLatency(asRecord(summaries[`${latencyPrefix}${name}`]), undefined);
+      return {
+        name,
+        requests,
+        throughputRps: requests !== undefined && durationSeconds && durationSeconds > 0 ? requests / durationSeconds : undefined,
+        latency,
+        virtualUsersCreated: counters[`${createdPrefix}${name}`],
+        virtualUsersCompleted: counters[`${completedPrefix}${name}`],
+        virtualUsersFailed: counters[`${failedPrefix}${name}`],
+        virtualUsersSkipped: counters[`${skippedPrefix}${name}`],
+        errorCount,
+        errorRatePercent: requests !== undefined && requests > 0 && errorCount !== undefined ? errorCount / requests * 100 : undefined,
+      };
+    })
+    .sort((left, right) => (right.virtualUsersCreated ?? 0) - (left.virtualUsersCreated ?? 0) || left.name.localeCompare(right.name))
     .slice(0, 6);
+}
+
+function firstNamedCounter(counters: Record<string, number>, prefixes: string[], name: string): number | undefined {
+  for (const prefix of prefixes) {
+    const value = counters[`${prefix}${name}`];
+    if (value !== undefined) return value;
+  }
+  return undefined;
 }
 
 function normalizeErrors(errors: Record<string, number>): ErrorSummary[] {
@@ -190,6 +229,7 @@ function normalizeErrors(errors: Record<string, number>): ErrorSummary[] {
     .map(([name, count]) => ({
       name: name.replace(/_/g, ' '),
       count,
+      sourceKey: name,
       endpoint: name.match(/(\/[^\s]+)/)?.[1],
     }));
 }

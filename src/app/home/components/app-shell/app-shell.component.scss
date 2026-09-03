@@ -1,0 +1,171 @@
+:host {
+  --arv-app-bar-height: 68px;
+  --arv-report-nav-height: 0px;
+  display: block;
+}
+
+.app-shell {
+  --arv-scroll-offset: 84px;
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: var(--arv-background);
+  color: var(--arv-text);
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 10;
+  padding: 0.55rem 0.75rem;
+  color: var(--arv-surface);
+  background: var(--arv-accent-strong);
+  border-radius: var(--arv-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 750;
+  transform: translateY(-160%);
+  transition: transform var(--arv-transition-fast);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.shell-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 1500px;
+  min-height: 100dvh;
+  margin: 0 auto;
+}
+
+.shell-workspace.has-report {
+  display: block;
+  min-height: 100dvh;
+  padding: var(--arv-app-bar-height) 0 0 208px;
+}
+
+.shell-navigation {
+  position: fixed;
+  top: var(--arv-app-bar-height);
+  right: auto;
+  bottom: 0;
+  left: max(0px, calc((100vw - 1500px) / 2));
+  z-index: 4;
+  display: block;
+  width: 208px;
+  height: calc(100dvh - var(--arv-app-bar-height));
+  min-height: 0;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+}
+
+.shell-content {
+  width: min(100%, 1280px);
+  min-width: 0;
+  margin: 0 auto;
+  padding: 2rem clamp(1.25rem, 3vw, 2.75rem) 4rem;
+}
+
+:host(.entry-shell) .shell-content {
+  padding: 0;
+}
+
+// Task 8.1 responsive shell contract: preserve anchored desktop navigation,
+// provide a readable tablet flow, and keep narrow layouts within the viewport.
+.app-shell,
+.shell-workspace,
+.shell-content {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.shell-content {
+  overflow-x: clip;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  :host {
+    --arv-report-nav-height: 64px;
+  }
+
+  .app-shell {
+    --arv-scroll-offset: 148px;
+  }
+
+  .shell-workspace.has-report {
+    padding: calc(var(--arv-app-bar-height) + var(--arv-report-nav-height)) 0 0;
+  }
+
+  .shell-navigation {
+    right: 0;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    height: var(--arv-report-nav-height);
+    min-height: 0;
+  }
+
+  .shell-content {
+    width: 100%;
+    margin: 0;
+    padding: 1.5rem clamp(1rem, 2.5vw, 2rem) 3rem;
+  }
+}
+
+@media (max-width: 767px) {
+  :host {
+    --arv-app-bar-height: 68px;
+  }
+
+  .app-shell {
+    --arv-scroll-offset: 84px;
+  }
+
+  .shell-workspace,
+  .shell-workspace.has-report,
+  .shell-content {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .shell-workspace.has-report {
+    padding: var(--arv-app-bar-height) 0 0;
+  }
+
+  .shell-navigation {
+    right: auto;
+    bottom: 0;
+    left: 0;
+    width: min(18rem, calc(100vw - 2rem));
+    height: auto;
+    max-height: calc(100dvh - var(--arv-app-bar-height));
+    overflow-y: auto;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(-105%);
+    transition: transform var(--arv-transition-fast), visibility var(--arv-transition-fast);
+  }
+
+  .shell-navigation.is-open {
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(0);
+    box-shadow: 0 12px 28px var(--arv-shadow);
+  }
+
+  .shell-content {
+    width: 100%;
+    margin: 0;
+    padding: 1rem 0.85rem 2.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell-navigation {
+    transition: none;
+  }
+}

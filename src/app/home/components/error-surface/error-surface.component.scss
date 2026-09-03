@@ -1,0 +1,317 @@
+:host {
+  display: block;
+}
+
+.error-surface {
+  min-width: 0;
+  padding: 1.15rem;
+  background: var(--arv-surface);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-panel);
+  box-shadow: 0 8px 22px var(--arv-shadow);
+  scroll-margin-top: var(--arv-scroll-offset, 84px);
+}
+
+.panel-heading,
+.subsection-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.section-kicker {
+  display: block;
+  margin-bottom: 0.38rem;
+  color: var(--arv-accent-strong);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.panel-heading h2,
+.subsection-heading h3,
+.error-detail h3 {
+  margin: 0;
+  color: var(--arv-text);
+  letter-spacing: -0.03em;
+}
+
+.panel-heading h2 {
+  font-size: 1rem;
+}
+
+.subsection-heading h3,
+.error-detail h3 {
+  font-size: 0.85rem;
+}
+
+.panel-heading p,
+.subsection-heading p,
+.error-detail p {
+  margin: 0.32rem 0 0;
+  color: var(--arv-muted-text);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.failure-total {
+  display: grid;
+  justify-items: end;
+  gap: 0.18rem;
+  min-width: 6rem;
+}
+
+.failure-total strong {
+  color: var(--arv-danger);
+  font-size: 1.35rem;
+  letter-spacing: -0.05em;
+}
+
+.failure-total span {
+  color: var(--arv-muted-text);
+  font-size: 0.62rem;
+}
+
+.failure-total[data-availability='unavailable'] strong,
+.error-summary dd[data-availability='unavailable'] {
+  color: var(--arv-state-empty);
+}
+
+.error-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 1.15rem 0 0;
+}
+
+.error-summary div {
+  min-width: 0;
+  padding: 0.7rem;
+  background: var(--arv-surface-muted);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-control);
+}
+
+.error-summary dt,
+.error-summary small,
+.status-bar-label small,
+.status-bar-value small,
+.status-code-row small,
+.failure-row small,
+.error-detail small {
+  color: var(--arv-muted-text);
+  font-size: 0.62rem;
+}
+
+.error-summary dt {
+  font-weight: 700;
+}
+
+.error-summary dd {
+  margin: 0.35rem 0 0.15rem;
+  color: var(--arv-text);
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.error-summary small,
+.status-bar-label small,
+.status-bar-value small,
+.status-code-row small,
+.failure-row small,
+.error-detail small {
+  display: block;
+}
+
+.status-distribution,
+.status-code-section,
+.failure-section {
+  margin-top: 1.25rem;
+}
+
+.status-bars {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.85rem;
+}
+
+.status-bar-row {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr) 5rem;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.status-bar-label,
+.status-bar-value {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.status-bar-label strong,
+.status-bar-value strong {
+  color: var(--arv-text);
+  font-size: 0.7rem;
+}
+
+.status-bar-value {
+  justify-items: end;
+  text-align: right;
+}
+
+.status-track {
+  height: 0.45rem;
+  overflow: hidden;
+  background: var(--arv-surface-muted);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-control);
+}
+
+.status-track i {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  background: var(--arv-accent);
+  border-radius: inherit;
+}
+
+.status-bar-row[data-tone='healthy'] .status-track i { background: var(--arv-success); }
+.status-bar-row[data-tone='neutral'] .status-track i { background: var(--arv-muted-text); }
+.status-bar-row[data-tone='warning'] .status-track i { background: var(--arv-warning); }
+.status-bar-row[data-tone='critical'] .status-track i { background: var(--arv-danger); }
+
+.status-code-list,
+.failure-list {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.85rem;
+}
+
+.status-code-row,
+.failure-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.62rem 0;
+  color: var(--arv-text);
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--arv-border);
+  cursor: pointer;
+  transition: background-color var(--arv-transition-fast), color var(--arv-transition-fast), transform var(--arv-transition-fast);
+}
+
+.status-code-row:last-child,
+.failure-row:last-child {
+  border-bottom: 0;
+}
+
+.status-code-row:hover,
+.failure-row:hover {
+  color: var(--arv-accent-strong);
+  background: var(--arv-control-background-hover);
+}
+
+.status-code-row > span:first-child,
+.failure-row > span:first-child {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.status-code-row > span:last-child {
+  display: grid;
+  justify-items: end;
+  gap: 0.15rem;
+  text-align: right;
+}
+
+.status-code-row strong,
+.failure-row strong {
+  overflow: hidden;
+  color: currentColor;
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.failure-action {
+  flex: 0 0 auto;
+  color: var(--arv-accent-strong);
+  font-size: 0.65rem;
+  font-weight: 750;
+}
+
+.empty-state {
+  margin: 0.85rem 0 0;
+  padding: 0.85rem;
+  color: var(--arv-muted-text);
+  background: var(--arv-state-empty-background);
+  border: 1px dashed var(--arv-border-strong);
+  border-radius: var(--arv-radius-control);
+  font-size: 0.7rem;
+}
+
+.error-detail {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 0.85rem;
+  background: var(--arv-surface-muted);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-control);
+}
+
+.error-detail p {
+  margin-bottom: 0.45rem;
+}
+
+.error-detail code {
+  color: var(--arv-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  overflow-wrap: anywhere;
+}
+
+.status-code-row:focus-visible,
+.failure-row:focus-visible {
+  outline: var(--arv-focus-width) solid var(--arv-focus);
+  outline-offset: var(--arv-focus-offset);
+}
+
+@media (max-width: 767px) {
+  .error-surface {
+    padding: 0.9rem;
+  }
+
+  .panel-heading,
+  .error-detail {
+    flex-direction: column;
+  }
+
+  .failure-total {
+    justify-items: start;
+  }
+
+  .error-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .status-bar-row {
+    grid-template-columns: 6.4rem minmax(0, 1fr) 4.2rem;
+    gap: 0.45rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-code-row,
+  .failure-row {
+    transition: none;
+  }
+}

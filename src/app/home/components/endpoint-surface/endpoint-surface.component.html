@@ -1,0 +1,172 @@
+<section class="endpoint-surface" id="endpoints" aria-labelledby="endpoint-surface-title">
+  <div class="panel-heading">
+    <div>
+      <span class="section-kicker">Measured by route when available</span>
+      <h2 id="endpoint-surface-title">{{title}}</h2>
+      <p>{{description}}</p>
+    </div>
+    <div class="panel-actions">
+      <div class="route-summary" aria-label="Route measurement coverage">
+        <span tuiBadge appearance="accent" size="s">{{endpointRows.length}} routes</span>
+        <span>
+          @if (!endpointRows.length) {
+            Route metrics unavailable
+          } @else if (hasMethods) {
+            Route metrics available
+          } @else {
+            Route metrics available. HTTP method not reported.
+          }
+        </span>
+      </div>
+      <button tuiButton class="sort-priority" type="button" size="s" appearance="secondary"
+        [attr.aria-pressed]="sort === 'priority'"
+        [attr.aria-label]="sort === 'priority' ? 'Endpoint rows sorted by priority, currently selected' : 'Sort endpoint rows by priority'"
+        (click)="sortBy('priority')">Priority order</button>
+    </div>
+  </div>
+
+  <div class="filter-row" aria-label="Endpoint filters" aria-describedby="endpoint-surface-filter-status">
+    <tui-textfield class="filter-control search-filter" tuiTextfieldSize="s">
+      <label tuiLabel>Search routes</label>
+      <input tuiInput type="search" [value]="search"
+        (input)="setFilter('endpoint-search', $any($event.target).value)"
+        aria-label="Search routes" placeholder="Filter by route name">
+    </tui-textfield>
+    <div class="filter-control filter-choice">
+      <span class="filter-label" id="endpoint-method-filter-label">Method</span>
+      <tui-segmented size="s" role="group" aria-labelledby="endpoint-method-filter-label"
+        [activeItemIndex]="methodFilterIndex" (activeItemIndexChange)="setMethodFilterByIndex($event)">
+        <button tuiButton type="button" size="s" [attr.aria-pressed]="method === 'all'">All</button>
+        @for (option of methodOptions; track option) {
+          <button tuiButton type="button" size="s" [attr.aria-pressed]="method === option">{{option}}</button>
+        }
+      </tui-segmented>
+    </div>
+    <div class="filter-control filter-choice">
+      <span class="filter-label" id="endpoint-status-filter-label">Status</span>
+      <tui-segmented size="s" role="group" aria-labelledby="endpoint-status-filter-label"
+        [activeItemIndex]="statusFilterIndex" (activeItemIndexChange)="setStatusFilterByIndex($event)">
+        @for (option of statusOptions; track option.value) {
+          <button tuiButton type="button" size="s" [attr.aria-pressed]="status === option.value">{{option.label}}</button>
+        }
+      </tui-segmented>
+    </div>
+    <div class="filter-control filter-choice">
+      <span class="filter-label" id="endpoint-error-filter-label">Error state</span>
+      <tui-segmented size="s" role="group" aria-labelledby="endpoint-error-filter-label"
+        [activeItemIndex]="errorFilterIndex" (activeItemIndexChange)="setErrorFilterByIndex($event)">
+        @for (option of errorOptions; track option.value) {
+          <button tuiButton type="button" size="s" [attr.aria-pressed]="errors === option.value">{{option.label}}</button>
+        }
+      </tui-segmented>
+    </div>
+    <button tuiButton class="clear-filters" type="button" size="s" appearance="secondary"
+      [disabled]="!hasActiveFilters" [attr.aria-disabled]="!hasActiveFilters ? 'true' : null"
+      (click)="clearFilters()">Clear filters</button>
+  </div>
+
+  <p id="endpoint-surface-filter-status" class="filter-status" role="status" aria-live="polite">
+    @if (!endpointRows.length) {
+      No endpoint metrics are available in this report.
+    } @else if (!filteredRows.length) {
+      No endpoint metrics match these filters.
+    } @else {
+      Showing {{filteredRows.length}} of {{endpointRows.length}} endpoint rows.
+    }
+  </p>
+
+  <div class="table-scroll">
+    <table>
+      <caption>Endpoint performance values from the active report</caption>
+      <thead>
+        <tr>
+          <th scope="col" [attr.aria-sort]="ariaSort('endpoint')">
+            <button tuiButton class="table-action" type="button" size="xs" appearance="secondary"
+              (click)="sortBy('endpoint')" [attr.aria-label]="'Sort endpoints by endpoint name'">Endpoint</button>
+          </th>
+          <th scope="col">Method</th>
+          <th scope="col" [attr.aria-sort]="ariaSort('requests')">
+            <button tuiButton class="table-action" type="button" size="xs" appearance="secondary"
+              (click)="sortBy('requests')" [attr.aria-label]="'Sort endpoints by request count'">Requests</button>
+          </th>
+          <th scope="col" [attr.aria-sort]="ariaSort('rps')">
+            <button tuiButton class="table-action" type="button" size="xs" appearance="secondary"
+              (click)="sortBy('rps')" [attr.aria-label]="'Sort endpoints by requests per second'">RPS</button>
+          </th>
+          <th scope="col">Avg</th>
+          <th scope="col">P50</th>
+          <th scope="col" [attr.aria-sort]="ariaSort('p95')">
+            <button tuiButton class="table-action" type="button" size="xs" appearance="secondary"
+              (click)="sortBy('p95')" [attr.aria-label]="'Sort endpoints by P95 latency'">P95</button>
+          </th>
+          <th scope="col" [attr.aria-sort]="ariaSort('p99')">
+            <button tuiButton class="table-action" type="button" size="xs" appearance="secondary"
+              (click)="sortBy('p99')" [attr.aria-label]="'Sort endpoints by P99 latency'">P99</button>
+          </th>
+          <th scope="col" [attr.aria-sort]="ariaSort('errorRate')">
+            <button tuiButton class="table-action" type="button" size="xs" appearance="secondary"
+              (click)="sortBy('errorRate')" [attr.aria-label]="'Sort endpoints by error rate'">Error %</button>
+          </th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of filteredRows; track row.endpoint) {
+          <tr [class.is-selected]="selectedEndpoint === row.endpoint"
+            [attr.aria-selected]="selectedEndpoint === row.endpoint ? 'true' : 'false'">
+            <th scope="row" class="endpoint-name">
+              <button tuiButton class="table-link endpoint-toggle" type="button" size="xs" appearance="secondary"
+                (click)="toggleEndpoint(row.endpoint)"
+                [attr.aria-expanded]="selectedEndpoint === row.endpoint" aria-controls="endpoint-detail"
+                [attr.aria-label]="(selectedEndpoint === row.endpoint ? 'Hide details for ' : 'Show details for ') + row.endpoint">
+                {{row.endpoint}}
+              </button>
+            </th>
+            <td><span tuiBadge appearance="neutral" size="s" class="method-badge"
+              [attr.aria-label]="row.method ? 'HTTP method ' + row.method : 'HTTP method not reported'"
+              [title]="row.method ? 'HTTP method ' + row.method : 'HTTP method not reported'">{{row.method ?? 'N/A'}}</span></td>
+            <td>{{formatCompact(row.requests)}}</td>
+            <td>{{row.rps === undefined ? 'N/A' : formatNumber(row.rps, 1)}}</td>
+            <td>{{formatMs(row.avg)}}</td>
+            <td>{{formatMs(row.p50)}}</td>
+            <td class="emphasis-number">{{formatMs(row.p95)}}</td>
+            <td class="emphasis-number">{{formatMs(row.p99)}}</td>
+            <td>{{formatPercent(row.errorRate)}}</td>
+            <td><span tuiBadge appearance="neutral" size="s" class="table-status"
+              [class]="'table-status tone-' + (row.status ?? 'neutral')">{{toneLabel(row.status)}}</span></td>
+          </tr>
+        }
+        @if (!endpointRows.length) {
+          <tr><td colspan="10" class="table-empty" role="status">No endpoint metrics are available in this report.</td></tr>
+        } @else if (!filteredRows.length) {
+          <tr><td colspan="10" class="table-empty" role="status">No endpoint metrics match these filters.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (selectedRow; as endpoint) {
+    <aside class="endpoint-detail" id="endpoint-detail" aria-labelledby="endpoint-detail-title" role="region">
+      <div class="detail-heading">
+        <div>
+          <span class="section-kicker">Endpoint detail</span>
+          <h3 id="endpoint-detail-title">{{endpoint.endpoint}}</h3>
+          <p>Measured route values and the current problem classification.</p>
+        </div>
+        <button tuiButton type="button" size="s" appearance="secondary" (click)="closeDetails()"
+          aria-label="Close endpoint details">Close</button>
+      </div>
+      <dl class="endpoint-facts">
+        <div><dt>Method</dt><dd>{{endpoint.method ?? 'N/A'}}</dd></div>
+        <div><dt>Requests</dt><dd>{{formatCompact(endpoint.requests)}}</dd></div>
+        <div><dt>RPS</dt><dd>{{endpoint.rps === undefined ? 'N/A' : formatNumber(endpoint.rps, 1)}}</dd></div>
+        <div><dt>Average</dt><dd>{{formatMs(endpoint.avg)}}</dd></div>
+        <div><dt>P50</dt><dd>{{formatMs(endpoint.p50)}}</dd></div>
+        <div><dt>P95</dt><dd>{{formatMs(endpoint.p95)}}</dd></div>
+        <div><dt>P99</dt><dd>{{formatMs(endpoint.p99)}}</dd></div>
+        <div><dt>Error rate</dt><dd>{{formatPercent(endpoint.errorRate)}}</dd></div>
+        <div><dt>Status</dt><dd>{{toneLabel(endpoint.status)}}</dd></div>
+      </dl>
+    </aside>
+  }
+</section>

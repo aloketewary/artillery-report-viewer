@@ -1,0 +1,26 @@
+@if (context; as report) {
+  <section class="report-context" aria-label="Report context">
+    <dl>
+      <div>
+        <dt>Report</dt>
+        <dd>{{report.fileName.display}}</dd>
+      </div>
+      <div>
+        <dt>Started</dt>
+        <dd>{{report.startedAt.display}}</dd>
+      </div>
+      <div>
+        <dt>Format</dt>
+        <dd>{{report.format.display}}</dd>
+      </div>
+      <div>
+        <dt>Duration</dt>
+        <dd>{{report.duration.display}}</dd>
+      </div>
+      <div class="context-status">
+        <dt>Status</dt>
+        <dd [attr.data-tone]="report.status.value ?? 'neutral'">{{report.statusLabel}}</dd>
+      </div>
+    </dl>
+  </section>
+}

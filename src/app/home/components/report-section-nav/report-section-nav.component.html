@@ -1,0 +1,33 @@
+<nav class="section-nav" aria-label="Report sections">
+  <div class="section-nav-heading">
+    <span>Analysis</span>
+    <small>Report sections</small>
+  </div>
+
+  <div class="section-nav-items">
+    @for (item of items; track item.id) {
+      <a
+        class="nav-item"
+        [class.is-active]="activeAnchor === item.id"
+        [href]="hrefFor(item.id)"
+        [attr.aria-current]="activeAnchor === item.id ? 'location' : null"
+        (click)="navigate(item.id)">
+        <tui-icon class="nav-icon" [icon]="navIcons[item.id]" aria-hidden="true"></tui-icon>
+        <span>{{item.label}}</span>
+      </a>
+    }
+  </div>
+
+  <div class="section-nav-footer">
+    <div class="footer-label">
+      <span class="data-badge">Local report</span>
+      <span class="footer-state">Loaded locally</span>
+    </div>
+    @if (context; as report) {
+      <strong class="report-file" [title]="report.fileName.display">{{report.fileName.display}}</strong>
+      <small>{{report.format.display}} values are available in this session.</small>
+    } @else {
+      <small>Values are read from the selected Artillery JSON file.</small>
+    }
+  </div>
+</nav>

@@ -1,0 +1,82 @@
+:host {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 3;
+  display: block;
+  height: 68px;
+}
+
+.app-bar {
+  display: grid;
+  box-sizing: border-box;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  gap: 1.25rem;
+  min-height: 68px;
+  padding: 0.7rem max(1.25rem, calc((100vw - 1500px) / 2));
+  background: color-mix(in srgb, var(--arv-surface) 96%, transparent);
+  border-bottom: 1px solid var(--arv-border-strong);
+  box-shadow: 0 4px 18px var(--arv-shadow);
+  backdrop-filter: blur(18px);
+}
+
+.app-bar > app-brand-block,
+.app-bar > app-global-actions,
+.navigation-toggle {
+  min-width: 0;
+}
+
+.navigation-toggle {
+  display: none;
+}
+
+@media (max-width: 1199px) {
+  .app-bar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 767px) {
+  :host {
+    height: 68px;
+  }
+
+  .app-bar {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 0.7rem;
+    padding-inline: 0.85rem;
+  }
+
+  .app-bar > app-global-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .navigation-toggle {
+    display: inline-flex;
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+@media (min-width: 1200px) {
+  .app-bar {
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .app-bar {
+    padding-inline: clamp(1rem, 3vw, 2rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-bar {
+    backdrop-filter: none;
+  }
+}

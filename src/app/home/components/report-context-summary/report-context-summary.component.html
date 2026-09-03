@@ -1,0 +1,29 @@
+@if (context; as report) {
+  <section class="report-context-summary" aria-label="Report context summary">
+    <dl>
+      <div>
+        <dt>Report</dt>
+        <dd [attr.data-availability]="report.fileName.availability">{{report.fileName.display}}</dd>
+      </div>
+      <div>
+        <dt>Started</dt>
+        <dd [attr.data-availability]="report.startedAt.availability">{{report.startedAt.display}}</dd>
+      </div>
+      <div>
+        <dt>Format</dt>
+        <dd [attr.data-availability]="report.format.availability">{{report.format.display}}</dd>
+      </div>
+      <div>
+        <dt>Duration</dt>
+        <dd [attr.data-availability]="report.duration.availability">{{report.duration.display}}</dd>
+      </div>
+      <div class="context-status">
+        <dt>Status</dt>
+        <dd [attr.data-tone]="report.status.value ?? 'neutral'" [attr.data-availability]="report.status.availability">
+          <strong>{{report.statusLabel}}</strong>
+          <small>{{report.status.availability === 'calculated' ? 'Calculated' : report.status.availability === 'measured' ? 'Measured' : 'Unavailable'}}</small>
+        </dd>
+      </div>
+    </dl>
+  </section>
+}

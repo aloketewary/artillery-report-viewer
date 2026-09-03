@@ -1,0 +1,105 @@
+<app-shell [presentation]="shellPresentation" [activeAnchor]="activeAnchor" (intent)="onShellIntent($event)">
+  <div class="app-content">
+    @if (errorMessage) {
+    <div tuiNotification appearance="negative" size="m" class="report-notification" role="alert"
+      aria-live="assertive" aria-atomic="true">
+      <strong>{{uploadState.kind === 'invalid-json' ? 'Invalid JSON file' : 'Unable to read report'}}</strong>
+      <span>{{errorMessage}}</span>
+    </div>
+    }
+
+    @if (exportStatus) {
+    <div id="export-status" class="app-notification export-status" [class.is-blocked]="exportStatusRole === 'alert'"
+      [attr.role]="exportStatusRole" [attr.aria-live]="exportStatusRole === 'alert' ? 'assertive' : 'polite'"
+      aria-atomic="true">
+      <strong>{{exportStatusRole === 'alert' ? 'Print guidance' : 'Export status'}}</strong>
+      <span>{{exportStatus}}</span>
+    </div>
+    }
+
+    <app-report-overview [view]="reportView" [context]="shellPresentation.reportContext"></app-report-overview>
+
+    <section class="panel timeline-panel" id="performance" aria-labelledby="timeline-title">
+      <div class="panel-heading timeline-heading">
+        <div><span class="section-kicker">Measured timeline</span>
+          <h2 id="timeline-title">Performance over time</h2>
+          <p>Use the series toggles to separate tail latency, traffic, and errors.</p>
+        </div>
+        <div class="chart-controls">
+          <div class="chart-control-group">
+            <span class="chart-control-label" id="timeline-metric-label">Measure</span>
+            <tui-segmented class="timeline-segmented" size="s" role="group"
+              aria-labelledby="timeline-metric-label" [activeItemIndex]="chartMetricIndex"
+              (activeItemIndexChange)="setChartMetricByIndex($event)">
+              <button tuiButton type="button" size="s" [attr.aria-pressed]="chartMetric === 'latency'"
+                aria-controls="timeline-chart" aria-label="Show latency series">Latency</button>
+              <button tuiButton type="button" size="s" [attr.aria-pressed]="chartMetric === 'throughput'"
+                aria-controls="timeline-chart" aria-label="Show throughput series">Throughput</button>
+              <button tuiButton type="button" size="s" [attr.aria-pressed]="chartMetric === 'errors'"
+                aria-controls="timeline-chart" aria-label="Show error rate series">Error rate</button>
+            </tui-segmented>
+          </div>
+          <div class="chart-control-group">
+            <span class="chart-control-label" id="timeline-range-label">Window</span>
+            <tui-segmented class="timeline-segmented" size="s" role="group"
+              aria-labelledby="timeline-range-label" [activeItemIndex]="chartRangeIndex"
+              (activeItemIndexChange)="setChartRangeByIndex($event)">
+              <button tuiButton type="button" size="s" [attr.aria-pressed]="chartRange === '1m'"
+                aria-controls="timeline-chart" aria-label="Show the last 1 minute">1m</button>
+              <button tuiButton type="button" size="s" [attr.aria-pressed]="chartRange === '5m'"
+                aria-controls="timeline-chart" aria-label="Show the last 5 minutes">5m</button>
+              <button tuiButton type="button" size="s" [attr.aria-pressed]="chartRange === '15m'"
+                aria-controls="timeline-chart" aria-label="Show the last 15 minutes">15m</button>
+              <button tuiButton type="button" size="s" [attr.aria-pressed]="chartRange === 'all'"
+                aria-controls="timeline-chart" aria-label="Show the complete timeline">All</button>
+            </tui-segmented>
+          </div>
+        </div>
+      </div>
+      <app-timeline-surface [timeline]="reportView.timeline" [metric]="chartMetric" [range]="chartRange"
+        [darkMode]="isDarkMode"></app-timeline-surface>
+    </section>
+
+    <app-endpoint-surface [view]="reportView" [search]="endpointSearch" [method]="methodFilter"
+      [status]="statusFilter" [errors]="errorFilter" [sort]="endpointSort"
+      [selectedEndpoint]="selectedEndpointName" (intent)="onInvestigationIntent($event)"></app-endpoint-surface>
+
+    <section class="panel latency-panel" aria-labelledby="latency-surface-title">
+      <app-latency-surface [latency]="reportView.latency"></app-latency-surface>
+    </section>
+
+    <app-scenario-surface [view]="reportView" [search]="scenarioSearch"
+      [selectedScenario]="selectedScenarioName" (intent)="onInvestigationIntent($event)"></app-scenario-surface>
+
+    <app-error-surface [view]="reportView" [selectedErrorKey]="selectedErrorKey"
+      [selectedStatusCode]="selectedStatusCode" (intent)="onInvestigationIntent($event)"></app-error-surface>
+
+    <section class="panel comparison-panel report-secondary-surface" id="comparison" aria-labelledby="comparison-title">
+      <div class="panel-heading">
+        <div><span class="section-kicker">Historical context</span>
+          <h2 id="comparison-title">Compare runs</h2>
+          <p>No previous run is available in the current report flow.</p>
+        </div><span class="score-state tone-neutral" role="status">Baseline unavailable</span>
+      </div>
+      <div class="comparison-empty" role="status" aria-labelledby="comparison-empty-title"
+        aria-describedby="comparison-empty-copy"><strong id="comparison-empty-title">No baseline available</strong><span
+          id="comparison-empty-copy">Comparison stays unavailable until the existing application flow provides a
+          previous run.</span><span>No deltas or trend values are shown without historical data.</span></div>
+      <div class="filter-row comparison-controls" aria-label="Comparison controls"><button
+          tuiButton class="button button-secondary" type="button" size="s" appearance="secondary" disabled aria-disabled="true"
+          aria-describedby="comparison-empty-copy" title="No baseline available">Compare previous run</button><span
+          class="unit-label">Unavailable until a baseline is supplied.</span></div>
+    </section>
+
+    <app-health-surface [health]="healthPresentation" [prioritySignals]="prioritySignalPresentation"></app-health-surface>
+
+    <app-raw-data-surface class="report-secondary-surface" [presentation]="rawDataPresentation" [copyStatus]="copyStatus"
+      (intent)="onRawIntent($event)"></app-raw-data-surface>
+
+    <div class="report-footer"><app-file-upload #fileUploadComp [requiredFileType]="'.json'"
+        (onFileProcess)="onReportUploadAndProcessed($event)" (onReset)="reset($event)"
+        (onFileError)="onFileError($event)"
+        (onStateChange)="onUploadStateChanged($event)"></app-file-upload><span>Measured values stay distinct from
+        calculated health scores.</span></div>
+  </div>
+</app-shell>

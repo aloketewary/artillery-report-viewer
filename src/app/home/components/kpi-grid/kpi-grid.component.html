@@ -1,0 +1,37 @@
+<section class="kpi-grid" aria-labelledby="kpi-title">
+  @for (metric of orderedMetrics; track metric.key) {
+    <article class="metric-card" [class]="'metric-' + metric.tone" [attr.data-availability]="metric.availability"
+      [attr.aria-labelledby]="'metric-label-' + metric.key"
+      [attr.aria-describedby]="'metric-value-' + metric.key + ' metric-detail-' + metric.key">
+      <div class="metric-topline">
+        <span [id]="'metric-label-' + metric.key">{{metric.label}}</span>
+        @if (metric.availability !== 'measured') {
+          <span class="metric-status" [attr.data-state]="metric.availability">Unavailable</span>
+        }
+      </div>
+
+      <div class="metric-main">
+        <strong class="metric-value" [id]="'metric-value-' + metric.key">{{metric.value}}</strong>
+        <span class="metric-detail" [id]="'metric-detail-' + metric.key">{{metric.detail}}</span>
+      </div>
+
+      <div class="metric-footer">
+        @if (metric.availability === 'measured') {
+          <div class="metric-spark" aria-hidden="true">
+            @for (bar of metric.bars; track $index) {
+              <span [style.height.%]="bar"></span>
+            }
+          </div>
+        } @else {
+          <div class="metric-spark metric-spark-empty" aria-hidden="true">
+            <span>No trend</span>
+          </div>
+        }
+
+        @if (metric.target) {
+          <span class="metric-reference">{{metric.target}}</span>
+        }
+      </div>
+    </article>
+  }
+</section>

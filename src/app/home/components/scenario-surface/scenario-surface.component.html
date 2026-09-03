@@ -1,0 +1,110 @@
+<section class="scenario-surface" id="scenarios" aria-labelledby="scenario-surface-title">
+  <div class="panel-heading">
+    <div>
+      <span class="section-kicker">Load shape</span>
+      <h2 id="scenario-surface-title">Scenario performance</h2>
+      <p>Measured scenario counters and source-provided performance values. Missing values remain N/A.</p>
+    </div>
+    <span class="unit-label">{{scenarioRows.length}} scenarios</span>
+  </div>
+
+  <div class="filter-row" aria-label="Scenario filters" aria-describedby="scenario-search-status">
+    <label for="scenario-search">Search scenarios</label>
+    <input id="scenario-search" class="arv-control" type="search" [value]="search"
+      (input)="setSearch($any($event.target).value)" placeholder="Filter scenarios"
+      aria-describedby="scenario-search-status">
+  </div>
+  <p id="scenario-search-status" class="filter-status" role="status" aria-live="polite">
+    @if (!scenarioRows.length) {
+      No scenario metrics are available in this report.
+    } @else if (!filteredRows.length) {
+      No scenario metrics match this search.
+    } @else {
+      Showing {{filteredRows.length}} of {{scenarioRows.length}} scenario rows.
+    }
+  </p>
+
+  <div class="table-scroll">
+    <table>
+      <caption>Scenario performance values from the active Artillery report</caption>
+      <thead>
+        <tr>
+          <th scope="col">Scenario</th>
+          <th scope="col">Requests</th>
+          <th scope="col">VUs created</th>
+          <th scope="col">VUs completed</th>
+          <th scope="col">VUs failed</th>
+          <th scope="col">VUs skipped</th>
+          <th scope="col">RPS</th>
+          <th scope="col">P95</th>
+          <th scope="col">P99</th>
+          <th scope="col">Errors</th>
+          <th scope="col">Error rate</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of filteredRows; track row.name) {
+          <tr [class.is-selected]="selectedScenario === row.name"
+            [attr.aria-selected]="selectedScenario === row.name ? 'true' : 'false'">
+            <th scope="row" class="scenario-name">
+              <button tuiButton class="table-link scenario-toggle" type="button" size="xs" appearance="secondary" (click)="toggleScenario(row.name)"
+                [attr.aria-expanded]="selectedScenario === row.name" aria-controls="scenario-detail"
+                [attr.aria-label]="(selectedScenario === row.name ? 'Hide details for ' : 'Show details for ') + row.name">
+                {{row.name}}
+              </button>
+            </th>
+            <td>{{formatCompact(row.requests)}}</td>
+            <td>{{formatCompact(row.virtualUsersCreated)}}</td>
+            <td>{{formatCompact(row.virtualUsersCompleted)}}</td>
+            <td>{{formatCompact(row.virtualUsersFailed)}}</td>
+            <td>{{formatCompact(row.virtualUsersSkipped)}}</td>
+            <td>{{formatNumber(row.rps)}}</td>
+            <td class="emphasis-number">{{formatMs(row.p95)}}</td>
+            <td class="emphasis-number">{{formatMs(row.p99)}}</td>
+            <td>{{formatCompact(row.errors)}}</td>
+            <td>{{formatPercent(row.errorRate)}}</td>
+            <td><span class="table-status" [class]="'tone-' + (row.status ?? 'neutral')"
+                [attr.data-availability]="row.status ? 'measured' : 'unavailable'">{{toneLabel(row.status)}}</span></td>
+          </tr>
+        }
+        @if (!scenarioRows.length) {
+          <tr><td colspan="12" class="table-empty" role="status">No scenario metrics are available in this report.</td></tr>
+        } @else if (!filteredRows.length) {
+          <tr><td colspan="12" class="table-empty" role="status">No scenario metrics match this search.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (selectedRow; as scenario) {
+    <aside class="scenario-detail" id="scenario-detail" aria-labelledby="scenario-detail-title"
+      aria-live="polite" role="region">
+      <div class="detail-heading">
+        <div>
+          <span class="section-kicker">Scenario detail</span>
+          <h3 id="scenario-detail-title">{{scenario.name}}</h3>
+          <p>Values below remain tied to scenario-specific report data.</p>
+        </div>
+        <button tuiButton class="button button-secondary arv-control" type="button" size="s" appearance="secondary" (click)="closeDetails()"
+          aria-label="Close scenario details">Close</button>
+      </div>
+      <dl class="scenario-facts">
+        <div><dt>Requests</dt><dd>{{formatCompact(scenario.requests)}}</dd></div>
+        <div><dt>VUs created</dt><dd>{{formatCompact(scenario.virtualUsersCreated)}}</dd></div>
+        <div><dt>VUs completed</dt><dd>{{formatCompact(scenario.virtualUsersCompleted)}}</dd></div>
+        <div><dt>VUs failed</dt><dd>{{formatCompact(scenario.virtualUsersFailed)}}</dd></div>
+        <div><dt>VUs skipped</dt><dd>{{formatCompact(scenario.virtualUsersSkipped)}}</dd></div>
+        <div><dt>RPS</dt><dd>{{formatNumber(scenario.rps)}}</dd></div>
+        <div><dt>P95</dt><dd>{{formatMs(scenario.p95)}}</dd></div>
+        <div><dt>P99</dt><dd>{{formatMs(scenario.p99)}}</dd></div>
+        <div><dt>Errors</dt><dd>{{formatCompact(scenario.errors)}}</dd></div>
+        <div><dt>Error rate</dt><dd>{{formatPercent(scenario.errorRate)}}</dd></div>
+        <div><dt>Status</dt><dd>{{toneLabel(scenario.status)}}</dd></div>
+      </dl>
+      @if (!hasMeasuredPerformance(scenario)) {
+        <p class="scenario-detail-note">This report does not provide scenario-level request, rate, latency, or error metrics. Available virtual-user counters remain measured, and unavailable values stay N/A.</p>
+      }
+    </aside>
+  }
+</section>

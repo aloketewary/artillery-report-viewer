@@ -1,0 +1,35 @@
+<section class="report-overview" id="overview" aria-labelledby="overview-title">
+  <header class="overview-header">
+    <div class="overview-copy">
+      <h1 id="overview-title">Performance run overview</h1>
+      <p>Measured traffic, latency, and reliability for this run.</p>
+    </div>
+  </header>
+
+  @if (context) {
+    <app-report-context-summary [context]="context"></app-report-context-summary>
+  }
+
+  <aside class="overview-analysis" [attr.data-tone]="view.status" aria-labelledby="analysis-title">
+    <div class="analysis-status">
+      <span class="analysis-kicker">Assessment</span>
+      <div class="analysis-status-line">
+        <h2 id="analysis-title">{{view.statusLabel}}</h2>
+        <span class="health-label">{{view.healthLabel}}</span>
+      </div>
+    </div>
+    <p>{{view.insight}}</p>
+    <div class="health-score" aria-label="Health score">
+      <strong>{{view.healthScore === undefined ? 'N/A' : view.healthScore}}</strong>
+      <span>Health score</span>
+    </div>
+  </aside>
+
+  <section class="kpi-section" aria-labelledby="kpi-title">
+    <header class="kpi-heading">
+      <h2 id="kpi-title">Key metrics</h2>
+      <span>Measured signals</span>
+    </header>
+    <app-kpi-grid [metrics]="view.metrics"></app-kpi-grid>
+  </section>
+</section>

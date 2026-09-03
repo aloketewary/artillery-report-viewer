@@ -1,0 +1,193 @@
+<input
+  #fileUpload
+  class="file-input"
+  type="file"
+  [accept]="requiredFileType"
+  [disabled]="isProcessing"
+  aria-label="Choose an Artillery JSON report"
+  tabindex="-1"
+  (change)="onFileSelected($event)"
+>
+
+<section
+  class="upload-surface drop-zone"
+  [class.is-dragging]="isDragging"
+  [class.is-processing]="isProcessing"
+  [class.has-report]="isFileUpload"
+  [attr.data-upload-state]="uploadState.kind"
+  [attr.aria-busy]="isProcessing ? 'true' : 'false'"
+  aria-labelledby="upload-surface-title"
+  aria-describedby="upload-surface-help upload-surface-status"
+  role="group"
+  tabindex="0"
+  (keydown)="onDropZoneKeydown($event)"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onFileDropped($event)"
+>
+  <header class="upload-header">
+    <div class="upload-heading">
+      <span class="upload-kicker">Start analysis</span>
+      <h2 id="upload-surface-title">Upload a performance report</h2>
+      <p id="upload-surface-help">Drop an Artillery JSON file here or choose one from your computer. Analysis stays in this browser.</p>
+    </div>
+    <span tuiBadge appearance="neutral" size="s" aria-label="Accepted file type: JSON">JSON only</span>
+  </header>
+
+  <div class="drop-content">
+    <div class="drop-mark" aria-hidden="true">{{ '{ }' }}</div>
+    <div class="drop-copy">
+      <strong>
+        @if (isDragging) {
+          Release to load report
+        } @else if (uploadState.kind === 'reading') {
+          Reading report locally
+        } @else if (uploadState.kind === 'processing') {
+          Processing report locally
+        } @else if (isFileUpload) {
+          Report ready to review
+        } @else {
+          Drop Artillery JSON here
+        }
+      </strong>
+      <span>Artillery JSON files up to {{formatFileSize(maxFileSizeBytes)}} are accepted.</span>
+    </div>
+  </div>
+
+  <div
+    id="upload-surface-status"
+    class="upload-live-status"
+    [class.is-error]="uploadState.kind === 'invalid-extension' || uploadState.kind === 'invalid-json' || uploadState.kind === 'unsupported-shape' || uploadState.kind === 'retry'"
+    [class.is-success]="uploadState.kind === 'ready'"
+    [class.is-loading]="uploadState.kind === 'reading' || uploadState.kind === 'processing'"
+    [attr.role]="uploadState.kind === 'invalid-extension' || uploadState.kind === 'invalid-json' || uploadState.kind === 'unsupported-shape' || uploadState.kind === 'retry' ? 'alert' : 'status'"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    <span class="status-label">
+      @if (uploadState.kind === 'idle') {
+        Ready to analyze
+      } @else if (uploadState.kind === 'drag-over') {
+        Drop report here
+      } @else if (uploadState.kind === 'reading') {
+        Reading locally
+      } @else if (uploadState.kind === 'processing') {
+        Processing locally
+      } @else if (uploadState.kind === 'ready') {
+        Report ready
+      } @else if (uploadState.kind === 'invalid-extension') {
+        Unsupported file type
+      } @else if (uploadState.kind === 'invalid-json') {
+        Invalid JSON
+      } @else if (uploadState.kind === 'unsupported-shape') {
+        Unsupported report shape
+      } @else {
+        Try again
+      }
+    </span>
+    <span class="status-message">
+      @if (uploadState.kind === 'idle') {
+        Choose or drop an Artillery JSON report.
+      } @else if (uploadState.kind === 'drag-over') {
+        Release to read the first selected file.
+      } @else if (uploadState.kind === 'reading') {
+        Reading {{uploadState.fileName || 'the selected report'}}.
+      } @else if (uploadState.kind === 'processing') {
+        Processing {{uploadState.fileName || 'the report'}} in this browser.
+      } @else if (uploadState.kind === 'ready') {
+        {{uploadState.fileName}} is ready.
+      } @else {
+        {{uploadState.message}}
+      }
+    </span>
+  </div>
+
+  <div class="upload-control">
+    @if (selectedFile; as file) {
+      <tui-file class="upload-selection" [file]="file" state="normal" [showDelete]="false"
+        [showSize]="true"></tui-file>
+    } @else {
+      <span class="upload-selection">
+        <span class="selection-label">Selected file</span>
+        <span class="upload-name">No report selected</span>
+      </span>
+    }
+
+    <div class="upload-actions">
+      @if (isProcessing) {
+        <button
+          tuiButton
+          type="button"
+          size="s"
+          appearance="secondary"
+          [disabled]="!isProcessing"
+          aria-label="Cancel report processing"
+          (click)="cancelUpload()"
+        >
+          Cancel
+        </button>
+      } @else if (isFileUpload) {
+        <button
+          tuiButton
+          type="button"
+          size="s"
+          appearance="secondary"
+          [disabled]="isProcessing"
+          aria-label="Clear selected report"
+          (click)="reset()"
+        >
+          Clear selection
+        </button>
+      } @else {
+        <button
+          tuiButton
+          type="button"
+          size="s"
+          appearance="accent"
+          [disabled]="isProcessing"
+          [attr.aria-label]="uploadState.kind === 'idle' || uploadState.kind === 'drag-over' ? 'Choose an Artillery JSON report' : uploadState.kind === 'retry' ? 'Try uploading another Artillery JSON report' : 'Choose another Artillery JSON report'"
+          (click)="openFileDialog()"
+        >
+          @if (uploadState.kind === 'idle' || uploadState.kind === 'drag-over') {
+            Choose file
+          } @else if (uploadState.kind === 'retry') {
+            Try again
+          } @else {
+            Choose another file
+          }
+        </button>
+        @if (uploadState.kind !== 'idle' && uploadState.kind !== 'drag-over') {
+          <button
+            tuiButton
+            type="button"
+            size="s"
+            appearance="secondary"
+            [disabled]="isProcessing"
+            aria-label="Reset upload"
+            (click)="reset()"
+          >
+            Reset upload
+          </button>
+        }
+      }
+    </div>
+  </div>
+</section>
+
+@if (uploadProgress !== null) {
+  <div class="progress-region" aria-live="polite">
+    <progress tuiProgressBar class="upload-progress" max="100" [value]="uploadProgress" aria-label="Upload progress"></progress>
+    <span>{{uploadProgress}}% complete</span>
+    <button
+      tuiButton
+      type="button"
+      size="xs"
+      appearance="secondary"
+      [disabled]="!isProcessing"
+      aria-label="Cancel upload"
+      (click)="cancelUpload()"
+    >
+      Cancel upload
+    </button>
+  </div>
+}

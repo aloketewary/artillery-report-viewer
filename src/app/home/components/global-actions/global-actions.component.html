@@ -1,0 +1,41 @@
+<div class="global-actions" role="group" aria-label="Global actions">
+  @if (canExport) {
+    <button
+      tuiIconButton
+      type="button"
+      size="s"
+      appearance="floating"
+      class="fab-action"
+      aria-label="Export current report"
+      title="Export current report"
+      (click)="exportReport()">
+      <span class="action-icon" aria-hidden="true">⇩</span>
+      <span class="visually-hidden">Export report</span>
+    </button>
+  }
+  @if (canReset) {
+    <button
+      tuiIconButton
+      type="button"
+      size="s"
+      appearance="floating"
+      class="fab-action"
+      aria-label="Reset current report"
+      title="Reset current report"
+      (click)="resetReport()">
+      <span class="action-icon" aria-hidden="true">↺</span>
+      <span class="visually-hidden">Reset report</span>
+    </button>
+  }
+  <button
+    tuiIconButton
+    type="button"
+    size="s"
+    appearance="icon"
+    class="theme-toggle"
+    [attr.aria-pressed]="theme === 'dark'"
+    [attr.aria-label]="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+    (click)="toggleTheme()">
+    <span class="theme-icon" aria-hidden="true">{{theme === 'dark' ? '☀' : '☾'}}</span>
+  </button>
+</div>

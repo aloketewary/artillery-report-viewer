@@ -1,0 +1,68 @@
+<section class="health-grid" id="insights" aria-labelledby="health-title" aria-describedby="health-explanation">
+  <article class="panel health-panel" aria-labelledby="health-title">
+    <div class="panel-heading">
+      <div>
+        <span class="section-kicker">Calculated signal</span>
+        <h2 id="health-title">Performance health</h2>
+        <p class="panel-subtitle">A directional score based on this run's available metrics.</p>
+      </div>
+      <span class="score-state" [class]="'tone-' + health.tone">{{health.label}}</span>
+    </div>
+
+    <div class="health-score" [attr.data-availability]="health.score.availability"
+      [attr.aria-label]="'Calculated health score: ' + health.score.display + ' out of 100. ' + health.label">
+      <strong>{{health.score.display}}</strong>
+      <span>/ 100</span>
+      <p id="health-explanation" class="health-explanation">{{health.explanation}}</p>
+    </div>
+
+    <div class="score-breakdown" aria-label="Calculated health breakdown">
+      @for (part of health.breakdown; track part.label) {
+        <div class="score-row" [attr.data-availability]="part.value.availability">
+          <span>{{part.label}}</span>
+          <strong>{{part.value.display}}</strong>
+          <div class="score-track" aria-hidden="true">
+            <span [style.width.%]="part.value.value ?? 0"></span>
+          </div>
+        </div>
+      }
+    </div>
+  </article>
+
+  <article class="panel signal-panel" aria-labelledby="signals-title">
+    <div class="panel-heading">
+      <div>
+        <span class="section-kicker">What to investigate</span>
+        <h2 id="signals-title">Run signals</h2>
+      </div>
+      <span class="signal-count">{{prioritySignals.length}} signals</span>
+    </div>
+
+    <div class="signal-list" aria-live="polite">
+      @if (prioritySignals.length) {
+        @for (signal of prioritySignals.slice(0, 3); track signal.sourceKey ?? signal.name) {
+          <div class="signal-item">
+            <span class="signal-icon tone-critical" aria-hidden="true">!</span>
+            <div>
+              <strong>{{signal.name}}</strong>
+              <small>
+                {{signal.count.display}} occurrences
+                @if (signal.endpoint?.display) {
+                  at {{signal.endpoint?.display}}
+                }
+              </small>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="signal-item signal-empty">
+          <span class="signal-icon tone-healthy" aria-hidden="true">✓</span>
+          <div>
+            <strong>No recorded failures</strong>
+            <small>Runtime and HTTP error maps are empty.</small>
+          </div>
+        </div>
+      }
+    </div>
+  </article>
+</section>

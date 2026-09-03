@@ -1,0 +1,224 @@
+:host {
+  display: block;
+}
+
+.health-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 0.85rem;
+  margin-top: 0.85rem;
+  scroll-margin-top: var(--arv-scroll-offset, 84px);
+}
+
+.panel {
+  min-width: 0;
+  min-height: 15rem;
+  padding: 1.25rem;
+  background: var(--arv-surface);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-panel);
+  box-shadow: 0 6px 18px var(--arv-shadow);
+}
+
+.panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.section-kicker {
+  display: block;
+  margin-bottom: 0.38rem;
+  color: var(--arv-accent-strong);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.panel-heading h2 {
+  margin: 0;
+  color: var(--arv-text);
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+}
+
+.panel-subtitle {
+  max-width: 30rem;
+  margin: 0.35rem 0 0;
+  color: var(--arv-muted-text);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.score-state,
+.signal-count {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.score-state {
+  padding: 0.3rem 0.45rem;
+  font-size: 0.61rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.tone-healthy { color: var(--arv-success); }
+.tone-warning { color: var(--arv-warning); }
+.tone-critical { color: var(--arv-danger); }
+.tone-neutral { color: var(--arv-muted-text); }
+
+.health-score {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  column-gap: 0.55rem;
+  margin-top: 1.25rem;
+}
+
+.health-score strong {
+  color: var(--arv-accent-strong);
+  font-size: 3.8rem;
+  font-weight: 800;
+  letter-spacing: -0.09em;
+  line-height: 0.8;
+}
+
+.health-score[data-availability='unavailable'] strong {
+  color: var(--arv-state-empty);
+  font-size: 2.8rem;
+  letter-spacing: -0.06em;
+}
+
+.health-score > span {
+  margin-bottom: 0.05rem;
+  color: var(--arv-muted-text);
+  font-size: 0.78rem;
+}
+
+.health-explanation {
+  grid-column: 1 / -1;
+  max-width: 34rem;
+  margin: 1rem 0 0;
+  color: var(--arv-muted-text);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.score-breakdown {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.15rem;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 6.3rem 2rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--arv-muted-text);
+  font-size: 0.7rem;
+}
+
+.score-row strong {
+  color: var(--arv-text);
+  font-size: 0.72rem;
+  text-align: right;
+}
+
+.score-row[data-availability='unavailable'] strong {
+  color: var(--arv-state-empty);
+}
+
+.score-track {
+  height: 5px;
+  overflow: hidden;
+  background: var(--arv-surface-muted);
+  border-radius: 3px;
+}
+
+.score-track span {
+  display: block;
+  height: 100%;
+  background: var(--arv-accent);
+  border-radius: inherit;
+}
+
+.signal-count {
+  color: var(--arv-muted-text);
+  font-size: 0.68rem;
+}
+
+.signal-list {
+  display: grid;
+  gap: 0.15rem;
+  margin-top: 1rem;
+}
+
+.signal-item {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--arv-border);
+}
+
+.signal-item:last-child {
+  border-bottom: 0;
+}
+
+.signal-icon {
+  display: grid;
+  width: 1.35rem;
+  height: 1.35rem;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 0.35rem;
+}
+
+.signal-item strong,
+.signal-item small {
+  display: block;
+}
+
+.signal-item strong {
+  overflow: hidden;
+  color: var(--arv-text);
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.signal-item small {
+  margin-top: 0.2rem;
+  color: var(--arv-muted-text);
+  font-size: 0.66rem;
+}
+
+@media (max-width: 767px) {
+  .health-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    padding: 0.9rem;
+  }
+
+  .panel-heading {
+    flex-direction: column;
+  }
+
+  .health-score strong {
+    font-size: 3.25rem;
+  }
+
+  .score-row {
+    grid-template-columns: 5.5rem 2rem minmax(0, 1fr);
+  }
+}

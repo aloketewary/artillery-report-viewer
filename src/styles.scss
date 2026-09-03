@@ -1,22 +1,34 @@
 @use 'theme/helper';
 
 :root {
-  --arv-background: #eef2f6;
+  color-scheme: light;
+  --arv-background: #f3f6f9;
   --arv-surface: #ffffff;
   --arv-surface-raised: #ffffff;
-  --arv-surface-muted: #f4f7fa;
-  --arv-text: #152238;
-  --arv-muted-text: #65758b;
-  --arv-border: #dce4ec;
-  --arv-border-strong: #c6d2df;
+  --arv-surface-muted: #f6f8fa;
+  --arv-text: #17263a;
+  --arv-muted-text: #617187;
+  --arv-border: #d7e0e9;
+  --arv-border-strong: #bccbd9;
   --arv-accent: #087f91;
   --arv-accent-strong: #075f70;
   --arv-accent-soft: #e0f3f5;
   --arv-success: #24775b;
   --arv-danger: #b4473d;
   --arv-warning: #a36b20;
-  --arv-shadow: rgb(21 34 56 / 0.07);
+  --arv-shadow: rgb(21 34 56 / 0.055);
   --arv-chart-grid: #dce4ec;
+  --arv-chart-text: #65758b;
+  --arv-chart-series-p50: #087f91;
+  --arv-chart-series-p90: #5aa7ae;
+  --arv-chart-series-p95: #d88a27;
+  --arv-chart-series-p99: #b4473d;
+  --arv-chart-area-throughput: rgb(8 127 145 / 0.12);
+  --arv-chart-area-errors: rgb(180 71 61 / 0.12);
+  --arv-chart-tooltip-background: #ffffff;
+  --arv-chart-tooltip-border: #c6d2df;
+  --arv-code-background: #f4f7fa;
+  --arv-code-text: #152238;
   --arv-focus: #075f70;
   --arv-card-gap: 1rem;
   --arv-card-padding: 1.1rem;
@@ -24,6 +36,7 @@
 
 .arv-dark,
 [data-theme='dark'] {
+  color-scheme: dark;
   --arv-background: #0d1725;
   --arv-surface: #142338;
   --arv-surface-raised: #192a41;
@@ -40,6 +53,17 @@
   --arv-warning: #e2ad69;
   --arv-shadow: rgb(0 0 0 / 0.24);
   --arv-chart-grid: #2d425b;
+  --arv-chart-text: #a6b7ca;
+  --arv-chart-series-p50: #72d1d8;
+  --arv-chart-series-p90: #86cfd3;
+  --arv-chart-series-p95: #e2ad69;
+  --arv-chart-series-p99: #ff9a8f;
+  --arv-chart-area-throughput: rgb(114 209 216 / 0.16);
+  --arv-chart-area-errors: rgb(255 154 143 / 0.16);
+  --arv-chart-tooltip-background: #142338;
+  --arv-chart-tooltip-border: #3d5570;
+  --arv-code-background: #0d1725;
+  --arv-code-text: #e8f0f7;
   --arv-focus: #9ae7e8;
 }
 
@@ -52,6 +76,10 @@ html,
 body {
   min-height: 100%;
   overflow-x: clip;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -157,5 +185,366 @@ input:focus-visible {
   .arv-panel-header {
     align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+// Shared PerfLens presentation tokens. Components consume these semantic aliases
+// instead of defining their own surface, control, radius, or state treatments.
+:root {
+  --arv-text-strong: var(--arv-text);
+  --arv-text-subtle: var(--arv-muted-text);
+  --arv-border-subtle: color-mix(in srgb, var(--arv-border) 72%, transparent);
+  --arv-control-background: var(--arv-surface);
+  --arv-control-background-hover: var(--arv-surface-muted);
+  --arv-control-background-active: var(--arv-accent-soft);
+  --arv-control-border: var(--arv-border-strong);
+  --arv-control-height-sm: 2rem;
+  --arv-control-height-md: 2.35rem;
+  --arv-control-height-lg: 2.75rem;
+  --arv-radius-xs: 0.25rem;
+  --arv-radius-sm: 0.45rem;
+  --arv-radius-md: 0.65rem;
+  --arv-radius-lg: 0.85rem;
+  --arv-radius-panel: 0.75rem;
+  --arv-radius-pill: 999px;
+  --arv-panel-padding: 1.25rem;
+  --arv-panel-gap: 1rem;
+  --arv-panel-min-height: 8rem;
+  --arv-focus-width: 3px;
+  --arv-focus-offset: 2px;
+  --arv-disabled-opacity: 0.48;
+  --arv-transition-fast: 140ms ease;
+  --arv-state-measured: var(--arv-accent-strong);
+  --arv-state-calculated: var(--arv-accent);
+  --arv-state-loading: var(--arv-accent-strong);
+  --arv-state-empty: var(--arv-muted-text);
+  --arv-state-validation: var(--arv-warning);
+  --arv-state-success: var(--arv-success);
+  --arv-state-warning: var(--arv-warning);
+  --arv-state-critical: var(--arv-danger);
+  --arv-state-neutral: var(--arv-muted-text);
+  --arv-state-neutral-background: var(--arv-surface-muted);
+  --arv-state-measured-background: color-mix(in srgb, var(--arv-accent-soft) 72%, var(--arv-surface));
+  --arv-state-calculated-background: color-mix(in srgb, var(--arv-accent-soft) 48%, var(--arv-surface));
+  --arv-state-loading-background: color-mix(in srgb, var(--arv-accent-soft) 58%, var(--arv-surface));
+  --arv-state-empty-background: var(--arv-surface-muted);
+  --arv-state-validation-background: color-mix(in srgb, var(--arv-warning) 10%, var(--arv-surface));
+  --arv-state-success-background: color-mix(in srgb, var(--arv-success) 10%, var(--arv-surface));
+  --arv-state-warning-background: color-mix(in srgb, var(--arv-warning) 10%, var(--arv-surface));
+  --arv-state-critical-background: color-mix(in srgb, var(--arv-danger) 10%, var(--arv-surface));
+}
+
+.arv-dark,
+[data-theme='dark'] {
+  --arv-text-strong: var(--arv-text);
+  --arv-text-subtle: var(--arv-muted-text);
+  --arv-border-subtle: color-mix(in srgb, var(--arv-border) 82%, transparent);
+  --arv-control-background: var(--arv-surface);
+  --arv-control-background-hover: var(--arv-surface-muted);
+  --arv-control-background-active: var(--arv-accent-soft);
+  --arv-control-border: var(--arv-border-strong);
+  --arv-state-measured: var(--arv-accent-strong);
+  --arv-state-calculated: var(--arv-accent);
+  --arv-state-loading: var(--arv-accent-strong);
+  --arv-state-empty: var(--arv-muted-text);
+  --arv-state-validation: var(--arv-warning);
+  --arv-state-success: var(--arv-success);
+  --arv-state-warning: var(--arv-warning);
+  --arv-state-critical: var(--arv-danger);
+  --arv-state-neutral: var(--arv-muted-text);
+  --arv-state-neutral-background: var(--arv-surface-muted);
+  --arv-state-measured-background: color-mix(in srgb, var(--arv-accent-soft) 86%, var(--arv-surface));
+  --arv-state-calculated-background: color-mix(in srgb, var(--arv-accent-soft) 66%, var(--arv-surface));
+  --arv-state-loading-background: color-mix(in srgb, var(--arv-accent-soft) 76%, var(--arv-surface));
+  --arv-state-empty-background: var(--arv-surface-muted);
+  --arv-state-validation-background: color-mix(in srgb, var(--arv-warning) 18%, var(--arv-surface));
+  --arv-state-success-background: color-mix(in srgb, var(--arv-success) 18%, var(--arv-surface));
+  --arv-state-warning-background: color-mix(in srgb, var(--arv-warning) 18%, var(--arv-surface));
+  --arv-state-critical-background: color-mix(in srgb, var(--arv-danger) 18%, var(--arv-surface));
+}
+
+.arv-control {
+  min-height: var(--arv-control-height-md);
+  box-sizing: border-box;
+  color: var(--arv-text-strong);
+  background: var(--arv-control-background);
+  border: 1px solid var(--arv-control-border);
+  border-radius: var(--arv-radius-sm);
+  transition: background-color var(--arv-transition-fast), border-color var(--arv-transition-fast), color var(--arv-transition-fast), transform var(--arv-transition-fast);
+}
+
+.arv-control:hover:not(:disabled),
+.arv-control[aria-pressed='true'],
+.arv-control[aria-selected='true'] {
+  background: var(--arv-control-background-hover);
+  border-color: var(--arv-accent);
+}
+
+.arv-control:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.arv-control:disabled,
+button:disabled,
+select:disabled,
+input:disabled {
+  cursor: not-allowed;
+  opacity: var(--arv-disabled-opacity);
+}
+
+:where(button, a, select, input, textarea, summary, [tabindex]):focus-visible {
+  outline: var(--arv-focus-width) solid var(--arv-focus);
+  outline-offset: var(--arv-focus-offset);
+}
+
+:where(button, a, select, input, textarea, summary, [tabindex]):focus:not(:focus-visible) {
+  outline: none;
+}
+
+.arv-panel {
+  min-height: var(--arv-panel-min-height);
+  padding: var(--arv-panel-padding);
+  border-radius: var(--arv-radius-panel);
+}
+
+.arv-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  min-height: var(--arv-control-height-sm);
+  box-sizing: border-box;
+  padding: 0.55rem 0.7rem;
+  color: var(--arv-state-neutral);
+  background: var(--arv-state-empty-background);
+  border: 1px solid var(--arv-border);
+  border-inline-start: 3px solid currentColor;
+  border-radius: var(--arv-radius-sm);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.arv-status[data-arv-state='measured'],
+.arv-state-measured {
+  color: var(--arv-state-measured);
+  background: var(--arv-state-measured-background);
+}
+
+.arv-status[data-arv-state='calculated'],
+.arv-state-calculated {
+  color: var(--arv-state-calculated);
+  background: var(--arv-state-calculated-background);
+}
+
+.arv-status[data-arv-state='loading'],
+.arv-state-loading {
+  color: var(--arv-state-loading);
+  background: var(--arv-state-loading-background);
+}
+
+.arv-status[data-arv-state='empty'],
+.arv-state-empty {
+  color: var(--arv-state-empty);
+  background: var(--arv-state-empty-background);
+}
+
+.arv-status[data-arv-state='validation'],
+.arv-state-validation {
+  color: var(--arv-state-validation);
+  background: var(--arv-state-validation-background);
+}
+
+.arv-status[data-arv-state='success'],
+.arv-state-success {
+  color: var(--arv-state-success);
+  background: var(--arv-state-success-background);
+}
+
+.arv-status[data-arv-state='warning'],
+.arv-state-warning {
+  color: var(--arv-state-warning);
+  background: var(--arv-state-warning-background);
+}
+
+.arv-status[data-arv-state='critical'],
+.arv-state-critical {
+  color: var(--arv-state-critical);
+  background: var(--arv-state-critical-background);
+}
+
+.arv-empty {
+  min-height: var(--arv-panel-min-height);
+  box-sizing: border-box;
+  background: var(--arv-state-empty-background);
+  border: 1px dashed var(--arv-border-strong);
+  border-inline-start: 3px solid var(--arv-state-empty);
+  border-radius: var(--arv-radius-md);
+}
+
+.arv-loading {
+  color: var(--arv-state-loading);
+  background: var(--arv-state-loading-background);
+  border-inline-start: 3px solid var(--arv-state-loading);
+}
+
+.arv-validation {
+  color: var(--arv-state-validation);
+  background: var(--arv-state-validation-background);
+  border-inline-start: 3px solid var(--arv-state-validation);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arv-control {
+    transition: none;
+  }
+}
+
+// Responsive report layout contract. Keep projected report content bounded by the
+// shell while allowing wide data tables to scroll inside their own regions.
+.shell-content,
+.shell-content .app-content,
+.shell-content .content-grid,
+.shell-content .panel,
+.shell-content .welcome-workspace,
+.shell-content .raw-panel {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.shell-content .app-content > *,
+.shell-content .content-grid > *,
+.shell-content .panel > *,
+.shell-content .welcome-workspace > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.shell-content .table-scroll {
+  display: block;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.shell-content .table-scroll > table {
+  max-width: none;
+}
+
+.shell-content .raw-panel pre {
+  max-width: 100%;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .shell-content .app-content:not(.compact-entry) {
+    padding-inline: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  .shell-content .panel-heading {
+    flex-wrap: wrap;
+  }
+
+  .shell-content .panel-heading > :first-child {
+    flex: 1 1 18rem;
+  }
+
+  .shell-content .panel-heading > .filter-row,
+  .shell-content .panel-heading > .chart-controls {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    max-width: 100%;
+  }
+
+  .shell-content .filter-row input,
+  .shell-content .filter-row select {
+    min-width: min(10rem, 100%);
+  }
+
+  .shell-content .chart-controls {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 767px) {
+  .shell-content .panel-heading,
+  .shell-content .scenario-detail-heading,
+  .shell-content .error-detail,
+  .shell-content .raw-panel summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .shell-content .panel-heading > :first-child {
+    width: 100%;
+  }
+
+  .shell-content .chart-controls,
+  .shell-content .filter-row,
+  .shell-content .raw-toolbar {
+    width: 100%;
+  }
+
+  .shell-content .segmented,
+  .shell-content .range-controls {
+    max-width: 100%;
+  }
+
+  .shell-content .filter-row input,
+  .shell-content .filter-row select,
+  .shell-content .raw-toolbar input,
+  .shell-content .raw-toolbar .button,
+  .shell-content .scenario-detail-heading .button,
+  .shell-content .error-detail .button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .shell-content .scenario-detail-heading .button,
+  .shell-content .error-detail .button {
+    align-self: stretch;
+  }
+
+  .shell-content .scenario-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .shell-content .percentile-rail {
+    min-height: 7.5rem;
+  }
+
+  .shell-content .report-footer app-file-upload {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+// Reduced motion is a presentation preference. Keep DOM state, focus, controls,
+// upload feedback, charts, and report handoff available while removing movement.
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --arv-transition-fast: 0ms;
+  }
+
+  html,
+  body,
+  * {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    animation-delay: 0ms !important;
+    animation-duration: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+    transition-delay: 0ms !important;
+    transition-duration: 0ms !important;
   }
 }

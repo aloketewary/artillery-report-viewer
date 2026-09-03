@@ -1,6 +1,7 @@
 import { ReportItem, Latency, Rps } from '../../model/report-item';
 import { ReportPayload } from '../../model/report-payload';
 import { ReportPhase } from '../../model/report-phase';
+import { ReportValidationError } from './report-validation-error';
 
 export type JsonRecord = Record<string, unknown>;
 
@@ -12,6 +13,7 @@ export interface ParsedReport {
 }
 
 const MODERN_FIELDS = ['counters', 'rates', 'summaries', 'histograms', 'period'];
+const LEGACY_FIELDS = ['latency', 'rps', 'codes', 'errors', 'requestsCompleted', 'timestamp', 'scenariosCreated', 'scenariosCompleted'];
 const DEFAULT_METRIC_PREFIXES = ['vusers.', 'core.vusers.', 'http.', 'errors.', 'engine.'];
 const LATENCY_KEYS = [
   'http.response_time',
@@ -23,13 +25,16 @@ const LATENCY_KEYS = [
 export function parseArtilleryReport(value: unknown): ParsedReport {
   const raw = asRecord(value);
   if (!raw) {
-    throw new Error('Report must contain a JSON object.');
+    throw new ReportValidationError('invalid-root');
   }
 
   const aggregate = asRecord(raw['aggregate']);
   const intermediate = raw['intermediate'];
   if (!aggregate && !Array.isArray(intermediate)) {
-    throw new Error('Report must contain aggregate or intermediate metrics.');
+    throw new ReportValidationError('unsupported-format');
+  }
+  if (!isRecognizedArtilleryReport(aggregate, intermediate)) {
+    throw new ReportValidationError('unsupported-schema');
   }
 
   const modern = isModernReport(aggregate, intermediate);
@@ -53,6 +58,14 @@ export function parseArtilleryReport(value: unknown): ParsedReport {
     version: modern ? 2 : 1,
     hasCustomMetrics: hasCustomMetrics(aggregate),
   };
+}
+
+function isRecognizedArtilleryReport(aggregate: JsonRecord | undefined, intermediate: unknown): boolean {
+  const items = [
+    aggregate,
+    ...(Array.isArray(intermediate) ? intermediate.map(asRecord) : []),
+  ].filter((item): item is JsonRecord => item !== undefined);
+  return items.some((item) => MODERN_FIELDS.some((field) => field in item) || LEGACY_FIELDS.some((field) => field in item));
 }
 
 function isModernReport(aggregate: JsonRecord | undefined, intermediate: unknown): boolean {

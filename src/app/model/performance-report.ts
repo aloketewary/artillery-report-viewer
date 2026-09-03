@@ -32,17 +32,22 @@ export interface EndpointPerformance {
 
 export interface ScenarioPerformance {
   name: string;
+  requests?: number;
+  throughputRps?: number;
+  latency?: Percentiles;
   virtualUsersCreated?: number;
   virtualUsersCompleted?: number;
   virtualUsersFailed?: number;
   virtualUsersSkipped?: number;
   errorCount?: number;
+  errorRatePercent?: number;
 }
 
 export interface ErrorSummary {
   name: string;
   count: number;
   endpoint?: string;
+  sourceKey?: string;
 }
 
 export interface TimelinePoint {

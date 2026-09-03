@@ -1,0 +1,32 @@
+<div class="app-shell" [class.arv-dark]="presentation.theme === 'dark'" [attr.data-theme]="presentation.theme">
+  <a class="skip-link" href="#workspace-content">Skip to report content</a>
+  @if (presentation.mode === 'report') {
+    <app-report-app-bar
+      [presentation]="presentation"
+      [navigationOpen]="navigationOpen"
+      (intent)="forwardIntent($event)"
+      (navigationToggle)="toggleNavigation()">
+    </app-report-app-bar>
+  }
+
+  <div class="shell-workspace" [class.has-report]="presentation.mode === 'report'">
+    @if (presentation.mode === 'report') {
+      <aside
+        id="report-section-navigation"
+        class="shell-navigation"
+        [class.is-open]="navigationOpen"
+        aria-label="Report section navigation">
+        <app-report-section-nav
+          [items]="presentation.navigation"
+          [activeAnchor]="activeAnchor"
+          [context]="presentation.reportContext"
+          (intent)="forwardIntent($event)">
+        </app-report-section-nav>
+      </aside>
+    }
+
+    <main id="workspace-content" class="shell-content" aria-label="PerfLens workspace" tabindex="-1">
+      <ng-content></ng-content>
+    </main>
+  </div>
+</div>
