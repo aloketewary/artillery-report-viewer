@@ -5,11 +5,10 @@
       type="button"
       size="s"
       appearance="floating"
-      class="fab-action"
       aria-label="Export current report"
       title="Export current report"
       (click)="exportReport()">
-      <span class="action-icon" aria-hidden="true">⇩</span>
+      <tui-icon class="action-icon" [icon]="'@tui.download'" aria-hidden="true"></tui-icon>
       <span class="visually-hidden">Export report</span>
     </button>
   }
@@ -19,11 +18,10 @@
       type="button"
       size="s"
       appearance="floating"
-      class="fab-action"
       aria-label="Reset current report"
       title="Reset current report"
       (click)="resetReport()">
-      <span class="action-icon" aria-hidden="true">↺</span>
+      <tui-icon class="action-icon" [icon]="'@tui.refresh-cw'" aria-hidden="true"></tui-icon>
       <span class="visually-hidden">Reset report</span>
     </button>
   }
@@ -32,10 +30,12 @@
     type="button"
     size="s"
     appearance="icon"
-    class="theme-toggle"
     [attr.aria-pressed]="theme === 'dark'"
     [attr.aria-label]="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
     (click)="toggleTheme()">
-    <span class="theme-icon" aria-hidden="true">{{theme === 'dark' ? '☀' : '☾'}}</span>
+    <tui-icon
+      class="theme-icon"
+      [icon]="theme === 'dark' ? '@tui.sun' : '@tui.moon'"
+      aria-hidden="true"></tui-icon>
   </button>
 </div>

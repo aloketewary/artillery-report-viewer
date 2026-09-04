@@ -18,6 +18,7 @@
     [attr.aria-expanded]="navigationOpen"
     [attr.aria-label]="navigationOpen ? 'Hide report sections' : 'Show report sections'"
     (click)="navigationToggle.emit()">
-    {{navigationOpen ? 'Close' : 'Sections'}}
+    <tui-icon class="navigation-icon" [icon]="'@tui.menu'" aria-hidden="true"></tui-icon>
+    <span>{{navigationOpen ? 'Close' : 'Sections'}}</span>
   </button>
 </header>

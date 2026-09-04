@@ -14,6 +14,7 @@ type SortableEndpointColumn = Extract<TableSortName, 'endpoint' | 'requests' | '
   standalone: false,
 })
 export class EndpointSurfaceComponent {
+
   @Input() view: Readonly<Pick<DashboardView, 'endpoints'>> = {endpoints: []};
   @Input() title = 'Endpoint performance';
   @Input() description = 'Sort by tail latency or failure rate to find the first place to investigate.';
@@ -24,6 +25,8 @@ export class EndpointSurfaceComponent {
   private errorValue = 'all';
   private sortValue: TableSortName = 'priority';
   private selectedEndpointValue?: string;
+  private methodOptionsSignature = '';
+  private methodOptionsValue: readonly FilterOption[] = [{value: 'all', label: 'All'}];
 
   @Input()
   set search(value: string) {
@@ -99,24 +102,20 @@ export class EndpointSurfaceComponent {
     return this.view.endpoints ?? [];
   }
 
-  get methodOptions(): readonly string[] {
-    const methods = new Set(this.endpointRows.map((row) => row.method ?? 'N/A'));
-    return [...methods].sort((left, right) => left.localeCompare(right));
-  }
+  get methodOptions(): readonly FilterOption[] {
+    const methods = [...new Set(this.endpointRows.map((row) => row.method ?? 'N/A'))]
+      .sort((left, right) => left.localeCompare(right));
+    const signature = methods.join('\u0000');
 
-  get methodFilterIndex(): number {
-    const index = this.method === 'all' ? 0 : this.methodOptions.indexOf(this.method) + 1;
-    return index > 0 ? index : 0;
-  }
+    if (signature !== this.methodOptionsSignature) {
+      this.methodOptionsSignature = signature;
+      this.methodOptionsValue = [
+        {value: 'all', label: 'All'},
+        ...methods.map((value) => ({value, label: value})),
+      ];
+    }
 
-  get statusFilterIndex(): number {
-    const index = this.statusOptions.findIndex((option) => option.value === this.status);
-    return index >= 0 ? index : 0;
-  }
-
-  get errorFilterIndex(): number {
-    const index = this.errorOptions.findIndex((option) => option.value === this.errors);
-    return index >= 0 ? index : 0;
+    return this.methodOptionsValue;
   }
 
   get hasMethods(): boolean {
@@ -142,27 +141,6 @@ export class EndpointSurfaceComponent {
 
   get selectedRow(): EndpointRow | undefined {
     return this.endpointRows.find((row) => row.endpoint === this.selectedEndpoint);
-  }
-
-  setMethodFilterByIndex(index: number): void {
-    const value = index === 0 ? 'all' : this.methodOptions[index - 1];
-    if (value !== undefined) {
-      this.setFilter('method', value);
-    }
-  }
-
-  setStatusFilterByIndex(index: number): void {
-    const option = this.statusOptions[index];
-    if (option) {
-      this.setFilter('status', option.value);
-    }
-  }
-
-  setErrorFilterByIndex(index: number): void {
-    const option = this.errorOptions[index];
-    if (option) {
-      this.setFilter('errors', option.value);
-    }
   }
 
   setFilter(filter: TableFilterName, value: string): void {

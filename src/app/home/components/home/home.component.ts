@@ -162,9 +162,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private sectionObserver?: IntersectionObserver;
 
-  constructor(private readonly reportSession: ReportSessionService) {}
+  constructor(
+    private readonly reportSession: ReportSessionService,
+    private readonly themePreference: ThemePreferenceService,
+  ) {}
 
   ngOnInit(): void {
+    this.isDarkMode = this.themePreference.load() === 'dark';
+
     const session = this.reportSession.current;
     if (session) {
       this.applyLoadedReport(session.parsed, session.report, session.fileName);
@@ -743,7 +748,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toggleTheme(): void {
-    this.isDarkMode = !this.isDarkMode;
+    const nextMode = this.isDarkMode ? 'light' : 'dark';
+    this.isDarkMode = nextMode === 'dark';
+    this.themePreference.save(nextMode);
   }
 
   get filteredEndpoints(): EndpointRow[] {

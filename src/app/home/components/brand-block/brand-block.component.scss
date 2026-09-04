@@ -19,19 +19,11 @@
   border-radius: var(--arv-radius-sm);
 }
 
-.brand-mark::before,
-.brand-mark::after,
-.brand-mark span {
-  display: block;
-  width: 0.78rem;
-  height: 0.1rem;
-  content: '';
-  background: var(--arv-surface);
-  border-radius: var(--arv-radius-pill);
+.brand-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--arv-surface);
 }
-
-.brand-mark::before { transform: translateY(-0.17rem); }
-.brand-mark::after { transform: translateY(0.17rem); }
 
 .brand-name,
 .brand-caption,

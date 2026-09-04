@@ -1,9 +1,9 @@
 <section class="latency-surface" aria-labelledby="latency-surface-title">
-  <div class="latency-heading">
+  <div class="latency-heading report-surface-heading">
     <div>
-      <span class="section-kicker">Measured latency</span>
+      <span class="section-kicker report-surface-kicker">Measured latency</span>
       <h2 id="latency-surface-title">Latency distribution</h2>
-      <p>Aggregate response-time percentiles supplied by the report.</p>
+      <p class="report-surface-description">Percentile view of aggregate response time. Use the timeline above to see how latency changes over time.</p>
     </div>
     <span class="unit-label">Milliseconds</span>
   </div>
@@ -11,10 +11,11 @@
   <div class="percentile-grid" role="list" aria-label="Latency percentile values">
     @for (percentile of percentiles; track percentile.key) {
       <article class="percentile-card" [attr.data-availability]="percentile.value.availability" role="listitem"
-        [attr.aria-label]="percentile.label + ': ' + percentile.value.display + (percentile.value.availability === 'measured' ? ' milliseconds, measured' : ', unavailable')">
+        [attr.aria-label]="percentile.label + ': ' + percentile.value.display + (percentile.value.availability === 'measured' ? ' milliseconds, ' + percentile.meaning.toLowerCase() + ', measured' : ', unavailable')">
         <span class="percentile-label">{{percentile.label}}</span>
         <strong>{{percentile.value.display}}</strong>
         <span class="percentile-unit">@if (percentile.value.availability === 'measured') { ms }</span>
+        <span class="percentile-meaning">{{percentile.meaning}}</span>
         <span class="availability-label">
           {{percentile.value.availability === 'measured' ? 'Measured' : 'Unavailable'}}
         </span>
@@ -22,11 +23,33 @@
     }
   </div>
 
-  <p class="latency-status" role="status" aria-live="polite">
+  <div class="latency-insight" aria-labelledby="latency-insight-title">
+    <div class="insight-copy">
+      <span class="insight-kicker">Tail behavior</span>
+      <strong id="latency-insight-title">How far slow requests stretch</strong>
+      <p>{{tailInsightMessage}}</p>
+    </div>
+    @if (hasTailInsight) {
+      <dl class="insight-stats" aria-label="Latency tail metrics">
+        <div>
+          <dt>Tail amplification</dt>
+          <dd>{{formatRatio(tailRatio!)}}</dd>
+          <span>P99 / P50</span>
+        </div>
+        <div>
+          <dt>Tail gap</dt>
+          <dd>{{formatNumber(tailSpread!, 1)}} ms</dd>
+          <span>P99 - P50</span>
+        </div>
+      </dl>
+    }
+  </div>
+
+  <div tuiMessage appearance="neutral" class="latency-status" role="status" aria-live="polite">
     @if (hasAvailableValue) {
       Values are measured from the source report. Missing percentiles remain N/A.
     } @else {
       No aggregate latency percentile values are available in this report.
     }
-  </p>
+  </div>
 </section>

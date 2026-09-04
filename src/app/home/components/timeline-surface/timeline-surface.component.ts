@@ -10,6 +10,17 @@ import type { TimelineMetric, TimelineRange } from '../../presentation/presentat
   standalone: false,
 })
 export class TimelineSurfaceComponent implements OnChanges {
+  readonly timelineColumns = [
+    'time',
+    'requests',
+    'throughput',
+    'p50',
+    'p90',
+    'p95',
+    'p99',
+    'errorRate',
+  ] as const;
+
   @Input() timeline: readonly TimelinePoint[] = [];
   @Input() metric: TimelineMetric = 'latency';
   @Input() range: TimelineRange = 'all';

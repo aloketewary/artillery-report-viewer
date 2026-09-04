@@ -1,7 +1,8 @@
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
-import {TuiBadge, TuiMessage, TuiMultiSelect, TuiSegmented, TuiSelect} from '@taiga-ui/kit';
+import {TuiTable} from '@taiga-ui/addon-table';
+import {TuiAccordion, TuiBadge, TuiDataListWrapper, TuiMessage, TuiMultiSelect, TuiSegmented, TuiSelect} from '@taiga-ui/kit';
 import {TuiButton, TuiIcon, TuiInput, TuiNotification, TuiRoot} from '@taiga-ui/core';
 import {ReportMetrics, ReportState} from '../../../model/report-state';
 import {HomeComponent} from './home.component';
@@ -40,9 +41,13 @@ describe('HomeComponent', () => {
         TuiIcon,
         ...TuiInput,
         TuiBadge,
+        ...TuiAccordion,
+        ...TuiDataListWrapper,
         TuiMessage,
         TuiSegmented,
+        ...TuiSelect,
         ...TuiNotification,
+        ...TuiTable,
         ...TuiMultiSelect,
         NgxEchartsModule.forRoot({echarts: () => import('echarts')}),
         ReactiveFormsModule,

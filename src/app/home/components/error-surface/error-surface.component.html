@@ -1,9 +1,9 @@
-<section class="error-surface" id="errors" aria-labelledby="error-surface-title">
-  <div class="panel-heading">
+<section class="report-surface error-surface" id="errors" aria-labelledby="error-surface-title">
+  <div class="panel-heading report-surface-heading">
     <div>
-      <span class="section-kicker">Response outcomes</span>
+      <span class="section-kicker report-surface-kicker">Response outcomes</span>
       <h2 id="error-surface-title">Errors and failures</h2>
-      <p>Measured HTTP and runtime failures, grouped response outcomes, and the most frequent recorded failures.</p>
+      <p class="report-surface-description">Measured HTTP and runtime failures, grouped response outcomes, and the most frequent recorded failures.</p>
     </div>
     <div class="failure-total" [attr.data-availability]="totalErrors.availability">
       <strong>{{totalErrors.display}}</strong>
@@ -35,10 +35,10 @@
   </dl>
 
   <section class="status-distribution" aria-labelledby="status-distribution-title">
-    <div class="subsection-heading">
+    <div class="subsection-heading report-surface-heading">
       <div>
         <h3 id="status-distribution-title">Status distribution</h3>
-        <p>Counts remain tied to the active report. Percentages are shown only when request totals are available.</p>
+        <p class="report-surface-description">Counts remain tied to the active report. Percentages are shown only when request totals are available.</p>
       </div>
     </div>
     <div class="status-bars" role="list" aria-label="Grouped response status distribution">
@@ -54,18 +54,18 @@
   </section>
 
   <section class="status-code-section" aria-labelledby="status-code-title">
-    <div class="subsection-heading">
+    <div class="subsection-heading report-surface-heading">
       <div>
         <h3 id="status-code-title">Status codes</h3>
-        <p>Open a code to find its source value in the original report.</p>
+        <p class="report-surface-description">Open a code to find its source value in the original report.</p>
       </div>
     </div>
     @if (statusRows.length) {
       <div class="status-code-list" aria-label="Status code distribution">
         @for (code of statusRows; track code.code) {
-          <button tuiButton class="status-code-row" type="button" size="s" appearance="secondary" (click)="toggleStatusCode(code.code)"
-            [attr.aria-expanded]="selectedStatusCode === code.code" aria-controls="status-code-detail"
-            [attr.aria-pressed]="selectedStatusCode === code.code"
+          <button tuiButton class="status-code-row" type="button" size="s" appearance="secondary"
+            (click)="toggleStatusCode(code.code)" [attr.aria-expanded]="selectedStatusCode === code.code"
+            aria-controls="status-code-detail" [attr.aria-pressed]="selectedStatusCode === code.code"
             [attr.aria-label]="(selectedStatusCode === code.code ? 'Hide details for ' : 'Show details for ') + code.code + ' ' + code.label">
             <span><strong>{{code.code}}</strong><small>{{code.label}}</small></span>
             <span><strong>{{code.count.display}}</strong><small>{{code.percentage.display}}</small></span>
@@ -73,54 +73,54 @@
         }
       </div>
     } @else {
-      <p class="empty-state" role="status">No status-code metrics are available in this report.</p>
+      <div tuiMessage appearance="neutral" class="empty-state" role="status" aria-live="polite">No status-code metrics are available in this report.</div>
     }
   </section>
 
   <section class="failure-section" aria-labelledby="failure-title">
-    <div class="subsection-heading">
+    <div class="subsection-heading report-surface-heading">
       <div>
         <h3 id="failure-title">Most frequent failures</h3>
-        <p>Failure ranking and affected routes are preserved from the report analysis.</p>
+        <p class="report-surface-description">Failure ranking and affected routes are preserved from the report analysis.</p>
       </div>
     </div>
     @if (hasRecordedFailures) {
       <div class="failure-list" aria-label="Most frequent recorded failures">
         @for (error of failureRows; track error.sourceKey ?? error.name) {
-          <button tuiButton class="failure-row" type="button" size="s" appearance="secondary" (click)="toggleError(error)"
-            [attr.aria-expanded]="selectedErrorKey === (error.sourceKey || error.name)" aria-controls="failure-detail"
-            [attr.aria-pressed]="selectedErrorKey === (error.sourceKey || error.name)"
+          <button tuiButton class="failure-row" type="button" size="s" appearance="secondary"
+            (click)="toggleError(error)" [attr.aria-expanded]="selectedErrorKey === (error.sourceKey || error.name)"
+            aria-controls="failure-detail" [attr.aria-pressed]="selectedErrorKey === (error.sourceKey || error.name)"
             [attr.aria-label]="(selectedErrorKey === (error.sourceKey || error.name) ? 'Hide details for ' : 'Show details for ') + error.name">
             <span>
               <strong>{{error.name}}</strong>
-              <small>{{error.count.display}} occurrences<span *ngIf="error.endpoint?.display"> at {{error.endpoint?.display}}</span></small>
+              <small>{{error.count.display}} occurrences<span>{{error.endpoint?.display ? ' at ' + error.endpoint.display : ''}}</span></small>
             </span>
             <span class="failure-action" aria-hidden="true">View</span>
           </button>
         }
       </div>
     } @else {
-      <p class="empty-state" role="status">No recorded failures in this report.</p>
+      <div tuiMessage appearance="neutral" class="empty-state" role="status" aria-live="polite">No recorded failures in this report.</div>
     }
   </section>
 
   @if (selectedStatus; as status) {
-    <aside class="error-detail" id="status-code-detail" aria-labelledby="status-detail-title" role="region" aria-live="polite">
+    <aside class="error-detail report-surface-detail" id="status-code-detail" aria-labelledby="status-detail-title" role="region" aria-live="polite">
       <div>
-        <span class="section-kicker">Status detail</span>
+        <span class="section-kicker report-surface-kicker">Status detail</span>
         <h3 id="status-detail-title">{{status.code}} {{status.label}}</h3>
-        <p>{{status.count.display}} responses, {{status.percentage.display}} of recorded requests.</p>
+        <p class="report-surface-description">{{status.count.display}} responses, {{status.percentage.display}} of recorded requests.</p>
       </div>
       <button tuiButton type="button" size="s" appearance="secondary" (click)="focusRawData(status.code)" aria-label="Find status code in raw JSON">Find in raw JSON</button>
     </aside>
   }
 
   @if (selectedError; as error) {
-    <aside class="error-detail" id="failure-detail" aria-labelledby="failure-detail-title" role="region" aria-live="polite">
+    <aside class="error-detail report-surface-detail" id="failure-detail" aria-labelledby="failure-detail-title" role="region" aria-live="polite">
       <div>
-        <span class="section-kicker">Failure detail</span>
+        <span class="section-kicker report-surface-kicker">Failure detail</span>
         <h3 id="failure-detail-title">{{error.name}}</h3>
-        <p>{{error.count.display}} occurrences<span *ngIf="error.endpoint?.display"> at {{error.endpoint?.display}}</span>.</p>
+        <p class="report-surface-description">{{error.count.display}} occurrences<span>{{error.endpoint?.display ? ' at ' + error.endpoint.display : ''}}</span>.</p>
         <small>Affected route: {{error.endpoint?.display || 'N/A'}}</small>
         <small>Source key: <code>{{error.sourceKey || error.name}}</code></small>
       </div>

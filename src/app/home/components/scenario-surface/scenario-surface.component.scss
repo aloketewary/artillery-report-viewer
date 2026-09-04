@@ -60,22 +60,29 @@
 }
 
 .filter-row {
-  display: grid;
-  gap: 0.25rem;
+  display: block;
   max-width: 20rem;
   margin-top: 1rem;
 }
 
-.filter-row label {
-  color: var(--arv-muted-text);
-  font-size: 0.62rem;
-  font-weight: 700;
+.scenario-search-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-block-size: var(--arv-control-height-sm);
+  box-sizing: border-box;
 }
 
-.filter-row input {
+.scenario-search-field input[tuiInput] {
   width: 100%;
-  padding: 0.45rem 0.55rem;
-  font-size: 0.7rem;
+  min-width: 0;
+  box-sizing: border-box;
+  color: var(--arv-text);
+}
+
+.scenario-search-field input[tuiInput]::placeholder {
+  color: var(--arv-muted-text);
+  opacity: 1;
 }
 
 .filter-status {
@@ -97,7 +104,7 @@ table {
   font-size: 0.7rem;
 }
 
-caption {
+.scenario-table-caption {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -108,7 +115,13 @@ caption {
   border: 0;
 }
 
-th {
+table th,
+table td {
+  padding: 0.72rem 0.7rem;
+  border-top: 1px solid var(--arv-border);
+}
+
+table th {
   color: var(--arv-muted-text);
   font-size: 0.62rem;
   font-weight: 750;
@@ -117,57 +130,35 @@ th {
   letter-spacing: 0.06em;
 }
 
-th,
-td {
-  padding: 0.72rem 0.7rem;
-  border-top: 1px solid var(--arv-border);
-}
-
-th:first-child,
-td:first-child {
+table th:first-child,
+table td:first-child {
   padding-left: 1.15rem;
 }
 
-th:last-child,
-td:last-child {
+table th:last-child,
+table td:last-child {
   padding-right: 1.15rem;
 }
 
-td {
+table td {
   color: var(--arv-muted-text);
   white-space: nowrap;
 }
 
 .scenario-name {
-  color: var(--arv-text);
+  color: var(--arv-text) !important;
   font-weight: 700;
-}
-
-.table-link,
-.button {
-  cursor: pointer;
-  transition: background-color var(--arv-transition-fast), border-color var(--arv-transition-fast), color var(--arv-transition-fast), transform var(--arv-transition-fast);
 }
 
 .table-link {
-  padding: 0;
-  color: var(--arv-text);
-  font: inherit;
-  font-weight: 700;
+  max-width: 15rem;
+  overflow: hidden;
   text-align: left;
-  background: transparent;
-  border: 0;
-  border-bottom: 1px solid transparent;
-}
-
-.table-link:hover,
-.button:hover {
-  color: var(--arv-accent-strong);
-  background: var(--arv-control-background-hover);
+  text-overflow: ellipsis;
 }
 
 .emphasis-number {
-  color: var(--arv-text);
+  color: var(--arv-text) !important;
   font-weight: 700;
 }
 
@@ -186,12 +177,13 @@ td {
 .tone-critical { color: var(--arv-danger); }
 .tone-neutral { color: var(--arv-muted-text); }
 
-tr.is-selected th,
-tr.is-selected td {
+table tr.is-selected > th,
+table tr.is-selected > td {
   background: color-mix(in srgb, var(--arv-accent) 6%, transparent);
 }
 
 .table-empty {
+  margin: 0;
   padding: 2rem;
   color: var(--arv-muted-text);
   text-align: center;
@@ -204,21 +196,6 @@ tr.is-selected td {
   background: var(--arv-surface-muted);
   border: 1px solid var(--arv-border);
   border-radius: var(--arv-radius-control);
-}
-
-.button {
-  min-height: var(--arv-control-height-sm);
-  padding: 0.52rem 0.7rem;
-  color: var(--arv-text);
-  font-size: 0.72rem;
-  font-weight: 700;
-  white-space: nowrap;
-  border: 1px solid var(--arv-control-border);
-  border-radius: var(--arv-radius-control);
-}
-
-.button-secondary {
-  background: var(--arv-surface-muted);
 }
 
 .scenario-facts {
@@ -259,13 +236,6 @@ tr.is-selected td {
   line-height: 1.45;
 }
 
-.table-link:focus-visible,
-.button:focus-visible,
-.filter-row input:focus-visible {
-  outline: var(--arv-focus-width) solid var(--arv-focus);
-  outline-offset: var(--arv-focus-offset);
-}
-
 @media (max-width: 767px) {
   .scenario-surface {
     padding: 0.9rem;
@@ -285,24 +255,17 @@ tr.is-selected td {
     margin-left: -0.9rem;
   }
 
-  th:first-child,
-  td:first-child {
+  table th:first-child,
+  table td:first-child {
     padding-left: 0.9rem;
   }
 
-  th:last-child,
-  td:last-child {
+  table th:last-child,
+  table td:last-child {
     padding-right: 0.9rem;
   }
 
   .scenario-facts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .table-link,
-  .button {
-    transition: none;
   }
 }

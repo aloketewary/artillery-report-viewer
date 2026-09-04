@@ -12,6 +12,7 @@ type ScenarioSurfaceView = Readonly<Pick<DashboardView, 'scenarios'>>;
   standalone: false,
 })
 export class ScenarioSurfaceComponent {
+
   @Input() view: ScenarioSurfaceView = {scenarios: []};
 
   private searchValue = '';

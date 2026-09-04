@@ -57,32 +57,32 @@
       <span>View timeline values as text</span>
       <span class="timeline-fallback-meta">{{pointSummary}}</span>
     </summary>
-    <div class="table-scroll" id="timeline-values-table">
-      <table>
-        <caption>{{metricLabel}} timeline values with request and error context</caption>
-        <thead>
-          <tr>
-            <th scope="col">Time</th>
-            <th scope="col">Requests</th>
-            <th scope="col">Throughput (RPS)</th>
-            <th scope="col">P50 (ms)</th>
-            <th scope="col">P90 (ms)</th>
-            <th scope="col">P95 (ms)</th>
-            <th scope="col">P99 (ms)</th>
-            <th scope="col">Error rate</th>
+    <div class="table-scroll report-table-scroll" id="timeline-values-table">
+      <table tuiTable [columns]="timelineColumns" size="s" aria-label="Timeline values">
+        <caption tuiCaption>{{metricLabel}} timeline values with request and error context</caption>
+        <thead tuiThead>
+          <tr tuiThGroup>
+            <th tuiTh scope="col">Time</th>
+            <th tuiTh scope="col">Requests</th>
+            <th tuiTh scope="col">Throughput (RPS)</th>
+            <th tuiTh scope="col">P50 (ms)</th>
+            <th tuiTh scope="col">P90 (ms)</th>
+            <th tuiTh scope="col">P95 (ms)</th>
+            <th tuiTh scope="col">P99 (ms)</th>
+            <th tuiTh scope="col">Error rate</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody tuiTbody [data]="displayEntries">
           @for (point of displayEntries; track $index) {
-            <tr>
-              <td>{{formatTime(point.at)}}</td>
-              <td>{{formatCompact(point.requestsCompleted)}}</td>
-              <td>{{formatNumber(point.throughputRps, 1)}}</td>
-              <td>{{formatMs(point.latency?.p50)}}</td>
-              <td>{{formatMs(point.latency?.p90)}}</td>
-              <td>{{formatMs(point.latency?.p95)}}</td>
-              <td>{{formatMs(point.latency?.p99)}}</td>
-              <td>{{formatPercent(point.errorRatePercent)}}</td>
+            <tr tuiTr>
+              <td tuiTd *tuiCell="'time'">{{formatTime(point.at)}}</td>
+              <td tuiTd *tuiCell="'requests'">{{formatCompact(point.requestsCompleted)}}</td>
+              <td tuiTd *tuiCell="'throughput'">{{formatNumber(point.throughputRps, 1)}}</td>
+              <td tuiTd *tuiCell="'p50'">{{formatMs(point.latency?.p50)}}</td>
+              <td tuiTd *tuiCell="'p90'">{{formatMs(point.latency?.p90)}}</td>
+              <td tuiTd *tuiCell="'p95'">{{formatMs(point.latency?.p95)}}</td>
+              <td tuiTd *tuiCell="'p99'">{{formatMs(point.latency?.p99)}}</td>
+              <td tuiTd *tuiCell="'errorRate'">{{formatPercent(point.errorRatePercent)}}</td>
             </tr>
           }
         </tbody>

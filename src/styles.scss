@@ -30,8 +30,6 @@
   --arv-code-background: #f4f7fa;
   --arv-code-text: #152238;
   --arv-focus: #075f70;
-  --arv-card-gap: 1rem;
-  --arv-card-padding: 1.1rem;
 }
 
 .arv-dark,
@@ -67,11 +65,6 @@
   --arv-focus: #9ae7e8;
 }
 
-[data-density='compact'] {
-  --arv-card-gap: 0.7rem;
-  --arv-card-padding: 0.85rem;
-}
-
 html,
 body {
   min-height: 100%;
@@ -97,14 +90,6 @@ input {
   font: inherit;
 }
 
-button:focus-visible,
-a:focus-visible,
-select:focus-visible,
-input:focus-visible {
-  outline: 3px solid var(--arv-focus);
-  outline-offset: 2px;
-}
-
 ::selection {
   color: var(--arv-text);
   background: var(--arv-accent-soft);
@@ -112,10 +97,11 @@ input:focus-visible {
 
 .arv-panel {
   margin: 1.25rem 0;
-  padding: 1.35rem;
+  min-height: var(--arv-panel-min-height);
+  padding: var(--arv-panel-padding);
   background: var(--arv-surface);
   border: 1px solid var(--arv-border);
-  border-radius: 1rem;
+  border-radius: var(--arv-radius-panel);
   box-shadow: 0 12px 32px var(--arv-shadow);
 }
 
@@ -144,7 +130,6 @@ input:focus-visible {
   font-size: 0.86rem;
 }
 
-.arv-panel-kicker,
 .panel-kicker {
   display: block;
   margin-bottom: 0.45rem;
@@ -168,18 +153,21 @@ input:focus-visible {
 
 .arv-empty {
   display: grid;
-  min-height: 5rem;
+  min-height: var(--arv-panel-min-height);
+  box-sizing: border-box;
   place-items: center;
   padding: 1rem;
   color: var(--arv-muted-text);
   text-align: center;
+  background: var(--arv-state-empty-background);
+  border: 1px dashed var(--arv-border-strong);
+  border-inline-start: 3px solid var(--arv-state-empty);
+  border-radius: var(--arv-radius-md);
 }
 
 @media (max-width: 700px) {
   .arv-panel {
     margin: 0.85rem 0;
-    padding: 1rem;
-    border-radius: 0.85rem;
   }
 
   .arv-panel-header {
@@ -206,9 +194,9 @@ input:focus-visible {
   --arv-radius-md: 0.65rem;
   --arv-radius-lg: 0.85rem;
   --arv-radius-panel: 0.75rem;
+  --arv-radius-control: var(--arv-radius-sm);
   --arv-radius-pill: 999px;
   --arv-panel-padding: 1.25rem;
-  --arv-panel-gap: 1rem;
   --arv-panel-min-height: 8rem;
   --arv-focus-width: 3px;
   --arv-focus-offset: 2px;
@@ -301,97 +289,6 @@ input:disabled {
   outline: none;
 }
 
-.arv-panel {
-  min-height: var(--arv-panel-min-height);
-  padding: var(--arv-panel-padding);
-  border-radius: var(--arv-radius-panel);
-}
-
-.arv-status {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.55rem;
-  min-height: var(--arv-control-height-sm);
-  box-sizing: border-box;
-  padding: 0.55rem 0.7rem;
-  color: var(--arv-state-neutral);
-  background: var(--arv-state-empty-background);
-  border: 1px solid var(--arv-border);
-  border-inline-start: 3px solid currentColor;
-  border-radius: var(--arv-radius-sm);
-  font-size: 0.76rem;
-  line-height: 1.4;
-}
-
-.arv-status[data-arv-state='measured'],
-.arv-state-measured {
-  color: var(--arv-state-measured);
-  background: var(--arv-state-measured-background);
-}
-
-.arv-status[data-arv-state='calculated'],
-.arv-state-calculated {
-  color: var(--arv-state-calculated);
-  background: var(--arv-state-calculated-background);
-}
-
-.arv-status[data-arv-state='loading'],
-.arv-state-loading {
-  color: var(--arv-state-loading);
-  background: var(--arv-state-loading-background);
-}
-
-.arv-status[data-arv-state='empty'],
-.arv-state-empty {
-  color: var(--arv-state-empty);
-  background: var(--arv-state-empty-background);
-}
-
-.arv-status[data-arv-state='validation'],
-.arv-state-validation {
-  color: var(--arv-state-validation);
-  background: var(--arv-state-validation-background);
-}
-
-.arv-status[data-arv-state='success'],
-.arv-state-success {
-  color: var(--arv-state-success);
-  background: var(--arv-state-success-background);
-}
-
-.arv-status[data-arv-state='warning'],
-.arv-state-warning {
-  color: var(--arv-state-warning);
-  background: var(--arv-state-warning-background);
-}
-
-.arv-status[data-arv-state='critical'],
-.arv-state-critical {
-  color: var(--arv-state-critical);
-  background: var(--arv-state-critical-background);
-}
-
-.arv-empty {
-  min-height: var(--arv-panel-min-height);
-  box-sizing: border-box;
-  background: var(--arv-state-empty-background);
-  border: 1px dashed var(--arv-border-strong);
-  border-inline-start: 3px solid var(--arv-state-empty);
-  border-radius: var(--arv-radius-md);
-}
-
-.arv-loading {
-  color: var(--arv-state-loading);
-  background: var(--arv-state-loading-background);
-  border-inline-start: 3px solid var(--arv-state-loading);
-}
-
-.arv-validation {
-  color: var(--arv-state-validation);
-  background: var(--arv-state-validation-background);
-  border-inline-start: 3px solid var(--arv-state-validation);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .arv-control {
     transition: none;
@@ -459,7 +356,7 @@ input:disabled {
     max-width: 100%;
   }
 
-  .shell-content .filter-row input,
+  .shell-content .filter-row input:not([tuiInput]):not([tuiSelect]),
   .shell-content .filter-row select {
     min-width: min(10rem, 100%);
   }
@@ -493,19 +390,11 @@ input:disabled {
     max-width: 100%;
   }
 
-  .shell-content .filter-row input,
+  .shell-content .filter-row input:not([tuiInput]):not([tuiSelect]),
   .shell-content .filter-row select,
-  .shell-content .raw-toolbar input,
-  .shell-content .raw-toolbar .button,
-  .shell-content .scenario-detail-heading .button,
-  .shell-content .error-detail .button {
+  .shell-content .raw-toolbar input {
     width: 100%;
     min-width: 0;
-  }
-
-  .shell-content .scenario-detail-heading .button,
-  .shell-content .error-detail .button {
-    align-self: stretch;
   }
 
   .shell-content .scenario-facts {
@@ -546,5 +435,121 @@ input:disabled {
     transition: none !important;
     transition-delay: 0ms !important;
     transition-duration: 0ms !important;
+  }
+}
+
+// Shared report surface contract. Individual surfaces may add data-specific layout,
+// but panel framing, focus rhythm, and responsive boundaries stay consistent.
+.report-surface {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  padding: 1.15rem;
+  background: var(--arv-surface);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-panel);
+  box-shadow: 0 8px 22px var(--arv-shadow);
+  scroll-margin-top: var(--arv-scroll-offset, 84px);
+}
+
+.report-surface-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.report-surface-kicker {
+  display: block;
+  margin-bottom: 0.38rem;
+  color: var(--arv-accent-strong);
+  font-size: 0.62rem;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.report-surface-heading h2,
+.report-surface-heading h3 {
+  margin: 0;
+  color: var(--arv-text);
+  letter-spacing: -0.03em;
+}
+
+.report-surface-heading h2 { font-size: 1rem; }
+.report-surface-heading h3 { font-size: 0.95rem; }
+
+.report-surface-description {
+  margin: 0.35rem 0 0;
+  color: var(--arv-muted-text);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.report-surface-state {
+  margin: 0;
+  color: var(--arv-muted-text);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.report-surface-detail {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--arv-surface-muted);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-control);
+}
+
+.report-surface-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin: 1rem 0 0;
+}
+
+.report-surface-facts > div {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.65rem;
+  background: var(--arv-surface);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-xs);
+}
+
+.report-surface-facts dt {
+  color: var(--arv-muted-text);
+  font-size: 0.62rem;
+}
+
+.report-surface-facts dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--arv-text);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+.report-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 767px) {
+  .report-surface {
+    padding: 0.9rem;
+  }
+
+  .report-surface-heading {
+    flex-direction: column;
+  }
+
+  .report-surface-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

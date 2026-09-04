@@ -4,12 +4,6 @@
 
 .error-surface {
   min-width: 0;
-  padding: 1.15rem;
-  background: var(--arv-surface);
-  border: 1px solid var(--arv-border);
-  border-radius: var(--arv-radius-panel);
-  box-shadow: 0 8px 22px var(--arv-shadow);
-  scroll-margin-top: var(--arv-scroll-offset, 84px);
 }
 
 .panel-heading,
@@ -18,42 +12,6 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-}
-
-.section-kicker {
-  display: block;
-  margin-bottom: 0.38rem;
-  color: var(--arv-accent-strong);
-  font-size: 0.62rem;
-  font-weight: 850;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-}
-
-.panel-heading h2,
-.subsection-heading h3,
-.error-detail h3 {
-  margin: 0;
-  color: var(--arv-text);
-  letter-spacing: -0.03em;
-}
-
-.panel-heading h2 {
-  font-size: 1rem;
-}
-
-.subsection-heading h3,
-.error-detail h3 {
-  font-size: 0.85rem;
-}
-
-.panel-heading p,
-.subsection-heading p,
-.error-detail p {
-  margin: 0.32rem 0 0;
-  color: var(--arv-muted-text);
-  font-size: 0.7rem;
-  line-height: 1.45;
 }
 
 .failure-total {
@@ -262,11 +220,6 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  margin-top: 1rem;
-  padding: 0.85rem;
-  background: var(--arv-surface-muted);
-  border: 1px solid var(--arv-border);
-  border-radius: var(--arv-radius-control);
 }
 
 .error-detail p {
@@ -286,10 +239,6 @@
 }
 
 @media (max-width: 767px) {
-  .error-surface {
-    padding: 0.9rem;
-  }
-
   .panel-heading,
   .error-detail {
     flex-direction: column;

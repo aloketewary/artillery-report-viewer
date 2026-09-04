@@ -1,10 +1,10 @@
 <section class="health-grid" id="insights" aria-labelledby="health-title" aria-describedby="health-explanation">
-  <article class="panel health-panel" aria-labelledby="health-title">
-    <div class="panel-heading">
+  <article class="report-surface panel health-panel" aria-labelledby="health-title">
+    <div class="panel-heading report-surface-heading">
       <div>
-        <span class="section-kicker">Calculated signal</span>
+        <span class="section-kicker report-surface-kicker">Calculated signal</span>
         <h2 id="health-title">Performance health</h2>
-        <p class="panel-subtitle">A directional score based on this run's available metrics.</p>
+        <p class="report-surface-description">A directional score based on this run's available metrics.</p>
       </div>
       <span class="score-state" [class]="'tone-' + health.tone">{{health.label}}</span>
     </div>
@@ -29,10 +29,10 @@
     </div>
   </article>
 
-  <article class="panel signal-panel" aria-labelledby="signals-title">
-    <div class="panel-heading">
+  <article class="report-surface panel signal-panel" aria-labelledby="signals-title">
+    <div class="panel-heading report-surface-heading">
       <div>
-        <span class="section-kicker">What to investigate</span>
+        <span class="section-kicker report-surface-kicker">What to investigate</span>
         <h2 id="signals-title">Run signals</h2>
       </div>
       <span class="signal-count">{{prioritySignals.length}} signals</span>

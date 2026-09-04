@@ -1,39 +1,38 @@
-<details class="raw-surface" id="raw-data" (toggle)="onToggle($event)">
-  <summary aria-labelledby="raw-data-title" aria-controls="raw-data-content">
+<details class="report-surface raw-surface" id="raw-data" [open]="isOpen" (toggle)="onToggle($event)" aria-labelledby="raw-data-title">
+  <summary aria-controls="raw-data-content">
     <span class="raw-summary-copy">
-      <span class="section-kicker">Source data</span>
+      <span class="section-kicker report-surface-kicker">Source data</span>
       <h2 id="raw-data-title">Raw Artillery data</h2>
       <small>Inspect a bounded excerpt. Copy and download retain the complete report.</small>
     </span>
     <span class="summary-action" aria-hidden="true">{{summaryAction}}</span>
   </summary>
-
   <div id="raw-data-content">
     <div class="raw-toolbar" role="group" aria-label="Raw JSON actions">
-    <label class="raw-search-field">
-      <span>Search source JSON</span>
-      <input type="search" [value]="presentation.search" (input)="onSearch($any($event.target).value)"
-        placeholder="Search JSON" aria-label="Search raw JSON">
-    </label>
-    <button tuiButton type="button" size="s" appearance="secondary" [disabled]="!presentation.hasData"
-      [attr.aria-label]="copyStatus || 'Copy complete raw JSON'"
-      (click)="copy()">{{copyStatus || 'Copy JSON'}}</button>
-    <button tuiButton type="button" size="s" appearance="secondary" [disabled]="!presentation.hasData"
-      aria-label="Download complete original JSON"
-      (click)="download()">Download JSON</button>
-  </div>
+      <tui-textfield class="raw-search-control" tuiTextfieldSize="s">
+        <label tuiLabel>Search source JSON</label>
+        <input tuiInput type="search" [value]="presentation.search" (input)="onSearch($any($event.target).value)"
+          placeholder="Search JSON" aria-label="Search raw JSON">
+      </tui-textfield>
+      <button tuiButton type="button" size="s" appearance="secondary" [disabled]="!presentation.hasData"
+        [attr.aria-label]="copyStatus || 'Copy complete raw JSON'"
+        (click)="copy()">{{copyStatus || 'Copy JSON'}}</button>
+      <button tuiButton type="button" size="s" appearance="secondary" [disabled]="!presentation.hasData"
+        aria-label="Download complete original JSON"
+        (click)="download()">Download JSON</button>
+    </div>
 
-  @if (copyStatus) {
-    <p class="raw-copy-status" role="status" aria-live="polite" aria-atomic="true">{{copyStatus}}</p>
-  }
+    @if (copyStatus) {
+      <p class="raw-copy-status" role="status" aria-live="polite" aria-atomic="true">{{copyStatus}}</p>
+    }
 
-  @if (!presentation.hasData) {
-    <div class="arv-empty" role="status" aria-live="polite">No raw report available.</div>
-  } @else if (presentation.search && !presentation.searchHasMatch) {
-    <div class="arv-empty" role="status" aria-live="polite">{{presentation.statusMessage}}</div>
-  } @else {
-    <p class="raw-status" role="status" aria-live="polite" aria-atomic="true">{{presentation.statusMessage}}</p>
-    <pre aria-label="Original report JSON">{{presentation.displayText}}</pre>
-  }
+    @if (!presentation.hasData) {
+      <div tuiMessage appearance="neutral" class="arv-empty" role="status" aria-live="polite">No raw report available.</div>
+    } @else if (presentation.search && !presentation.searchHasMatch) {
+      <div tuiMessage appearance="neutral" class="arv-empty" role="status" aria-live="polite">{{presentation.statusMessage}}</div>
+    } @else {
+      <p class="raw-status" role="status" aria-live="polite" aria-atomic="true">{{presentation.statusMessage}}</p>
+      <pre aria-label="Original report JSON">{{presentation.displayText}}</pre>
+    }
   </div>
 </details>

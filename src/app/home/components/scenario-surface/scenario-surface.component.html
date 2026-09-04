@@ -1,18 +1,20 @@
-<section class="scenario-surface" id="scenarios" aria-labelledby="scenario-surface-title">
-  <div class="panel-heading">
+<section class="report-surface scenario-surface" id="scenarios" aria-labelledby="scenario-surface-title">
+  <div class="panel-heading report-surface-heading">
     <div>
-      <span class="section-kicker">Load shape</span>
+      <span class="section-kicker report-surface-kicker">Measured by scenario when available</span>
       <h2 id="scenario-surface-title">Scenario performance</h2>
-      <p>Measured scenario counters and source-provided performance values. Missing values remain N/A.</p>
+      <p class="report-surface-description">Measured scenario counters and source-provided performance values. Missing values remain N/A.</p>
     </div>
     <span class="unit-label">{{scenarioRows.length}} scenarios</span>
   </div>
 
   <div class="filter-row" aria-label="Scenario filters" aria-describedby="scenario-search-status">
-    <label for="scenario-search">Search scenarios</label>
-    <input id="scenario-search" class="arv-control" type="search" [value]="search"
-      (input)="setSearch($any($event.target).value)" placeholder="Filter scenarios"
-      aria-describedby="scenario-search-status">
+    <tui-textfield class="scenario-search-field" tuiTextfieldSize="s">
+      <label tuiLabel>Search scenarios</label>
+      <input tuiInput id="scenario-search" type="search" [value]="search"
+        (input)="setSearch($any($event.target).value)" placeholder="Filter scenarios"
+        aria-describedby="scenario-search-status">
+    </tui-textfield>
   </div>
   <p id="scenario-search-status" class="filter-status" role="status" aria-live="polite">
     @if (!scenarioRows.length) {
@@ -24,9 +26,9 @@
     }
   </p>
 
-  <div class="table-scroll">
-    <table>
-      <caption>Scenario performance values from the active Artillery report</caption>
+  <div class="table-scroll report-table-scroll">
+    <table aria-label="Scenario performance">
+      <caption class="scenario-table-caption">Scenario performance values from the active Artillery report</caption>
       <thead>
         <tr>
           <th scope="col">Scenario</th>
@@ -64,32 +66,33 @@
             <td class="emphasis-number">{{formatMs(row.p99)}}</td>
             <td>{{formatCompact(row.errors)}}</td>
             <td>{{formatPercent(row.errorRate)}}</td>
-            <td><span class="table-status" [class]="'tone-' + (row.status ?? 'neutral')"
+            <td><span tuiBadge appearance="neutral" size="s" class="table-status"
+                [class]="'table-status tone-' + (row.status ?? 'neutral')"
                 [attr.data-availability]="row.status ? 'measured' : 'unavailable'">{{toneLabel(row.status)}}</span></td>
           </tr>
         }
-        @if (!scenarioRows.length) {
-          <tr><td colspan="12" class="table-empty" role="status">No scenario metrics are available in this report.</td></tr>
-        } @else if (!filteredRows.length) {
-          <tr><td colspan="12" class="table-empty" role="status">No scenario metrics match this search.</td></tr>
-        }
       </tbody>
     </table>
+    @if (!scenarioRows.length) {
+      <div tuiMessage appearance="neutral" class="table-empty" role="status">No scenario metrics are available in this report.</div>
+    } @else if (!filteredRows.length) {
+      <div tuiMessage appearance="neutral" class="table-empty" role="status">No scenario metrics match this search.</div>
+    }
   </div>
 
   @if (selectedRow; as scenario) {
-    <aside class="scenario-detail" id="scenario-detail" aria-labelledby="scenario-detail-title"
+    <aside class="scenario-detail report-surface-detail" id="scenario-detail" aria-labelledby="scenario-detail-title"
       aria-live="polite" role="region">
-      <div class="detail-heading">
+      <div class="detail-heading report-surface-heading">
         <div>
-          <span class="section-kicker">Scenario detail</span>
+          <span class="section-kicker report-surface-kicker">Scenario detail</span>
           <h3 id="scenario-detail-title">{{scenario.name}}</h3>
-          <p>Values below remain tied to scenario-specific report data.</p>
+          <p class="report-surface-description">Values below remain tied to scenario-specific report data.</p>
         </div>
-        <button tuiButton class="button button-secondary arv-control" type="button" size="s" appearance="secondary" (click)="closeDetails()"
+        <button tuiButton type="button" size="s" appearance="secondary" (click)="closeDetails()"
           aria-label="Close scenario details">Close</button>
       </div>
-      <dl class="scenario-facts">
+      <dl class="scenario-facts report-surface-facts">
         <div><dt>Requests</dt><dd>{{formatCompact(scenario.requests)}}</dd></div>
         <div><dt>VUs created</dt><dd>{{formatCompact(scenario.virtualUsersCreated)}}</dd></div>
         <div><dt>VUs completed</dt><dd>{{formatCompact(scenario.virtualUsersCompleted)}}</dd></div>
@@ -100,7 +103,8 @@
         <div><dt>P99</dt><dd>{{formatMs(scenario.p99)}}</dd></div>
         <div><dt>Errors</dt><dd>{{formatCompact(scenario.errors)}}</dd></div>
         <div><dt>Error rate</dt><dd>{{formatPercent(scenario.errorRate)}}</dd></div>
-        <div><dt>Status</dt><dd>{{toneLabel(scenario.status)}}</dd></div>
+        <div><dt>Status</dt><dd><span tuiBadge appearance="neutral" size="s"
+            class="detail-status" [class]="'detail-status tone-' + (scenario.status ?? 'neutral')">{{toneLabel(scenario.status)}}</span></dd></div>
       </dl>
       @if (!hasMeasuredPerformance(scenario)) {
         <p class="scenario-detail-note">This report does not provide scenario-level request, rate, latency, or error metrics. Available virtual-user counters remain measured, and unavailable values stay N/A.</p>

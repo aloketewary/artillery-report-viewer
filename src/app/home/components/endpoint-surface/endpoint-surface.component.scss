@@ -13,7 +13,6 @@
 }
 
 .panel-heading,
-.filter-row,
 .detail-heading {
   display: flex;
   align-items: flex-start;
@@ -78,34 +77,10 @@
   line-height: 1.45;
 }
 
-.sort-priority,
-.table-action,
-.table-link,
-.button,
-.clear-filters {
-  cursor: pointer;
-  transition: background-color var(--arv-transition-fast), border-color var(--arv-transition-fast), color var(--arv-transition-fast), transform var(--arv-transition-fast);
-}
-
-.button {
-  min-height: var(--arv-control-height-sm);
-  padding: 0.52rem 0.7rem;
-  color: var(--arv-text);
-  font-size: 0.72rem;
-  font-weight: 700;
-  white-space: nowrap;
-  background: var(--arv-control-background);
-  border: 1px solid var(--arv-control-border);
-  border-radius: var(--arv-radius-control);
-}
-
-.sort-priority[aria-pressed='true'] {
-  color: var(--arv-accent-strong);
-}
-
 .filter-row {
   display: grid;
   grid-template-columns: minmax(15rem, 1.45fr) repeat(3, minmax(9.5rem, 1fr)) auto;
+  grid-template-areas: 'search method status error clear';
   align-items: end;
   gap: 0.95rem;
   margin: 0;
@@ -113,54 +88,69 @@
   border-top: 1px solid var(--arv-border);
 }
 
+.search-filter { grid-area: search; }
+.method-filter { grid-area: method; }
+.status-filter { grid-area: status; }
+.error-filter { grid-area: error; }
+.clear-filters { grid-area: clear; }
+
 .filter-control {
   min-width: 0;
 }
 
-.filter-choice {
-  display: grid;
-  gap: 0.35rem;
+.filter-control tui-textfield {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-block-size: var(--arv-control-height-sm);
+  box-sizing: border-box;
 }
 
-.filter-label {
+.filter-control tui-textfield input[tuiInput] {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  color: var(--arv-text);
+}
+
+.filter-control tui-textfield input[tuiInput]::placeholder {
   color: var(--arv-muted-text);
-  font-size: 0.62rem;
+  opacity: 1;
+}
+
+.filter-control > label {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--arv-muted-text);
+  font-size: 0.64rem;
   font-weight: 700;
 }
 
-.filter-choice tui-segmented {
+.filter-control select {
   display: block;
   width: 100%;
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-.filter-choice tui-segmented button {
-  min-width: max-content;
-  white-space: nowrap;
-}
-
-.filter-choice tui-segmented button[aria-pressed='true'],
-.filter-choice tui-segmented button[aria-pressed='true']:hover {
-  color: var(--arv-accent-strong);
-  background: var(--arv-control-background-active);
-  border-color: var(--arv-accent);
-  box-shadow: inset 0 -2px 0 var(--arv-accent);
-}
-
-.filter-row .search-filter {
   min-width: 0;
+  min-height: var(--arv-control-height-sm);
+  box-sizing: border-box;
+  padding: 0.35rem 0.6rem;
+  color: var(--arv-text);
+  background: var(--arv-control-background);
+  border: 1px solid var(--arv-control-border);
+  border-radius: var(--arv-radius-control);
+  cursor: pointer;
+  font-size: 0.72rem;
 }
 
-.filter-control,
-.filter-control tui-textfield,
-.filter-control input,
-.filter-control select {
-  width: 100%;
+.filter-control select:hover {
+  border-color: var(--arv-accent);
+}
+
+.filter-control select:focus-visible {
+  outline: var(--arv-focus-width) solid var(--arv-focus);
+  outline-offset: var(--arv-focus-offset);
 }
 
 .clear-filters {
-  align-self: end;
   min-height: var(--arv-control-height-sm);
   white-space: nowrap;
 }
@@ -219,21 +209,6 @@ td:first-child {
 th:last-child,
 td:last-child {
   padding-right: clamp(1rem, 1.5vw, 1.4rem);
-}
-
-.table-action {
-  color: var(--arv-muted-text);
-  font-size: 0.62rem;
-  font-weight: 750;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-}
-
-.table-action:hover,
-.table-link:hover,
-.sort-priority:hover {
-  color: var(--arv-accent-strong);
 }
 
 td {
@@ -340,23 +315,12 @@ tr.is-selected th {
   text-overflow: ellipsis;
 }
 
-.button-secondary {
-  background: var(--arv-surface-muted);
-}
-
-.sort-priority:focus-visible,
-.clear-filters:focus-visible,
-.table-action:focus-visible,
-.table-link:focus-visible,
-.button:focus-visible,
-.filter-control:focus-within {
-  outline: var(--arv-focus-width) solid var(--arv-focus);
-  outline-offset: var(--arv-focus-offset);
-}
-
 @media (max-width: 1080px) and (min-width: 768px) {
   .filter-row {
-    grid-template-columns: minmax(15rem, 1.4fr) repeat(2, minmax(10rem, 1fr));
+    grid-template-columns: minmax(14rem, 1.45fr) repeat(2, minmax(9.5rem, 1fr));
+    grid-template-areas:
+      'search search method'
+      'status error clear';
   }
 }
 
@@ -399,6 +363,12 @@ tr.is-selected th {
 
   .filter-row {
     grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'search'
+      'method'
+      'status'
+      'error'
+      'clear';
     gap: 0.85rem;
     padding-top: 0.9rem;
   }
@@ -435,15 +405,5 @@ tr.is-selected th {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.6rem;
     margin-top: 1rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sort-priority,
-  .table-action,
-  .table-link,
-  .button,
-  .clear-filters {
-    transition: none;
   }
 }

@@ -10,30 +10,15 @@
   min-width: max-content;
 }
 
-.fab-action {
-  display: inline-grid;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0;
-  place-items: center;
-  border-radius: 50%;
-}
-
 .action-icon {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.theme-toggle {
-  display: inline-grid;
-  width: 2.25rem;
-  height: 2.25rem;
-  place-items: center;
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .theme-icon {
-  font-size: 1.15rem;
-  line-height: 1;
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--arv-text-strong);
 }
 
 .visually-hidden {

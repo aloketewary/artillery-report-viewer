@@ -11,7 +11,8 @@ import {
   provideTaiga,
   tuiAssetsPathProvider,
 } from '@taiga-ui/core';
-import { TuiBadge, TuiMessage, TuiSegmented } from '@taiga-ui/kit';
+import { TuiTable } from '@taiga-ui/addon-table';
+import { TuiAccordion, TuiBadge, TuiMessage, TuiSegmented } from '@taiga-ui/kit';
 import { NgxEchartsModule } from 'ngx-echarts';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -77,9 +78,11 @@ import { RawDataSurfaceComponent } from './home/components/raw-data-surface/raw-
     TuiButton,
     ...TuiInput,
     TuiBadge,
+    ...TuiAccordion,
     TuiMessage,
     TuiSegmented,
     ...TuiNotification,
+    ...TuiTable,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'),
     }),

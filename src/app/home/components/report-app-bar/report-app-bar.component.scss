@@ -32,6 +32,11 @@
   display: none;
 }
 
+.navigation-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
 @media (max-width: 1199px) {
   .app-bar {
     grid-template-columns: auto minmax(0, 1fr) auto;

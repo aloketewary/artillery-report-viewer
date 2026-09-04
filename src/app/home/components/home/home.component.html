@@ -19,11 +19,11 @@
 
     <app-report-overview [view]="reportView" [context]="shellPresentation.reportContext"></app-report-overview>
 
-    <section class="panel timeline-panel" id="performance" aria-labelledby="timeline-title">
-      <div class="panel-heading timeline-heading">
-        <div><span class="section-kicker">Measured timeline</span>
+    <section class="report-surface panel timeline-panel" id="performance" aria-labelledby="timeline-title">
+      <div class="panel-heading timeline-heading report-surface-heading">
+        <div><span class="section-kicker report-surface-kicker">Measured timeline</span>
           <h2 id="timeline-title">Performance over time</h2>
-          <p>Use the series toggles to separate tail latency, traffic, and errors.</p>
+          <p class="report-surface-description">Use the series toggles to separate tail latency, traffic, and errors.</p>
         </div>
         <div class="chart-controls">
           <div class="chart-control-group">
@@ -64,7 +64,7 @@
       [status]="statusFilter" [errors]="errorFilter" [sort]="endpointSort"
       [selectedEndpoint]="selectedEndpointName" (intent)="onInvestigationIntent($event)"></app-endpoint-surface>
 
-    <section class="panel latency-panel" aria-labelledby="latency-surface-title">
+    <section class="report-surface panel latency-panel" aria-labelledby="latency-surface-title">
       <app-latency-surface [latency]="reportView.latency"></app-latency-surface>
     </section>
 
@@ -74,19 +74,19 @@
     <app-error-surface [view]="reportView" [selectedErrorKey]="selectedErrorKey"
       [selectedStatusCode]="selectedStatusCode" (intent)="onInvestigationIntent($event)"></app-error-surface>
 
-    <section class="panel comparison-panel report-secondary-surface" id="comparison" aria-labelledby="comparison-title">
-      <div class="panel-heading">
-        <div><span class="section-kicker">Historical context</span>
+    <section class="report-surface panel comparison-panel report-secondary-surface" id="comparison" aria-labelledby="comparison-title">
+      <div class="panel-heading report-surface-heading">
+        <div><span class="section-kicker report-surface-kicker">Historical context</span>
           <h2 id="comparison-title">Compare runs</h2>
-          <p>No previous run is available in the current report flow.</p>
+          <p class="report-surface-description">No previous run is available in the current report flow.</p>
         </div><span class="score-state tone-neutral" role="status">Baseline unavailable</span>
       </div>
-      <div class="comparison-empty" role="status" aria-labelledby="comparison-empty-title"
+      <div tuiMessage appearance="neutral" class="comparison-empty" role="status" aria-labelledby="comparison-empty-title"
         aria-describedby="comparison-empty-copy"><strong id="comparison-empty-title">No baseline available</strong><span
           id="comparison-empty-copy">Comparison stays unavailable until the existing application flow provides a
           previous run.</span><span>No deltas or trend values are shown without historical data.</span></div>
       <div class="filter-row comparison-controls" aria-label="Comparison controls"><button
-          tuiButton class="button button-secondary" type="button" size="s" appearance="secondary" disabled aria-disabled="true"
+          tuiButton type="button" size="s" appearance="secondary" disabled aria-disabled="true"
           aria-describedby="comparison-empty-copy" title="No baseline available">Compare previous run</button><span
           class="unit-label">Unavailable until a baseline is supplied.</span></div>
     </section>
