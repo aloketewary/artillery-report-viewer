@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, Optional, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { FileUploadComponent } from '../../../file-upload/components/file-upload/file-upload.component';
 import { Percentiles, PerformanceReport, TimelinePoint } from '../../../model/performance-report';
 import { ReportState } from '../../../model/report-state';
@@ -6,6 +7,7 @@ import { normalizeArtilleryReport } from '../../../shared/report/performance-rep
 import { ParsedReport, parseArtilleryReport } from '../../../shared/report/report-adapter';
 import { ReportSessionService } from '../../../shared/report/report-session.service';
 import { ThemePreferenceService } from '../../../shared/theme/theme-preference.service';
+import { GrowthTelemetryService } from '../../../shared/telemetry/growth-telemetry.service';
 import { ReportValidationError, reportValidationMessage } from '../../../shared/report/report-validation-error';
 import {
   REPORT_SECTION_NAVIGATION,
@@ -28,6 +30,14 @@ import type {KpiKey, TableSortName} from '../../presentation/presentation.contra
 type ChartMetric = 'latency' | 'throughput' | 'errors';
 type ChartRange = '1m' | '5m' | '15m' | 'all';
 type StatusTone = 'healthy' | 'warning' | 'critical' | 'neutral';
+
+interface ComparisonRow {
+  label: string;
+  current: string;
+  baseline: string;
+  delta: string;
+  tone: StatusTone;
+}
 
 export interface MetricCard {
   key: KpiKey;
@@ -165,6 +175,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private readonly reportSession: ReportSessionService,
     private readonly themePreference: ThemePreferenceService,
+    private readonly telemetry: GrowthTelemetryService,
+    @Optional() private readonly router?: Router,
   ) {}
 
   ngOnInit(): void {
@@ -192,8 +204,27 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       reportContext: hasReport ? this.reportContextPresentation() : undefined,
       navigation: REPORT_SECTION_NAVIGATION,
       canExport: hasReport,
-      canReset: false,
+      canReset: hasReport,
     };
+  }
+
+  get comparisonRows(): readonly ComparisonRow[] {
+    const baseline = this.reportSession.previous?.report;
+    if (!baseline || !this.reportState.isLoaded) {
+      return [];
+    }
+
+    return [
+      this.comparisonRow('Requests', this.reportView.requests, baseline.summary.requestsCompleted, value => this.formatCompact(value)),
+      this.comparisonRow('Throughput', this.reportView.throughput, baseline.summary.throughputRps, value => this.formatNumber(value, 1) + ' req/s'),
+      this.comparisonRow('Error rate', this.reportView.errorRate, baseline.summary.errorRatePercent, value => this.formatPercent(value)),
+      this.comparisonRow('P95 latency', this.reportView.p95, baseline.summary.latency?.p95, value => this.formatMs(value)),
+      this.comparisonRow('P99 latency', this.reportView.p99, baseline.summary.latency?.p99, value => this.formatMs(value)),
+    ];
+  }
+
+  get hasComparisonBaseline(): boolean {
+    return this.comparisonRows.length > 0;
   }
 
   get rawDataPresentation(): Readonly<RawDataPresentation> {
@@ -342,7 +373,13 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.toggleTheme();
         return;
       case 'export':
-        this.exportReport();
+        this.downloadHtmlReport();
+        return;
+      case 'download-json':
+        this.onDownloadHit();
+        return;
+      case 'print':
+        this.printReport();
         return;
       case 'reset':
         this.reset('shell');
@@ -416,8 +453,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  reset(_: string): void {
-    this.reportSession.clear();
+  reset(source: string): void {
+    this.reportSession.clear(source === 'shell');
     this.setUploadState({kind: 'idle'});
     this.sectionObserver?.disconnect();
     this.sectionObserver = undefined;
@@ -437,6 +474,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.selectedErrorKey = undefined;
     this.selectedStatusCode = undefined;
     this.resetEndpointWindow();
+
+    if (source === 'shell') {
+      void this.router?.navigate(['/home/landing']);
+    }
   }
 
   onReportUploadAndProcessed(data: ReportState): void {
@@ -458,7 +499,6 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onFileError(message: string): void {
-    this.reportSession.clear();
     const stateBeforeReset = this.uploadState;
     this.errorMessage = message;
     this.sectionObserver?.disconnect();
@@ -510,37 +550,53 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const blob = new Blob([rawJson], { type: 'application/json' });
+    const blob = new Blob([rawJson], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const downloader = document.createElement('a');
     downloader.href = url;
     downloader.download = this.reportView.fileName || 'report.json';
     downloader.click();
     setTimeout(() => URL.revokeObjectURL(url));
+    this.telemetry.track('export_selected', {format: 'json'});
+    this.exportStatus = `Downloaded ${downloader.download}.`;
+    this.exportStatusRole = 'status';
   }
 
   exportReport(): void {
+    this.downloadHtmlReport();
+  }
+
+  private downloadHtmlReport(): void {
     if (!this.reportState.isLoaded) {
       return;
     }
 
-    this.exportStatusRole = 'status';
-    this.exportStatus = 'Preparing report export. The HTML download will start before the print view.';
     const html = this.buildExportHtml();
     const fileName = this.exportFileName();
-    const blob = new Blob([html], { type: 'text/html' });
+    const blob = new Blob([html], {type: 'text/html'});
     const url = URL.createObjectURL(blob);
     const downloader = document.createElement('a');
     downloader.href = url;
     downloader.download = fileName;
     downloader.click();
     setTimeout(() => URL.revokeObjectURL(url));
-    this.exportStatus = `Downloaded ${fileName}. Preparing the print view.`;
+    this.telemetry.track('export_selected', {format: 'html'});
+    this.exportStatusRole = 'status';
+    this.exportStatus = `Downloaded ${fileName}.`;
+  }
 
+  private printReport(): void {
+    if (!this.reportState.isLoaded) {
+      return;
+    }
+
+    const html = this.buildExportHtml();
+    const fileName = this.exportFileName();
     const printWindow = window.open('', '_blank');
+    this.telemetry.track('export_selected', {format: 'print'});
     if (!printWindow) {
       this.exportStatusRole = 'alert';
-      this.exportStatus = `Downloaded ${fileName}. Pop-up was blocked. Allow pop-ups for this site, then select Export report again to print or save a PDF.`;
+      this.exportStatus = `Print view was blocked. Allow pop-ups for this site, then select PDF again.`;
       return;
     }
 
@@ -550,7 +606,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       printWindow.focus();
       printWindow.print();
-      this.exportStatus = `Downloaded ${fileName}. Print dialog opened.`;
+      this.exportStatusRole = 'status';
+      this.exportStatus = `Print view opened for ${fileName}.`;
     }, 250);
   }
 
@@ -896,6 +953,25 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.resetEndpointWindow();
   }
 
+  private comparisonRow(
+    label: string,
+    current: number | undefined,
+    baseline: number | undefined,
+    format: (value?: number) => string,
+  ): ComparisonRow {
+    if (current === undefined || baseline === undefined || !Number.isFinite(current) || !Number.isFinite(baseline)) {
+      return {label, current: 'N/A', baseline: 'N/A', delta: 'Unavailable', tone: 'neutral'};
+    }
+
+    const delta = current - baseline;
+    const percent = baseline === 0 ? undefined : (delta / Math.abs(baseline)) * 100;
+    const deltaLabel = percent === undefined
+      ? `${delta >= 0 ? '+' : ''}${this.formatNumber(delta, 1)}`
+      : `${percent >= 0 ? '+' : ''}${this.formatNumber(percent, 1)}%`;
+
+    return {label, current: format(current), baseline: format(baseline), delta: `${deltaLabel} vs baseline`, tone: 'neutral'};
+  }
+
   formatNumber(value?: number, maximumFractionDigits = 0): string {
     if (value === undefined || !Number.isFinite(value)) {
       return 'N/A';
@@ -1054,7 +1130,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private loadSource(source: unknown, fileName: string): void {
     const parsed = parseArtilleryReport(source);
     const normalized = normalizeArtilleryReport(parsed, fileName);
+    const replacing = Boolean(this.reportSession.current);
     this.reportSession.set({fileName, parsed, report: normalized});
+    this.telemetry.track(replacing ? 'report_replaced' : 'upload_completed', {fileName});
     this.applyLoadedReport(parsed, normalized, fileName);
   }
 
@@ -1072,6 +1150,9 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sectionObserver = undefined;
     this.reportState = state;
     this.reportView = this.buildView(report);
+    if (this.reportSession.previous) {
+      this.telemetry.track('comparison_viewed', {baselineFileName: this.reportSession.previous.fileName});
+    }
     this.activeAnchor = 'overview';
     this.selectedScenarioName = undefined;
     this.selectedEndpointName = undefined;

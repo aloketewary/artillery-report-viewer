@@ -31,10 +31,21 @@
             (onFileProcess)="onReportUploadAndProcessed($event)" (onReset)="reset($event)"
             (onFileError)="onFileError($event)" (onStateChange)="onUploadStateChanged($event)"></app-file-upload>
           <div class="welcome-actions" aria-describedby="sample-action-help">
-            <button tuiButton type="button" size="s" appearance="secondary" [disabled]="isUploadBusy()"
+            <button tuiButton type="button" size="s" appearance="secondary" [disabled]="isUploadBusy() || isRestoringReport"
               [attr.aria-busy]="isUploadBusy() ? 'true' : 'false'"
               aria-describedby="sample-action-help upload-surface-status"
               (click)="loadSampleReport()">Open sample report</button>
+            @if (savedReportName) {
+              <button tuiButton type="button" size="s" appearance="secondary" [disabled]="isRestoringReport || isUploadBusy()"
+                [attr.aria-busy]="isRestoringReport ? 'true' : 'false'"
+                aria-label="Resume saved report"
+                (click)="resumeSavedReport()">
+                Resume {{savedReportName}}
+              </button>
+              <button tuiButton type="button" size="s" appearance="ghost" [disabled]="isRestoringReport || isUploadBusy()"
+                aria-label="Clear saved report"
+                (click)="clearSavedReport()">Clear saved report</button>
+            }
             <span id="sample-action-help">Explore the dashboard with a built-in JSON example.</span>
           </div>
         </div>

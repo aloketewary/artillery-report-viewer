@@ -17,6 +17,14 @@ export class GlobalActionsComponent {
     this.intent.emit({type: 'export'});
   }
 
+  downloadJson(): void {
+    this.intent.emit({type: 'download-json'});
+  }
+
+  printReport(): void {
+    this.intent.emit({type: 'print'});
+  }
+
   toggleTheme(): void {
     this.intent.emit({
       type: 'toggle-theme',

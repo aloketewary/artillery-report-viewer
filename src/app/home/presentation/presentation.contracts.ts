@@ -106,6 +106,8 @@ export type ShellIntent =
   | UiIntent<'navigate', {readonly anchor: ReportAnchorId}>
   | UiIntent<'toggle-theme', {readonly mode: ThemeMode}>
   | UiIntent<'export'>
+  | UiIntent<'download-json'>
+  | UiIntent<'print'>
   | UiIntent<'reset'>;
 
 export type EntryIntent =

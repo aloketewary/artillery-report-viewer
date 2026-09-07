@@ -3,7 +3,7 @@
   inset: 0 0 auto;
   z-index: 3;
   display: block;
-  height: 68px;
+  height: 72px;
 }
 
 .app-bar {
@@ -83,5 +83,54 @@
 @media (prefers-reduced-motion: reduce) {
   .app-bar {
     backdrop-filter: none;
+  }
+}
+
+.app-bar {
+  min-height: 72px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--arv-accent-soft) 22%, transparent), transparent 38%),
+    var(--arv-surface-glass);
+  border-bottom-color: var(--arv-border-strong);
+  box-shadow: 0 10px 34px var(--arv-shadow), inset 0 -1px 0 color-mix(in srgb, var(--arv-accent) 16%, transparent);
+  backdrop-filter: blur(22px) saturate(125%);
+}
+
+@media (max-width: 767px) {
+  .app-bar {
+    min-height: 68px;
+    background: var(--arv-surface-glass);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-bar {
+    backdrop-filter: none;
+  }
+}
+
+:host {
+  height: 76px;
+}
+
+.app-bar {
+  min-height: 76px;
+  padding-inline: max(1.5rem, calc((100vw - 1600px) / 2));
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--arv-accent-soft) 35%, transparent), transparent 30%),
+    color-mix(in srgb, var(--arv-background) 78%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--arv-accent) 28%, var(--arv-border));
+  box-shadow: 0 14px 42px rgb(0 0 0 / 0.22), inset 0 -1px 0 color-mix(in srgb, var(--arv-accent) 18%, transparent);
+  backdrop-filter: blur(26px) saturate(145%);
+}
+
+@media (max-width: 767px) {
+  :host {
+    height: 68px;
+  }
+
+  .app-bar {
+    min-height: 68px;
+    padding-inline: 0.8rem;
   }
 }

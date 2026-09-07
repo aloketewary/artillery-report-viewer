@@ -91,9 +91,9 @@
       } @else if (uploadState.kind === 'drag-over') {
         Release to read the first selected file.
       } @else if (uploadState.kind === 'reading') {
-        Reading {{uploadState.fileName || 'the selected report'}}.
+        Reading {{uploadState.fileName || 'the selected report'}}{{uploadProgress !== null ? ' ' + uploadProgress + '%' : ''}}.
       } @else if (uploadState.kind === 'processing') {
-        Processing {{uploadState.fileName || 'the report'}} in this browser.
+        Parsing {{uploadState.fileName || 'the report'}} locally. Large files may take a moment.
       } @else if (uploadState.kind === 'ready') {
         {{uploadState.fileName}} is ready.
       } @else {

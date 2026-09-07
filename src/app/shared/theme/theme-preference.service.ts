@@ -33,15 +33,14 @@ export class ThemePreferenceService {
 
   private read(): ThemeMode {
     if (!isPlatformBrowser(this.platformId)) {
-      return 'light';
+      return 'dark';
     }
 
     try {
-      return this.document.defaultView?.localStorage.getItem(THEME_STORAGE_KEY) === 'dark'
-        ? 'dark'
-        : 'light';
+      const storedMode = this.document.defaultView?.localStorage.getItem(THEME_STORAGE_KEY);
+      return storedMode === 'light' ? 'light' : 'dark';
     } catch {
-      return 'light';
+      return 'dark';
     }
   }
 

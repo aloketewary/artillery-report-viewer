@@ -184,3 +184,219 @@
     animation: none;
   }
 }
+
+.report-overview {
+  position: relative;
+  padding-bottom: 0.35rem;
+}
+
+.overview-header {
+  position: relative;
+  padding-top: 0.5rem;
+}
+
+.overview-header::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4rem;
+  height: 2px;
+  content: '';
+  background: var(--arv-accent);
+  box-shadow: 0 0 16px var(--arv-accent-glow);
+}
+
+.analysis-kicker {
+  color: var(--arv-accent-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+}
+
+.overview-copy h1 {
+  max-width: 48rem;
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  font-weight: 720;
+  letter-spacing: -0.075em;
+}
+
+.overview-copy p {
+  font-size: 0.76rem;
+}
+
+.overview-analysis {
+  margin-top: 1.15rem;
+  padding: 1.15rem 1.25rem;
+  background: linear-gradient(105deg, color-mix(in srgb, var(--analysis-tone) 13%, var(--arv-surface)), var(--arv-surface));
+  border-color: color-mix(in srgb, var(--analysis-tone) 34%, var(--arv-border));
+  border-inline-start-width: 3px;
+  box-shadow: 0 14px 34px var(--arv-shadow), inset 0 1px 0 color-mix(in srgb, var(--arv-surface-raised) 72%, transparent);
+}
+
+.health-score strong,
+.metric-value,
+.summary-score {
+  font-variant-numeric: tabular-nums;
+}
+
+.health-score strong {
+  color: var(--analysis-tone);
+  font-size: 2.15rem;
+}
+
+.kpi-section {
+  margin-top: 1.9rem;
+}
+
+.kpi-heading h2 {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.kpi-heading span {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.58rem;
+}
+
+/* Overview becomes a living focal surface for the report. */
+.overview-header {
+  min-height: 12rem;
+  display: flex;
+  align-items: flex-end;
+  box-sizing: border-box;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 86% 18%, color-mix(in srgb, var(--arv-accent) 24%, transparent), transparent 17rem),
+    linear-gradient(130deg, color-mix(in srgb, var(--arv-accent-soft) 48%, var(--arv-surface)), var(--arv-surface));
+  border: 1px solid color-mix(in srgb, var(--arv-accent) 28%, var(--arv-border));
+  border-radius: 1.5rem;
+  box-shadow: 0 26px 70px var(--arv-shadow), inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+.overview-header::after {
+  position: absolute;
+  right: clamp(-6rem, -4vw, -2rem);
+  bottom: clamp(-8rem, -5vw, -3rem);
+  width: 19rem;
+  height: 19rem;
+  content: '';
+  border: 1px solid color-mix(in srgb, var(--arv-accent) 36%, transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2.5rem color-mix(in srgb, var(--arv-accent) 5%, transparent), 0 0 0 5rem color-mix(in srgb, var(--arv-accent) 3%, transparent);
+  transform: rotate(-18deg);
+  pointer-events: none;
+}
+
+.overview-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.overview-copy h1 {
+  max-width: 52rem;
+  font-size: clamp(2.4rem, 6vw, 5rem);
+  font-weight: 680;
+  letter-spacing: -0.1em;
+  line-height: 0.92;
+}
+
+.overview-copy p {
+  max-width: 34rem;
+  margin-top: 1rem;
+  font-size: 0.78rem;
+}
+
+.overview-analysis {
+  position: relative;
+  overflow: hidden;
+  margin-top: 1rem;
+  padding: clamp(1rem, 2vw, 1.45rem);
+  background: color-mix(in srgb, var(--arv-surface) 82%, transparent);
+  border: 1px solid color-mix(in srgb, var(--analysis-tone) 38%, var(--arv-border));
+  border-inline-start-width: 3px;
+  border-radius: 1rem;
+  box-shadow: 0 20px 50px var(--arv-shadow), inset 0 1px 0 rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(18px) saturate(125%);
+}
+
+.overview-analysis::after {
+  position: absolute;
+  top: -5rem;
+  right: 16%;
+  width: 12rem;
+  height: 12rem;
+  content: '';
+  border: 1px solid color-mix(in srgb, var(--analysis-tone) 28%, transparent);
+  border-radius: 50%;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.analysis-status,
+.overview-analysis p,
+.health-score {
+  position: relative;
+  z-index: 1;
+}
+
+.health-score strong {
+  color: var(--analysis-tone);
+  font-size: clamp(2rem, 4vw, 3rem);
+  text-shadow: 0 0 24px color-mix(in srgb, var(--analysis-tone) 26%, transparent);
+}
+
+.kpi-section {
+  margin-top: clamp(1.5rem, 3vw, 2.75rem);
+}
+
+@media (max-width: 767px) {
+  .overview-header {
+    min-height: 14rem;
+    padding: 1.5rem 1.15rem;
+    border-radius: 1.1rem;
+  }
+
+  .overview-copy h1 {
+    font-size: clamp(2.35rem, 12vw, 4rem);
+  }
+
+  .overview-analysis {
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overview-analysis {
+    backdrop-filter: none;
+  }
+}
+
+/* Overview QA correction: report utility leads, atmosphere supports. */
+.overview-header {
+  min-height: 10.5rem;
+  padding: clamp(1.35rem, 3vw, 2.2rem);
+}
+
+.overview-copy h1 {
+  max-width: 44rem;
+  font-size: clamp(2.1rem, 4.3vw, 3.7rem);
+  line-height: 0.96;
+}
+
+.overview-header::after {
+  opacity: 0.42;
+}
+
+@media (max-width: 767px) {
+  .overview-header {
+    min-height: 11rem;
+    padding: 1.25rem 1rem;
+  }
+
+  .overview-copy h1 {
+    font-size: clamp(2.15rem, 10vw, 3.3rem);
+  }
+}

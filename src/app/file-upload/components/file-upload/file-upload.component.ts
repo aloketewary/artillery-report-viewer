@@ -3,6 +3,7 @@ import { ReportMetrics, ReportState } from '../../../model/report-state';
 import { DEFAULT_MAX_FILE_SIZE_BYTES } from '../../file-upload.config';
 import { ReportValidationError, fileTooLargeMessage, formatFileSize, reportValidationMessage } from '../../../shared/report/report-validation-error';
 import { UploadUiState } from '../../../home/presentation/presentation.contracts';
+import {GrowthTelemetryService} from '../../../shared/telemetry/growth-telemetry.service';
 import {TuiFileLike} from '@taiga-ui/kit';
 
 @Component({
@@ -30,6 +31,10 @@ export class FileUploadComponent {
   @Output() onFileError = new EventEmitter<string>();
   @Output() onStateChange = new EventEmitter<UploadUiState>();
   private selectionId = 0;
+  private activeReader?: FileReader;
+  private activeWorker?: Worker;
+
+  constructor(private readonly telemetry: GrowthTelemetryService) {}
 
   openFileDialog(): void {
     if (this.isProcessing) {
@@ -114,6 +119,8 @@ export class FileUploadComponent {
     this.fileName = file.name;
     this.selectedFile = {name: file.name, size: file.size, type: file.type};
     this.isProcessing = true;
+    this.uploadProgress = 0;
+    this.telemetry.track('upload_started', {fileName: file.name, sizeBytes: file.size});
     this.setUploadState({kind: 'reading', fileName: file.name});
     void this.processTheJson(file, selectionId);
   }
@@ -127,6 +134,10 @@ export class FileUploadComponent {
   }
 
   reset(emit = true): void {
+    this.activeReader?.abort();
+    this.activeReader = undefined;
+    this.activeWorker?.terminate();
+    this.activeWorker = undefined;
     this.selectionId += 1;
     this.uploadProgress = null;
     this.fileName = '';
@@ -147,12 +158,12 @@ export class FileUploadComponent {
 
   async processTheJson(fileData: File, selectionId = this.selectionId): Promise<void> {
     try {
-      const text = await fileData.text();
+      const text = await this.readFile(fileData, selectionId);
       if (selectionId !== this.selectionId) {
         return;
       }
       this.setUploadState({kind: 'processing', fileName: this.fileName});
-      const parsed: unknown = JSON.parse(text);
+      const parsed: unknown = await this.parseJson(text, selectionId);
       if (selectionId !== this.selectionId) {
         return;
       }
@@ -165,24 +176,74 @@ export class FileUploadComponent {
       this.reportData = new ReportState();
       this.reportData.report = new ReportMetrics(this.fileName, 0);
       this.reportData.report.rawResults = parsed;
+      this.uploadProgress = 100;
       this.onFileProcess.emit(this.reportData);
       if (selectionId === this.selectionId && this.isFileUpload) {
         this.setUploadState({kind: 'ready', fileName: this.fileName});
       }
     } catch (error: unknown) {
-      if (selectionId === this.selectionId) {
+      if (selectionId === this.selectionId && !(error instanceof DOMException && error.name === 'AbortError')) {
         const validationError = error instanceof SyntaxError ? new ReportValidationError('invalid-json', error) : error;
         this.handleError(validationError);
       }
     } finally {
       if (selectionId === this.selectionId) {
+        this.activeReader = undefined;
+        this.activeWorker = undefined;
         this.isProcessing = false;
       }
     }
   }
 
+  private readFile(file: File, selectionId: number): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      this.activeReader = reader;
+      reader.onprogress = (event) => {
+        if (selectionId !== this.selectionId || !event.lengthComputable) {
+          return;
+        }
+        this.uploadProgress = Math.min(99, Math.round((event.loaded / event.total) * 100));
+      };
+      reader.onload = () => resolve(String(reader.result ?? ''));
+      reader.onerror = () => reject(new Error('Unable to read report file.'));
+      reader.onabort = () => reject(new DOMException('Reading cancelled.', 'AbortError'));
+      reader.readAsText(file);
+    });
+  }
+
+  private parseJson(text: string, selectionId: number): Promise<unknown> {
+    if (typeof Worker === 'undefined') {
+      return Promise.resolve().then(() => JSON.parse(text));
+    }
+
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(new URL('./report-json.worker', import.meta.url), {type: 'module'});
+      this.activeWorker = worker;
+      worker.onmessage = ({data}: MessageEvent<{ok: boolean; value?: unknown}>) => {
+        worker.terminate();
+        if (selectionId !== this.selectionId) {
+          return;
+        }
+        if (data.ok) {
+          resolve(data.value);
+        } else {
+          reject(new SyntaxError('Invalid JSON'));
+        }
+      };
+      worker.onerror = () => {
+        worker.terminate();
+        if (selectionId === this.selectionId) {
+          reject(new SyntaxError('Invalid JSON'));
+        }
+      };
+      worker.postMessage(text);
+    });
+  }
+
   private handleError(error: unknown): void {
     const message = this.errorMessage(error);
+    this.telemetry.track('upload_failed', {message});
     this.reset(false);
     this.setUploadState(this.errorState(error, message));
     this.onFileError.emit(message);

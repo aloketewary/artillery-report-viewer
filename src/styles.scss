@@ -553,3 +553,170 @@ input:disabled {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Futuristic observability skin. Semantic names stay stable for charts and report surfaces. */
+:root {
+  --arv-background: #edf3f6;
+  --arv-surface: #f8fbfc;
+  --arv-surface-raised: #ffffff;
+  --arv-surface-muted: #e8f0f3;
+  --arv-text: #10242e;
+  --arv-muted-text: #5c717b;
+  --arv-border: #c9d9df;
+  --arv-border-strong: #99b6bf;
+  --arv-accent: #087f91;
+  --arv-accent-strong: #045969;
+  --arv-accent-soft: #d6f0f2;
+  --arv-shadow: rgb(10 52 64 / 0.12);
+  --arv-grid-line: rgb(8 127 145 / 0.09);
+  --arv-accent-glow: rgb(8 127 145 / 0.2);
+  --arv-surface-glass: rgb(248 251 252 / 0.84);
+  --arv-radius-xs: 0.2rem;
+  --arv-radius-sm: 0.38rem;
+  --arv-radius-md: 0.58rem;
+  --arv-radius-lg: 0.72rem;
+  --arv-radius-panel: 0.72rem;
+  --arv-radius-control: 0.38rem;
+  --arv-panel-padding: 1.2rem;
+  --arv-focus: #045969;
+}
+
+.arv-dark,
+[data-theme='dark'] {
+  --arv-background: #07131d;
+  --arv-surface: #0c1d29;
+  --arv-surface-raised: #102633;
+  --arv-surface-muted: #0e2531;
+  --arv-text: #e8f6f7;
+  --arv-muted-text: #8caab3;
+  --arv-border: #1e3d4a;
+  --arv-border-strong: #2d6370;
+  --arv-accent: #59d6d7;
+  --arv-accent-strong: #9af3ed;
+  --arv-accent-soft: #103b45;
+  --arv-shadow: rgb(0 0 0 / 0.34);
+  --arv-grid-line: rgb(89 214 215 / 0.08);
+  --arv-accent-glow: rgb(89 214 215 / 0.22);
+  --arv-surface-glass: rgb(12 29 41 / 0.82);
+  --arv-focus: #9af3ed;
+}
+
+html,
+body {
+  background:
+    radial-gradient(circle at 8% -10%, var(--arv-accent-glow), transparent 30rem),
+    var(--arv-background);
+}
+
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.005em;
+}
+
+.arv-panel,
+.report-surface {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--arv-surface-raised) 96%, var(--arv-accent-soft)), var(--arv-surface)),
+    var(--arv-surface);
+  border-color: var(--arv-border);
+  box-shadow: 0 16px 42px var(--arv-shadow), inset 0 1px 0 color-mix(in srgb, var(--arv-surface-raised) 80%, transparent);
+}
+
+.panel-kicker,
+.report-surface-kicker,
+.section-kicker {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+}
+
+button,
+a,
+select,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .arv-panel,
+  .report-surface {
+    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  }
+
+  .arv-panel:hover,
+  .report-surface:hover {
+    border-color: color-mix(in srgb, var(--arv-accent) 46%, var(--arv-border));
+    box-shadow: 0 18px 46px var(--arv-shadow), 0 0 0 1px color-mix(in srgb, var(--arv-accent) 10%, transparent);
+  }
+}
+
+/* Fluid system pass. Panels are layered surfaces, not static cards. */
+:root {
+  --arv-ease-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+  --arv-radius-panel: 1.1rem;
+  --arv-radius-lg: 1rem;
+  --arv-radius-md: 0.72rem;
+  --arv-radius-control: 0.65rem;
+}
+
+.arv-dark,
+[data-theme='dark'] {
+  --arv-background: #050b12;
+  --arv-surface: #091721;
+  --arv-surface-raised: #0f222e;
+  --arv-surface-muted: #0b1d28;
+  --arv-text: #edfafa;
+  --arv-muted-text: #86aab1;
+  --arv-border: #173845;
+  --arv-border-strong: #2b6972;
+  --arv-accent: #5ff1df;
+  --arv-accent-strong: #b0fff3;
+  --arv-accent-soft: #0d3942;
+  --arv-shadow: rgb(0 0 0 / 0.5);
+  --arv-grid-line: rgb(95 241 223 / 0.075);
+  --arv-accent-glow: rgb(95 241 223 / 0.24);
+  --arv-surface-glass: rgb(9 23 33 / 0.72);
+  --arv-focus: #b0fff3;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .app-shell::before {
+    animation: ambient-drift 18s var(--arv-ease-fluid) infinite alternate;
+  }
+
+  .report-surface,
+  .arv-panel {
+    will-change: transform;
+    transition: transform 420ms var(--arv-ease-fluid), border-color 240ms ease, box-shadow 420ms var(--arv-ease-fluid);
+  }
+
+  .report-surface:hover,
+  .arv-panel:hover {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes ambient-drift {
+  0% { transform: translate3d(-2%, -1%, 0) scale(1); }
+  100% { transform: translate3d(4%, 2%, 0) scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-surface,
+  .arv-panel {
+    will-change: auto;
+  }
+}
+
+/* Component QA correction: dense report surfaces stay visually anchored while inspecting data. */
+.report-surface:hover,
+.arv-panel:hover {
+  transform: none;
+}
+
+@media (max-width: 767px) {
+  .report-surface:hover,
+  .arv-panel:hover {
+    transform: none;
+  }
+}

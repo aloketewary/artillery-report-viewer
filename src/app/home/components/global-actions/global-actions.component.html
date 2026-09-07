@@ -1,15 +1,34 @@
 <div class="global-actions" role="group" aria-label="Global actions">
   @if (canExport) {
     <button
-      tuiIconButton
+      tuiButton
       type="button"
       size="s"
       appearance="floating"
-      aria-label="Export current report"
-      title="Export current report"
+      aria-label="Download HTML report"
+      title="Download HTML report"
       (click)="exportReport()">
-      <tui-icon class="action-icon" [icon]="'@tui.download'" aria-hidden="true"></tui-icon>
-      <span class="visually-hidden">Export report</span>
+      HTML
+    </button>
+    <button
+      tuiButton
+      type="button"
+      size="s"
+      appearance="floating"
+      aria-label="Download original JSON"
+      title="Download original JSON"
+      (click)="downloadJson()">
+      JSON
+    </button>
+    <button
+      tuiButton
+      type="button"
+      size="s"
+      appearance="floating"
+      aria-label="Print report or save as PDF"
+      title="Print report or save as PDF"
+      (click)="printReport()">
+      PDF
     </button>
   }
   @if (canReset) {
@@ -18,11 +37,11 @@
       type="button"
       size="s"
       appearance="floating"
-      aria-label="Reset current report"
-      title="Reset current report"
+      aria-label="Analyze another report"
+      title="Analyze another report"
       (click)="resetReport()">
       <tui-icon class="action-icon" [icon]="'@tui.refresh-cw'" aria-hidden="true"></tui-icon>
-      <span class="visually-hidden">Reset report</span>
+      <span class="visually-hidden">Analyze another report</span>
     </button>
   }
   <button

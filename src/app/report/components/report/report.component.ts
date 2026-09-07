@@ -17,8 +17,9 @@ export class ReportComponent implements AfterViewInit {
     private readonly router: Router,
   ) {}
 
-  ngAfterViewInit(): void {
-    if (!this.reportSession.current) {
+  async ngAfterViewInit(): Promise<void> {
+    const session = await this.reportSession.restore();
+    if (!session) {
       void this.router.navigate(['/home/landing']);
       return;
     }

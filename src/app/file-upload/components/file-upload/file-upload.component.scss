@@ -262,3 +262,113 @@
     transition: none;
   }
 }
+
+.upload-surface {
+  min-height: 16rem;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--arv-accent-soft) 18%, transparent), transparent 48%),
+    color-mix(in srgb, var(--arv-surface-muted) 84%, transparent);
+  border-color: color-mix(in srgb, var(--arv-accent) 42%, var(--arv-control-border));
+  border-radius: 0.7rem;
+  box-shadow: inset 0 0 28px color-mix(in srgb, var(--arv-accent) 6%, transparent);
+}
+
+.upload-surface:focus-within,
+.upload-surface.is-dragging {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--arv-accent-soft) 50%, transparent), transparent 60%),
+    var(--arv-control-background-active);
+  border-color: var(--arv-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--arv-focus) 18%, transparent), inset 0 0 34px color-mix(in srgb, var(--arv-accent) 14%, transparent);
+}
+
+.upload-kicker,
+.selection-label {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+}
+
+.upload-heading h2 {
+  font-size: 1.2rem;
+  font-weight: 720;
+  letter-spacing: -0.045em;
+}
+
+.upload-heading p,
+.drop-copy span,
+.upload-live-status,
+.upload-name {
+  font-size: 0.68rem;
+}
+
+.drop-content {
+  min-height: 7.5rem;
+  background: color-mix(in srgb, var(--arv-surface) 70%, transparent);
+  border-color: var(--arv-border-strong);
+  border-radius: var(--arv-radius-control);
+}
+
+.drop-mark {
+  background: var(--arv-accent-soft);
+  border-color: color-mix(in srgb, var(--arv-accent) 40%, var(--arv-border));
+  box-shadow: 0 0 18px var(--arv-accent-glow);
+}
+
+.upload-control {
+  background: color-mix(in srgb, var(--arv-surface) 78%, transparent);
+  border-color: var(--arv-border-strong);
+  border-radius: var(--arv-radius-control);
+}
+
+.upload-live-status {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.upload-surface {
+  min-height: 17rem;
+  padding: clamp(1.3rem, 3vw, 2rem);
+  background:
+    radial-gradient(circle at 82% 16%, color-mix(in srgb, var(--arv-accent) 16%, transparent), transparent 13rem),
+    color-mix(in srgb, var(--arv-surface-muted) 72%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--arv-accent) 50%, var(--arv-border-strong));
+  border-radius: 1rem;
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--arv-accent) 8%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .upload-surface:not(.is-processing):not(.has-report) {
+    animation: upload-surface-breathe 6s ease-in-out infinite;
+  }
+}
+
+@keyframes upload-surface-breathe {
+  0%, 100% { box-shadow: inset 0 0 40px color-mix(in srgb, var(--arv-accent) 6%, transparent); }
+  50% { box-shadow: inset 0 0 56px color-mix(in srgb, var(--arv-accent) 13%, transparent), 0 0 28px color-mix(in srgb, var(--arv-accent) 7%, transparent); }
+}
+
+.drop-content {
+  min-height: 8rem;
+  padding: 1.2rem;
+  background: color-mix(in srgb, var(--arv-surface) 66%, transparent);
+  border-color: color-mix(in srgb, var(--arv-accent) 24%, var(--arv-border));
+  border-radius: 0.8rem;
+}
+
+.drop-mark {
+  width: 3rem;
+  height: 3rem;
+  flex-basis: 3rem;
+  border-radius: 0.8rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .upload-surface:not(.is-processing):not(.has-report) {
+    animation: none;
+  }
+}
+
+/* Upload QA correction: no idle breathing loop on a task-critical control. */
+.upload-surface:not(.is-processing):not(.has-report) {
+  animation: none;
+}

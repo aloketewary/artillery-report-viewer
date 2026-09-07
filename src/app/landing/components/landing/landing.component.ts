@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {Component, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {FileUploadComponent} from '../../../file-upload/components/file-upload/file-upload.component';
 import {ReportState} from '../../../model/report-state';
@@ -7,6 +7,7 @@ import {normalizeArtilleryReport} from '../../../shared/report/performance-repor
 import {ParsedReport, parseArtilleryReport} from '../../../shared/report/report-adapter';
 import {ReportSessionService} from '../../../shared/report/report-session.service';
 import {ReportValidationError, reportValidationMessage} from '../../../shared/report/report-validation-error';
+import {GrowthTelemetryService} from '../../../shared/telemetry/growth-telemetry.service';
 import {ShellPresentation, UploadUiState} from '../../../home/presentation/presentation.contracts';
 
 @Component({
@@ -18,6 +19,8 @@ import {ShellPresentation, UploadUiState} from '../../../home/presentation/prese
 export class LandingComponent {
   errorMessage = '';
   isLoading = false;
+  isRestoringReport = false;
+  savedReportName = '';
   uploadState: UploadUiState = {kind: 'idle'};
   readonly localProcessingMessage = 'Your report is read and analyzed in this browser. Report contents are not uploaded.';
 
@@ -27,12 +30,22 @@ export class LandingComponent {
     private readonly http: HttpClient,
     private readonly reportSession: ReportSessionService,
     private readonly router: Router,
+    private readonly telemetry: GrowthTelemetryService,
   ) {}
+
+  ngOnInit(): void {
+    this.telemetry.track('landing_viewed');
+    this.isRestoringReport = true;
+    void this.reportSession.restore().then((session) => {
+      this.savedReportName = session?.fileName ?? '';
+      this.isRestoringReport = false;
+    });
+  }
 
   get shellPresentation(): Readonly<ShellPresentation> {
     return {
       mode: 'entry',
-      theme: 'light',
+      theme: 'dark',
       navigation: [],
       canExport: false,
       canReset: false,
@@ -44,6 +57,7 @@ export class LandingComponent {
       return;
     }
 
+    this.telemetry.track('sample_opened');
     this.errorMessage = '';
     this.isLoading = true;
     this.setUploadState({kind: 'reading'});
@@ -67,6 +81,29 @@ export class LandingComponent {
         this.onFileError(message);
       },
     });
+  }
+
+  resumeSavedReport(): void {
+    if (this.isRestoringReport || this.isUploadBusy()) {
+      return;
+    }
+
+    this.isRestoringReport = true;
+    void this.reportSession.restore().then((session) => {
+      this.isRestoringReport = false;
+      if (!session) {
+        this.savedReportName = '';
+        this.errorMessage = 'Saved report is no longer available. Upload a JSON report to continue.';
+        return;
+      }
+      this.telemetry.track('report_resumed', {fileName: session.fileName});
+      void this.router.navigate(['/home/report']);
+    });
+  }
+
+  clearSavedReport(): void {
+    this.reportSession.discardSavedReports();
+    this.savedReportName = '';
   }
 
   reset(_: string): void {
@@ -95,6 +132,7 @@ export class LandingComponent {
   }
 
   onFileError(message: string): void {
+    this.telemetry.track('upload_failed', {message});
     this.reportSession.clear();
     const stateBeforeReset = this.uploadState;
     this.isLoading = false;
@@ -165,6 +203,7 @@ export class LandingComponent {
     const parsed: ParsedReport = parseArtilleryReport(source);
     const normalized = normalizeArtilleryReport(parsed, fileName);
     this.reportSession.set({fileName, parsed, report: normalized});
+    this.telemetry.track('upload_completed', {fileName});
     this.errorMessage = '';
     this.uploadState = {kind: 'ready', fileName};
     void this.router.navigate(['/home/report']);

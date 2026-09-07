@@ -9,6 +9,15 @@
     </app-report-app-bar>
   }
 
+  @if (presentation.mode === 'report' && navigationOpen) {
+    <button
+      class="navigation-scrim"
+      type="button"
+      aria-label="Close report sections"
+      (click)="toggleNavigation()">
+    </button>
+  }
+
   <div class="shell-workspace" [class.has-report]="presentation.mode === 'report'">
     @if (presentation.mode === 'report') {
       <aside

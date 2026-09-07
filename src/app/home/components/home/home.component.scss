@@ -784,3 +784,261 @@ tr.is-selected td { background: color-mix(in srgb, var(--arv-accent) 6%, transpa
   letter-spacing: 0;
   text-transform: none;
 }
+
+/* Report canvas: sharper surfaces, telemetry labels, and readable data density. */
+.app-content {
+  gap: 1rem;
+  padding-top: 2.4rem;
+}
+
+.panel,
+.metric-card,
+.empty-workspace {
+  border-radius: var(--arv-radius-panel);
+}
+
+.panel {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--arv-accent-soft) 12%, transparent), transparent 32%),
+    var(--arv-surface);
+  border-color: var(--arv-border);
+  box-shadow: 0 16px 42px var(--arv-shadow), inset 0 1px 0 color-mix(in srgb, var(--arv-surface-raised) 70%, transparent);
+}
+
+.panel-heading h2,
+.report-surface-heading h2,
+.report-surface-heading h3 {
+  font-size: 1.08rem;
+  font-weight: 720;
+  letter-spacing: -0.045em;
+}
+
+.panel-heading p,
+.report-surface-description {
+  font-size: 0.7rem;
+}
+
+.section-kicker,
+.report-surface-kicker {
+  color: var(--arv-accent-strong);
+}
+
+.chart-control-label,
+th,
+.error-list-heading {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+}
+
+.filter-row input,
+.filter-row select,
+.raw-toolbar input {
+  background: color-mix(in srgb, var(--arv-surface-muted) 84%, transparent);
+  border-color: var(--arv-border-strong);
+  border-radius: var(--arv-radius-control);
+}
+
+.filter-row input:focus,
+.filter-row select:focus,
+.raw-toolbar input:focus {
+  border-color: var(--arv-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--arv-focus) 20%, transparent);
+}
+
+table {
+  font-variant-numeric: tabular-nums;
+}
+
+th,
+td {
+  border-top-color: color-mix(in srgb, var(--arv-border) 78%, transparent);
+}
+
+.metric-status,
+.table-status,
+.method-badge,
+.data-badge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: 0.04em;
+}
+
+.metric-status {
+  border: 1px solid color-mix(in srgb, var(--arv-accent) 22%, transparent);
+}
+
+.raw-panel pre {
+  background: color-mix(in srgb, var(--arv-background) 66%, var(--arv-surface));
+  color: var(--arv-text);
+}
+
+.report-footer {
+  padding-top: 0.4rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.59rem;
+}
+
+@media (max-width: 767px) {
+  .app-content {
+    padding-top: 1.25rem;
+  }
+}
+
+/* Fluid report composition. Keep data dense, remove visual stiffness. */
+.app-content {
+  width: min(100%, 1480px);
+  gap: clamp(1rem, 1.8vw, 1.65rem);
+  padding-top: clamp(1rem, 3vw, 2.75rem);
+}
+
+.panel,
+.metric-card,
+.empty-workspace {
+  border-radius: 1.1rem;
+}
+
+.panel {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--arv-accent-soft) 14%, transparent), transparent 38%),
+    color-mix(in srgb, var(--arv-surface) 91%, transparent);
+  border-color: color-mix(in srgb, var(--arv-accent) 18%, var(--arv-border));
+  box-shadow: 0 22px 58px var(--arv-shadow), inset 0 1px 0 rgb(255 255 255 / 0.07);
+  backdrop-filter: blur(16px) saturate(120%);
+}
+
+.panel::before {
+  position: absolute;
+  top: 0;
+  right: 12%;
+  left: 12%;
+  height: 1px;
+  content: '';
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--arv-accent) 65%, transparent), transparent);
+  opacity: 0.75;
+}
+
+.panel-heading h2,
+.report-surface-heading h2,
+.report-surface-heading h3 {
+  font-size: clamp(1rem, 1.3vw, 1.22rem);
+  font-weight: 680;
+  letter-spacing: -0.055em;
+}
+
+.panel-heading p,
+.report-surface-description {
+  max-width: 42rem;
+  font-size: 0.72rem;
+}
+
+.timeline-panel {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.chart-controls {
+  gap: 0.9rem;
+}
+
+.chart-control-group {
+  padding: 0.35rem;
+  background: color-mix(in srgb, var(--arv-surface-muted) 56%, transparent);
+  border: 1px solid var(--arv-border);
+  border-radius: 0.85rem;
+}
+
+.filter-row input,
+.filter-row select,
+.raw-toolbar input {
+  min-height: 2.45rem;
+  background: color-mix(in srgb, var(--arv-surface-muted) 72%, transparent);
+  border-color: color-mix(in srgb, var(--arv-accent) 22%, var(--arv-border));
+  border-radius: 0.7rem;
+}
+
+table {
+  font-size: 0.72rem;
+}
+
+th,
+td {
+  padding-block: 0.85rem;
+  border-top-color: color-mix(in srgb, var(--arv-border) 70%, transparent);
+}
+
+tr:hover td {
+  background: color-mix(in srgb, var(--arv-accent) 6%, transparent);
+}
+
+.raw-panel pre {
+  background: color-mix(in srgb, var(--arv-background) 78%, var(--arv-surface));
+}
+
+@media (max-width: 767px) {
+  .app-content {
+    width: 100%;
+    gap: 0.9rem;
+    padding-top: 1rem;
+  }
+
+  .panel {
+    backdrop-filter: none;
+  }
+
+  .chart-control-group {
+    padding: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    backdrop-filter: none;
+  }
+}
+.comparison-grid {
+  display: grid;
+  gap: 0;
+  margin-top: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-sm);
+}
+
+.comparison-grid-heading,
+.comparison-grid-row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 1.3fr) repeat(3, minmax(5rem, 1fr));
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.7rem 0.85rem;
+}
+
+.comparison-grid-heading {
+  color: var(--arv-muted-text);
+  background: var(--arv-surface-muted);
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.comparison-grid-row {
+  border-top: 1px solid var(--arv-border);
+  color: var(--arv-text);
+  font-size: 0.72rem;
+}
+
+.comparison-grid-row strong { font-size: 0.7rem; }
+.comparison-grid-row span:last-child { color: var(--arv-muted-text); }
+.comparison-note { margin: 0.75rem 0 0; color: var(--arv-muted-text); font-size: 0.68rem; }
+
+@media (max-width: 560px) {
+  .comparison-grid-heading,
+  .comparison-grid-row {
+    grid-template-columns: minmax(6.5rem, 1fr) repeat(2, minmax(4.5rem, 1fr));
+  }
+
+  .comparison-grid-heading span:nth-child(3),
+  .comparison-grid-row span:nth-child(3) { display: none; }
+}

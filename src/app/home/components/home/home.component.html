@@ -78,17 +78,30 @@
       <div class="panel-heading report-surface-heading">
         <div><span class="section-kicker report-surface-kicker">Historical context</span>
           <h2 id="comparison-title">Compare runs</h2>
-          <p class="report-surface-description">No previous run is available in the current report flow.</p>
-        </div><span class="score-state tone-neutral" role="status">Baseline unavailable</span>
+          <p class="report-surface-description">Review current results against your previous report.</p>
+        </div><span class="score-state tone-neutral" role="status">{{hasComparisonBaseline ? 'Baseline available' : 'Baseline unavailable'}}</span>
       </div>
-      <div tuiMessage appearance="neutral" class="comparison-empty" role="status" aria-labelledby="comparison-empty-title"
-        aria-describedby="comparison-empty-copy"><strong id="comparison-empty-title">No baseline available</strong><span
-          id="comparison-empty-copy">Comparison stays unavailable until the existing application flow provides a
-          previous run.</span><span>No deltas or trend values are shown without historical data.</span></div>
-      <div class="filter-row comparison-controls" aria-label="Comparison controls"><button
+      @if (hasComparisonBaseline) {
+        <div class="comparison-grid" role="table" aria-label="Current report compared with previous report">
+          <div class="comparison-grid-heading" role="row">
+            <span role="columnheader">Metric</span><span role="columnheader">Current</span><span role="columnheader">Previous</span><span role="columnheader">Change</span>
+          </div>
+          @for (row of comparisonRows; track row.label) {
+            <div class="comparison-grid-row" role="row">
+              <strong role="rowheader">{{row.label}}</strong><span role="cell">{{row.current}}</span><span role="cell">{{row.baseline}}</span><span role="cell" [class]="'tone-' + row.tone">{{row.delta}}</span>
+            </div>
+          }
+        </div>
+        <p class="comparison-note">Previous values stay in this browser only. No report contents leave the device.</p>
+      } @else {
+        <div class="comparison-empty" role="status" aria-labelledby="comparison-empty-title"
+          aria-describedby="comparison-empty-copy"><strong id="comparison-empty-title">No baseline available</strong><span
+          id="comparison-empty-copy">Load another report after this one to compare key performance metrics.</span><span>Previous reports are kept locally in this browser.</span><span>No deltas or trend values are shown without historical data.</span></div>
+        <div class="filter-row comparison-controls" aria-label="Comparison controls"><button
           tuiButton type="button" size="s" appearance="secondary" disabled aria-disabled="true"
-          aria-describedby="comparison-empty-copy" title="No baseline available">Compare previous run</button><span
-          class="unit-label">Unavailable until a baseline is supplied.</span></div>
+          aria-describedby="comparison-empty-copy" title="Load another report to create a baseline">Compare previous run</button><span
+          class="unit-label">Upload another report to enable comparison.</span></div>
+      }
     </section>
 
     <app-health-surface [health]="healthPresentation" [prioritySignals]="prioritySignalPresentation"></app-health-surface>

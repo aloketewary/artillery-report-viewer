@@ -1,5 +1,5 @@
 :host {
-  --arv-app-bar-height: 68px;
+  --arv-app-bar-height: 72px;
   --arv-report-nav-height: 0px;
   display: block;
 }
@@ -167,5 +167,273 @@
 @media (prefers-reduced-motion: reduce) {
   .shell-navigation {
     transition: none;
+  }
+}
+
+/* Futuristic shell: one stable chrome layer, one restrained telemetry grid. */
+.app-shell {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(var(--arv-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--arv-grid-line) 1px, transparent 1px),
+    radial-gradient(circle at 76% 8%, var(--arv-accent-glow), transparent 26rem),
+    var(--arv-background);
+  background-size: 38px 38px, 38px 38px, auto, auto;
+}
+
+.app-shell::after {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: '';
+  opacity: 0.18;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, color-mix(in srgb, var(--arv-accent) 12%, transparent) 4px);
+  mix-blend-mode: soft-light;
+}
+
+.shell-content {
+  position: relative;
+}
+
+.shell-workspace.has-report {
+  padding-left: 232px;
+}
+
+.shell-navigation {
+  width: 232px;
+  background: color-mix(in srgb, var(--arv-background) 86%, transparent);
+  border-right: 1px solid var(--arv-border);
+  box-shadow: 12px 0 36px rgb(0 0 0 / 0.08);
+  backdrop-filter: blur(16px);
+}
+
+@media (max-width: 1199px) {
+  .shell-workspace.has-report {
+    padding-left: 0;
+  }
+
+  .shell-navigation {
+    width: 100%;
+    background: color-mix(in srgb, var(--arv-background) 90%, transparent);
+    border-right: 0;
+    box-shadow: 0 12px 28px rgb(0 0 0 / 0.08);
+  }
+}
+
+@media (max-width: 767px) {
+  .shell-navigation {
+    width: min(19rem, calc(100vw - 1rem));
+    background: var(--arv-surface);
+    border-right: 1px solid var(--arv-border);
+  }
+
+  .shell-navigation.is-open {
+    box-shadow: 18px 0 48px rgb(0 0 0 / 0.22);
+  }
+}
+
+/* Floating workspace frame. The report is a spatial instrument, not a document stack. */
+.app-shell {
+  overflow-x: clip;
+  background:
+    linear-gradient(var(--arv-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--arv-grid-line) 1px, transparent 1px),
+    radial-gradient(ellipse at 82% 0%, color-mix(in srgb, var(--arv-accent) 17%, transparent), transparent 34rem),
+    radial-gradient(ellipse at 5% 72%, color-mix(in srgb, var(--arv-accent) 9%, transparent), transparent 28rem),
+    var(--arv-background);
+  background-size: 44px 44px, 44px 44px, auto, auto, auto;
+}
+
+.app-shell::before {
+  position: absolute;
+  top: -18rem;
+  right: -14rem;
+  z-index: -1;
+  width: 46rem;
+  height: 46rem;
+  content: '';
+  pointer-events: none;
+  background: radial-gradient(circle, color-mix(in srgb, var(--arv-accent) 17%, transparent), transparent 63%);
+  filter: blur(22px);
+}
+
+.app-shell::after {
+  opacity: 0.1;
+  background: repeating-linear-gradient(0deg, transparent 0 5px, color-mix(in srgb, var(--arv-accent) 16%, transparent) 6px);
+  mix-blend-mode: screen;
+}
+
+.shell-workspace.has-report {
+  padding-left: 252px;
+}
+
+.shell-navigation {
+  width: 252px;
+  padding: 0.85rem 0.7rem;
+  background: transparent;
+  border-right: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.shell-content {
+  width: min(100%, 1480px);
+  padding: 2.5rem clamp(1.25rem, 4vw, 4.5rem) 5rem;
+}
+
+@media (max-width: 1199px) {
+  .shell-workspace.has-report {
+    padding-left: 0;
+  }
+
+  .shell-navigation {
+    width: 100%;
+    padding: 0;
+  }
+
+  .shell-content {
+    width: 100%;
+    padding: 2rem clamp(1rem, 3vw, 2.5rem) 4rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .shell-content {
+    padding: 1.25rem 0.8rem 3rem;
+  }
+
+  .shell-navigation {
+    padding: 0;
+  }
+}
+
+/* Layout repair: desktop rail and report content share one explicit grid. */
+:host {
+  --arv-app-bar-height: 76px;
+}
+
+@media (min-width: 1200px) {
+  .shell-workspace.has-report {
+    display: grid;
+    grid-template-columns: 252px minmax(0, 1fr);
+    grid-template-rows: auto;
+    max-width: 1600px;
+    padding: var(--arv-app-bar-height) 0 0;
+  }
+
+  .shell-navigation {
+    position: sticky;
+    top: var(--arv-app-bar-height);
+    right: auto;
+    bottom: auto;
+    left: auto;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    width: auto;
+    height: calc(100dvh - var(--arv-app-bar-height));
+    min-height: 0;
+    padding: 0.85rem 0.7rem;
+    overflow: hidden;
+  }
+
+  .shell-content {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 2.5rem clamp(1.25rem, 3vw, 3.5rem) 5rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  :host {
+    --arv-app-bar-height: 76px;
+  }
+
+  .shell-workspace.has-report {
+    display: block;
+    padding: calc(var(--arv-app-bar-height) + var(--arv-report-nav-height)) 0 0;
+  }
+
+  .shell-navigation {
+    position: fixed;
+    top: var(--arv-app-bar-height);
+    right: 0;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    height: var(--arv-report-nav-height);
+    padding: 0;
+  }
+
+  .shell-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 2rem clamp(1rem, 3vw, 2.5rem) 4rem;
+  }
+}
+
+@media (max-width: 767px) {
+  :host {
+    --arv-app-bar-height: 68px;
+  }
+
+  .shell-workspace.has-report {
+    display: block;
+    padding: var(--arv-app-bar-height) 0 0;
+  }
+
+  .shell-navigation {
+    position: fixed;
+    top: var(--arv-app-bar-height);
+    right: auto;
+    bottom: 0;
+    left: 0;
+    width: min(19rem, calc(100vw - 1rem));
+    height: auto;
+    max-height: calc(100dvh - var(--arv-app-bar-height));
+    padding: 0;
+  }
+
+  .shell-content {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 1.25rem 0.8rem 3rem;
+  }
+}
+
+/* Mobile drawer QA correction: provide a clear, dismissible separation from report content. */
+.navigation-scrim {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .navigation-scrim {
+    position: fixed;
+    inset: var(--arv-app-bar-height) 0 0;
+    z-index: 3;
+    display: block;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    background: rgb(2 8 13 / 0.62);
+    border: 0;
+    backdrop-filter: blur(3px);
+  }
+
+  .shell-navigation {
+    z-index: 4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navigation-scrim {
+    backdrop-filter: none;
   }
 }

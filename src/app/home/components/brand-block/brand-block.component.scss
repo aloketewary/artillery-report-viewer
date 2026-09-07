@@ -67,3 +67,53 @@
     display: none;
   }
 }
+
+.brand-block {
+  gap: 0.75rem;
+}
+
+.brand-mark {
+  position: relative;
+  width: 2.25rem;
+  height: 2.25rem;
+  overflow: hidden;
+  background: var(--arv-accent-strong);
+  border: 1px solid color-mix(in srgb, var(--arv-accent) 70%, transparent);
+  border-radius: 0.52rem;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--arv-accent) 12%, transparent), 0 0 24px var(--arv-accent-glow);
+}
+
+.brand-mark::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.34), transparent 46%);
+  pointer-events: none;
+}
+
+.brand-icon {
+  position: relative;
+  z-index: 1;
+}
+
+.brand-name {
+  font-size: 1.02rem;
+  font-weight: 760;
+  letter-spacing: -0.045em;
+}
+
+.brand-caption {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.57rem;
+  letter-spacing: 0.12em;
+}
+
+.brand-mode {
+  color: var(--arv-accent-strong);
+  background: var(--arv-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--arv-accent) 30%, transparent);
+  border-radius: 999px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+}
