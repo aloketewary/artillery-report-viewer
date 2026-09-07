@@ -720,3 +720,85 @@ input {
     transform: none;
   }
 }
+
+/* UX refinement: calm analytical surfaces with one consistent accent. */
+html,
+body {
+  background: var(--arv-background);
+}
+
+.arv-panel,
+.report-surface {
+  box-shadow: 0 10px 28px var(--arv-shadow), inset 0 1px 0 color-mix(in srgb, var(--arv-surface-raised) 78%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .arv-panel,
+  .report-surface {
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .arv-panel:hover,
+  .report-surface:hover {
+    border-color: color-mix(in srgb, var(--arv-accent) 34%, var(--arv-border));
+    box-shadow: 0 12px 32px var(--arv-shadow), inset 0 1px 0 color-mix(in srgb, var(--arv-surface-raised) 82%, transparent);
+  }
+}
+
+/* Datadog-style console system: dense, flat, and signal-first. */
+:root {
+  --arv-background: #f5f7f9;
+  --arv-surface: #ffffff;
+  --arv-surface-raised: #ffffff;
+  --arv-surface-muted: #eef2f5;
+  --arv-text: #17212b;
+  --arv-muted-text: #667787;
+  --arv-border: #d8e0e6;
+  --arv-border-strong: #b7c4ce;
+  --arv-accent: #087f91;
+  --arv-accent-strong: #075f70;
+  --arv-accent-soft: #e4f2f4;
+  --arv-shadow: rgb(23 33 43 / 0.06);
+  --arv-grid-line: transparent;
+  --arv-accent-glow: transparent;
+  --arv-surface-glass: #ffffff;
+  --arv-radius-xs: 0.2rem;
+  --arv-radius-sm: 0.3rem;
+  --arv-radius-md: 0.4rem;
+  --arv-radius-lg: 0.45rem;
+  --arv-radius-panel: 0.45rem;
+  --arv-radius-control: 0.3rem;
+  --arv-ease-fluid: ease;
+  --arv-panel-padding: 1rem;
+  --arv-transition-fast: 120ms ease;
+}
+
+.arv-dark,
+[data-theme='dark'] {
+  --arv-background: #11181f;
+  --arv-surface: #182129;
+  --arv-surface-raised: #1c2731;
+  --arv-surface-muted: #202d38;
+  --arv-text: #e8eef2;
+  --arv-muted-text: #9aabb7;
+  --arv-border: #30404b;
+  --arv-border-strong: #435563;
+  --arv-accent: #69c9d0;
+  --arv-accent-strong: #a3e6e8;
+  --arv-accent-soft: #203e46;
+  --arv-shadow: rgb(0 0 0 / 0.18);
+  --arv-surface-glass: #182129;
+  --arv-focus: #a3e6e8;
+}
+
+body {
+  font-size: 0.8125rem;
+  letter-spacing: 0;
+}
+
+.arv-panel,
+.report-surface {
+  background: var(--arv-surface);
+  border-radius: var(--arv-radius-panel);
+  box-shadow: 0 1px 2px var(--arv-shadow);
+}

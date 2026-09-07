@@ -427,3 +427,114 @@
 .welcome-upload {
   animation: none;
 }
+
+/* Console entry: direct, utilitarian report opening surface. */
+:host {
+  background: var(--arv-background);
+}
+
+.app-content,
+.app-content::before {
+  background: var(--arv-background);
+}
+
+.app-content::before {
+  display: none;
+}
+
+.welcome-workspace {
+  width: min(100%, 1100px);
+  min-height: 100dvh;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.8fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  padding: 4rem clamp(1rem, 4vw, 3rem);
+}
+
+.welcome-copy::before {
+  width: 2.5rem;
+  height: 2px;
+  margin-bottom: 1rem;
+  background: var(--arv-accent);
+  box-shadow: none;
+}
+
+.section-kicker {
+  font-family: inherit;
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+}
+
+.welcome-copy h1 {
+  max-width: 34rem;
+  font-size: clamp(2.3rem, 5vw, 4.2rem);
+  font-weight: 720;
+  letter-spacing: -0.065em;
+  line-height: 1;
+}
+
+.welcome-lede {
+  max-width: 31rem;
+  margin-top: 1rem;
+  color: var(--arv-muted-text);
+  font-size: 0.88rem;
+}
+
+.local-processing-note {
+  margin-top: 0.85rem;
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--arv-border-strong);
+  font-family: inherit;
+  font-size: 0.64rem;
+}
+
+.welcome-upload {
+  padding: 1.25rem;
+  background: var(--arv-surface);
+  border: 1px solid var(--arv-border-strong);
+  border-radius: var(--arv-radius-md);
+  box-shadow: 0 2px 5px var(--arv-shadow);
+  backdrop-filter: none;
+}
+
+.welcome-upload::before,
+.welcome-upload::after {
+  display: none;
+}
+
+.welcome-actions {
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--arv-border);
+}
+
+.welcome-actions span {
+  flex-basis: 100%;
+  font-family: inherit;
+  font-size: 0.64rem;
+}
+
+@media (max-width: 899px) {
+  .welcome-workspace {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding-top: 3rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .welcome-workspace {
+    gap: 1.5rem;
+    padding: 2rem 0.85rem;
+  }
+
+  .welcome-copy h1 {
+    font-size: clamp(2.25rem, 12vw, 3.5rem);
+  }
+
+  .welcome-upload {
+    padding: 1rem;
+  }
+}

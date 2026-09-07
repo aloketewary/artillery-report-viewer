@@ -55,3 +55,83 @@
   border-color: var(--arv-accent);
   background: var(--arv-accent-soft);
 }
+
+/* UX refinement: export actions grouped, PDF receives primary emphasis. */
+.global-actions {
+  gap: 0.35rem;
+}
+
+.export-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-right: 0.45rem;
+  border-right: 1px solid var(--arv-border);
+}
+
+.export-actions button {
+  min-width: 2.75rem;
+}
+
+.export-actions .export-action-primary {
+  color: var(--arv-accent-strong);
+  background: var(--arv-accent-soft);
+  border-color: color-mix(in srgb, var(--arv-accent) 28%, var(--arv-border));
+}
+
+@media (max-width: 767px) {
+  .export-actions {
+    padding-right: 0.25rem;
+  }
+
+  .export-actions button {
+    min-width: 2.35rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .global-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+}
+
+/* Console actions: outlined utilities, one deliberate primary export. */
+.global-actions {
+  gap: 0.3rem;
+}
+
+.global-actions button {
+  min-height: 2rem;
+  color: var(--arv-muted-text);
+  background: var(--arv-surface);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-sm);
+  box-shadow: none;
+}
+
+.global-actions button:hover {
+  color: var(--arv-text);
+  background: var(--arv-surface-muted);
+  border-color: var(--arv-border-strong);
+}
+
+.export-actions .export-action-primary {
+  color: var(--arv-accent-strong);
+  background: var(--arv-accent-soft);
+  border-color: color-mix(in srgb, var(--arv-accent) 32%, var(--arv-border));
+}
+
+@media (max-width: 767px) {
+  .global-actions {
+    gap: 0.25rem;
+  }
+
+  .global-actions button {
+    min-height: 1.9rem;
+  }
+}
+
+.export-actions {
+  border-right-color: var(--arv-border);
+}

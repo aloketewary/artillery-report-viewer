@@ -1,35 +1,38 @@
 <div class="global-actions" role="group" aria-label="Global actions">
   @if (canExport) {
-    <button
-      tuiButton
-      type="button"
-      size="s"
-      appearance="floating"
-      aria-label="Download HTML report"
-      title="Download HTML report"
-      (click)="exportReport()">
-      HTML
-    </button>
-    <button
-      tuiButton
-      type="button"
-      size="s"
-      appearance="floating"
-      aria-label="Download original JSON"
-      title="Download original JSON"
-      (click)="downloadJson()">
-      JSON
-    </button>
-    <button
-      tuiButton
-      type="button"
-      size="s"
-      appearance="floating"
-      aria-label="Print report or save as PDF"
-      title="Print report or save as PDF"
-      (click)="printReport()">
-      PDF
-    </button>
+    <div class="export-actions" role="group" aria-label="Export report">
+      <button
+        tuiButton
+        type="button"
+        size="s"
+        appearance="floating"
+        aria-label="Download HTML report"
+        title="Download HTML report"
+        (click)="exportReport()">
+        HTML
+      </button>
+      <button
+        tuiButton
+        type="button"
+        size="s"
+        appearance="floating"
+        aria-label="Download original JSON"
+        title="Download original JSON"
+        (click)="downloadJson()">
+        JSON
+      </button>
+      <button
+        class="export-action-primary"
+        tuiButton
+        type="button"
+        size="s"
+        appearance="floating"
+        aria-label="Print report or save as PDF"
+        title="Print report or save as PDF"
+        (click)="printReport()">
+        PDF
+      </button>
+    </div>
   }
   @if (canReset) {
     <button

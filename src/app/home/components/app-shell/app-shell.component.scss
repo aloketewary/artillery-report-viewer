@@ -437,3 +437,118 @@
     backdrop-filter: none;
   }
 }
+
+/* UX refinement: analytical workspace, not decorative cockpit. */
+.app-shell {
+  background:
+    radial-gradient(circle at 86% -8%, color-mix(in srgb, var(--arv-accent) 9%, transparent), transparent 28rem),
+    var(--arv-background);
+}
+
+.app-shell::before {
+  display: none;
+}
+
+.app-shell::after {
+  opacity: 0;
+}
+
+@media (min-width: 1200px) {
+  .shell-workspace.has-report {
+    grid-template-columns: 224px minmax(0, 1fr);
+    max-width: 1440px;
+  }
+
+  .shell-navigation {
+    padding: 0.8rem 0.55rem;
+  }
+
+  .shell-content {
+    padding: 2rem clamp(1.25rem, 2.8vw, 3rem) 4rem;
+  }
+}
+
+/* Mobile app bar gets a dedicated action row to prevent control collisions. */
+@media (max-width: 767px) {
+  :host {
+    --arv-app-bar-height: 108px;
+  }
+
+  .app-shell {
+    --arv-scroll-offset: 124px;
+  }
+}
+
+/* Console shell: compact chrome, persistent rail, no ambient decoration. */
+:host {
+  --arv-app-bar-height: 64px;
+}
+
+.app-shell,
+.app-shell::before,
+.app-shell::after {
+  background: var(--arv-background);
+}
+
+.app-shell::before,
+.app-shell::after {
+  display: none;
+}
+
+.shell-workspace.has-report {
+  padding-left: 0;
+}
+
+@media (min-width: 1200px) {
+  .shell-workspace.has-report {
+    grid-template-columns: 220px minmax(0, 1fr);
+    max-width: 1440px;
+  }
+
+  .shell-navigation {
+    padding: 0;
+    background: var(--arv-surface);
+    border-right: 1px solid var(--arv-border);
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .shell-content {
+    padding: 1.5rem 2rem 3.5rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  :host {
+    --arv-app-bar-height: 64px;
+  }
+
+  .shell-navigation {
+    background: var(--arv-surface);
+    border-bottom: 1px solid var(--arv-border);
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (max-width: 767px) {
+  :host {
+    --arv-app-bar-height: 96px;
+  }
+
+  .app-shell {
+    --arv-scroll-offset: 112px;
+  }
+
+  .shell-navigation {
+    width: min(18rem, calc(100vw - 1rem));
+    background: var(--arv-surface);
+    border-right: 1px solid var(--arv-border);
+    box-shadow: 12px 0 28px var(--arv-shadow);
+  }
+
+  .shell-content {
+    padding: 1rem 0.75rem 2.5rem;
+  }
+}

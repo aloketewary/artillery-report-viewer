@@ -88,3 +88,31 @@
     grid-column: 1 / -1;
   }
 }
+
+/* Console context row: metadata reads like a run header, not a floating card. */
+.report-context-summary {
+  padding: 0.7rem 0.85rem;
+  background: var(--arv-surface);
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-md);
+  box-shadow: none;
+}
+
+.report-context-summary dl {
+  gap: 0.7rem 1rem;
+}
+
+.report-context-summary dt {
+  font-size: 0.56rem;
+  letter-spacing: 0.05em;
+}
+
+.report-context-summary dd {
+  font-size: 0.7rem;
+}
+
+@media (max-width: 767px) {
+  .report-context-summary {
+    padding: 0.7rem;
+  }
+}

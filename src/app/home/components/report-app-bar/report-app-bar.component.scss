@@ -115,7 +115,7 @@
 
 .app-bar {
   min-height: 76px;
-  padding-inline: max(1.5rem, calc((100vw - 1600px) / 2));
+  padding-inline: max(1.5rem, calc((100vw - 1440px) / 2));
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--arv-accent-soft) 35%, transparent), transparent 30%),
     color-mix(in srgb, var(--arv-background) 78%, transparent);
@@ -132,5 +132,58 @@
   .app-bar {
     min-height: 68px;
     padding-inline: 0.8rem;
+  }
+}
+
+/* Mobile action row: keep every report control visible and comfortably tappable. */
+@media (max-width: 767px) {
+  :host {
+    height: 108px;
+  }
+
+  .app-bar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    align-content: center;
+    row-gap: 0.35rem;
+    min-height: 108px;
+    padding-block: 0.65rem;
+  }
+
+  .app-bar > app-global-actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+  }
+
+  .navigation-toggle {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+/* Console app bar: fixed 64px command strip. */
+:host {
+  height: 64px;
+}
+
+.app-bar {
+  min-height: 64px;
+  padding-inline: max(1.5rem, calc((100vw - 1440px) / 2));
+  background: var(--arv-surface);
+  border-bottom: 1px solid var(--arv-border);
+  box-shadow: 0 1px 2px var(--arv-shadow);
+  backdrop-filter: none;
+}
+
+@media (max-width: 767px) {
+  :host {
+    height: 96px;
+  }
+
+  .app-bar {
+    min-height: 96px;
+    padding: 0.55rem 0.75rem;
+    background: var(--arv-surface);
   }
 }

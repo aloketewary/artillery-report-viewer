@@ -400,3 +400,180 @@
     font-size: clamp(2.15rem, 10vw, 3.3rem);
   }
 }
+
+/* UX refinement: compact first viewport with clear assessment hierarchy. */
+.overview-header {
+  min-height: 8.75rem;
+  align-items: center;
+  padding: clamp(1.35rem, 3vw, 2rem);
+  background:
+    linear-gradient(110deg, color-mix(in srgb, var(--arv-accent-soft) 58%, var(--arv-surface)), var(--arv-surface) 70%),
+    var(--arv-surface);
+  border-color: color-mix(in srgb, var(--arv-accent) 22%, var(--arv-border));
+  border-radius: var(--arv-radius-panel);
+  box-shadow: 0 12px 30px var(--arv-shadow), inset 0 1px 0 color-mix(in srgb, var(--arv-surface-raised) 84%, transparent);
+}
+
+.overview-header::before {
+  width: 3.25rem;
+  box-shadow: none;
+}
+
+.overview-header::after {
+  right: -7rem;
+  bottom: -9rem;
+  opacity: 0.2;
+  box-shadow: 0 0 0 2.5rem color-mix(in srgb, var(--arv-accent) 4%, transparent), 0 0 0 5rem color-mix(in srgb, var(--arv-accent) 2%, transparent);
+}
+
+.overview-copy h1 {
+  max-width: 40rem;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 0.98;
+}
+
+.overview-copy p {
+  max-width: 36rem;
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+}
+
+.overview-analysis {
+  margin-top: 0.8rem;
+  padding: 1rem 1.15rem;
+  background: var(--arv-surface);
+  border-color: color-mix(in srgb, var(--analysis-tone) 28%, var(--arv-border));
+  border-inline-start-width: 3px;
+  border-radius: var(--arv-radius-md);
+  box-shadow: 0 8px 22px var(--arv-shadow);
+  backdrop-filter: none;
+}
+
+.overview-analysis::after {
+  display: none;
+}
+
+.health-score strong {
+  text-shadow: none;
+}
+
+.kpi-section {
+  margin-top: 1.35rem;
+}
+
+.kpi-heading {
+  margin-bottom: 0.6rem;
+}
+
+@media (max-width: 767px) {
+  .overview-header {
+    min-height: 9.75rem;
+    padding: 1.25rem 1rem;
+  }
+
+  .overview-copy h1 {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .overview-analysis {
+    padding: 0.95rem;
+  }
+}
+
+/* Console overview: compact title band, status strip, dense metric cells. */
+.overview-header {
+  min-height: auto;
+  align-items: flex-start;
+  padding: 0.35rem 0 1rem;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--arv-border);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.overview-header::before,
+.overview-header::after {
+  display: none;
+}
+
+.overview-copy h1 {
+  max-width: none;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 720;
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+
+.overview-copy p {
+  margin-top: 0.45rem;
+  font-size: 0.76rem;
+}
+
+.overview-analysis {
+  grid-template-columns: minmax(9rem, 0.65fr) minmax(0, 2fr) auto;
+  gap: 1rem;
+  margin-top: 0.8rem;
+  padding: 0.8rem 0.9rem;
+  background: var(--arv-surface);
+  border: 1px solid var(--arv-border);
+  border-inline-start: 3px solid var(--analysis-tone);
+  border-radius: var(--arv-radius-md);
+  box-shadow: 0 1px 2px var(--arv-shadow);
+  backdrop-filter: none;
+}
+
+.overview-analysis::after {
+  display: none;
+}
+
+.analysis-status-line h2 {
+  font-size: 0.9rem;
+}
+
+.overview-analysis p {
+  color: var(--arv-muted-text);
+  font-size: 0.74rem;
+}
+
+.health-score strong {
+  color: var(--analysis-tone);
+  font-size: 1.7rem;
+  text-shadow: none;
+}
+
+.kpi-section {
+  margin-top: 1rem;
+}
+
+.kpi-heading {
+  margin-bottom: 0.45rem;
+}
+
+.kpi-heading h2 {
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.kpi-heading span {
+  font-family: inherit;
+  font-size: 0.64rem;
+}
+
+@media (max-width: 767px) {
+  .overview-header {
+    padding-top: 0;
+  }
+
+  .overview-copy h1 {
+    font-size: 1.65rem;
+  }
+
+  .overview-analysis {
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+  }
+}

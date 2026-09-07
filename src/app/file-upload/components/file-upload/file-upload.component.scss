@@ -372,3 +372,73 @@
 .upload-surface:not(.is-processing):not(.has-report) {
   animation: none;
 }
+
+/* Console upload surface: task-first dropzone with clear state feedback. */
+.upload-surface {
+  min-height: 14rem;
+  padding: 1rem;
+  background: var(--arv-surface-muted);
+  border: 1px dashed var(--arv-border-strong);
+  border-radius: var(--arv-radius-md);
+  box-shadow: none;
+}
+
+.upload-surface:focus-within,
+.upload-surface.is-dragging {
+  background: var(--arv-accent-soft);
+  border-color: var(--arv-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--arv-focus) 18%, transparent);
+}
+
+.upload-surface[data-upload-state='ready'] {
+  border-color: var(--arv-success);
+}
+
+.upload-surface[data-upload-state='invalid-json'],
+.upload-surface[data-upload-state='invalid-extension'],
+.upload-surface[data-upload-state='unsupported-shape'],
+.upload-surface[data-upload-state='retry'] {
+  border-color: var(--arv-danger);
+}
+
+.upload-kicker,
+.selection-label {
+  font-family: inherit;
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+}
+
+.upload-heading h2 {
+  font-size: 1.05rem;
+  font-weight: 720;
+  letter-spacing: -0.02em;
+}
+
+.upload-heading p,
+.drop-copy span,
+.upload-live-status,
+.upload-name {
+  font-size: 0.7rem;
+}
+
+.drop-content {
+  min-height: 6.5rem;
+  padding: 0.9rem;
+  background: var(--arv-surface);
+  border-color: var(--arv-border);
+  border-radius: var(--arv-radius-sm);
+}
+
+.drop-mark {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-basis: 2.5rem;
+  border-radius: var(--arv-radius-xs);
+  box-shadow: none;
+}
+
+.upload-control {
+  background: var(--arv-surface);
+  border-color: var(--arv-border);
+  border-radius: var(--arv-radius-sm);
+}

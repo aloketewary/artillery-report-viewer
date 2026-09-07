@@ -117,3 +117,39 @@
   font-size: 0.55rem;
   letter-spacing: 0.1em;
 }
+
+/* Console brand: compact product identity, no glow treatment. */
+.brand-block {
+  gap: 0.55rem;
+  min-width: 10.5rem;
+}
+
+.brand-mark {
+  width: 1.8rem;
+  height: 1.8rem;
+  background: var(--arv-accent);
+  border: 0;
+  border-radius: var(--arv-radius-sm);
+  box-shadow: none;
+}
+
+.brand-name {
+  font-size: 0.9rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.brand-caption {
+  font-family: inherit;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.brand-mode {
+  border: 1px solid var(--arv-border);
+  border-radius: var(--arv-radius-xs);
+  font-family: inherit;
+  font-size: 0.58rem;
+  letter-spacing: 0.03em;
+}
